@@ -370,7 +370,7 @@ const Profile = () => {
               <div key={index} className="flex-shrink-0 flex flex-col items-center">
                 <div className="relative">
                   <div className="w-16 h-16 rounded-full bg-gray-200 border-2 border-[#FFFFF5]"></div>
-                  <div className="absolute bottom-0 right-0 bg-[#FFBA00] rounded-full w-4 h-4 border-2 border-[#FFFFF5]"></div>
+
                 </div>
                 <div className="mt-2 text-sm font-medium text-[#0C3B2E] truncate max-w-[80px]">
                   UmerNoor{index + 1}

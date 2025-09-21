@@ -22,13 +22,6 @@ let tokenExpiry: number | null = null;
 // in-memory token cache
 
 async function getAccessToken() {
-  const now = Date.now();
-
-  // reuse token if still valid
-  if (cachedToken && tokenExpiry && now < tokenExpiry) {
-    return cachedToken;
-  }
-
   const resp = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",
     headers: {
@@ -36,7 +29,7 @@ async function getAccessToken() {
       Authorization:
         "Basic " +
         Buffer.from(
-          process.env.SPOTIFY_CLIENT_ID + ":" + process.env.SPOTIFY_CLIENT_SECRET
+          `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
         ).toString("base64"),
     },
     body: "grant_type=client_credentials",
@@ -48,9 +41,7 @@ async function getAccessToken() {
   }
 
   const data = await resp.json();
-  cachedToken = data.access_token;
-  tokenExpiry = now + data.expires_in * 1000; // ms
-  return cachedToken;
+  return data.access_token; // always fresh
 }
 
 // ------------------ Spotify API Helpers ------------------

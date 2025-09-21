@@ -254,7 +254,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
     ];
 
     const dropdownItems = [
-        { label: "Profile", href: `/profile/${user.username}`, icon: User },
+        { label: "Profile", href: `/profile/${user.name}`, icon: User, link: true },
         { type: "divider" },
         { label: "My Likes", href: "/my-likes", icon: Heart },
         {
@@ -342,7 +342,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                         <div className="flex items-center gap-3">
                             <div className="h-12 w-auto">
                                 <Image
-                                    src="/logo1.svg"
+                                    src="/logo.svg"
                                     alt="Trackboxd Logo"
                                     width={40}
                                     height={60}
