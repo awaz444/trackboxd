@@ -13,7 +13,7 @@ export async function GET(
 ) {
     const session = await getServerSession(authOptions);
 
-    if (!session?.accessToken) {
+    if (!session?.user?.id) {
         return NextResponse.json(
             { error: "Not authenticated" },
             { status: 401 }
@@ -80,9 +80,6 @@ export async function GET(
         const tracksWithDetails = await Promise.all(
             albumTracks.items.map(async (track: any) => {
                 try {
-                    if (!session.accessToken) {
-                        throw new Error("No access token available");
-                    }
                     const trackDetails = await getTrackDetails(
                         track.id
                     );

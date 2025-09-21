@@ -9,11 +9,6 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
     };
-    accessToken?: string;
-    refreshToken?: string;
-    expiresAt?: number;
-    error?: string;
-    spotifyId?: string;
   }
 }
 
@@ -23,9 +18,6 @@ declare module "next-auth/jwt" {
     email?: string | null;
     picture?: string | null;
     sub?: string;
-    accessToken?: string;
-    refreshToken?: string;
-    expiresAt?: number;
-    error?: string;
+    id?: string;
   }
 }

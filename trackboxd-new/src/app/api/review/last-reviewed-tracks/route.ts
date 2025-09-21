@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
     const session = await getServerSession(authOptions);
   
-    if (!session?.accessToken) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Not authenticated" },
         { status: 401 }
@@ -56,11 +56,6 @@ export async function GET(req: NextRequest) {
         // Fetch additional track details from Spotify for each review
         const reviewsWithTrackDetails = await Promise.all(
             reviews.map(async (review) => {
-                if (!session.accessToken) {
-                    console.error("No access token available");
-                    return review; // Return without track details
-                  }
-
                 try {
                     const trackDetails = await getTrackDetails( review.item_id);
                     console.log(`Fetched details for track ${review.item_id}`);

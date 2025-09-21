@@ -49,12 +49,11 @@ export async function GET(req: NextRequest) {
   const supabase = createClient(cookieStore);
 
   try {
-    // Get server session for Spotify access
+    // Get server session for user authentication
     const session = await getServerSession(authOptions);
-    if (!session?.accessToken) {
+    if (!session?.user?.id) {
       return new NextResponse("Not authenticated", { status: 401 });
     }
-    const accessToken = session.accessToken;
 
     // Fetch activity data
     const { data: activities, error: activityError } = await supabase

@@ -1,9 +1,6 @@
 import { searchTracks } from '@/lib/spotify';
 import { NextResponse } from 'next/server';
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q') || '';

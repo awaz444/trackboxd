@@ -34,9 +34,9 @@ interface HeaderProps {
 }
 
 interface SpotifyUser {
-    display_name: string;
+    name: string;
     email: string;
-    images?: { url: string }[];
+    image_url?: string;
     id: string;
 }
 
@@ -188,8 +188,8 @@ const Header: React.FC<HeaderProps> = ({}) => {
     };
 
     const user = {
-        name: spotifyUser?.display_name || "Guest User",
-        avatar: spotifyUser?.images?.[0]?.url,
+        name: spotifyUser?.name || "Guest User",
+        avatar: spotifyUser?.image_url,
         username: spotifyUser?.email?.split("@")[0] || "guest",
     };
 
@@ -557,7 +557,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                         ) : (
                                             <span className="text-[#FFFBEb] text-sm font-semibold">
                                                 {getInitials(
-                                                    spotifyUser?.display_name ||
+                                                    spotifyUser?.name ||
                                                         "Guest User"
                                                 )}
                                             </span>
@@ -566,7 +566,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                 </div>
 
                                 <span className="text-sm font-medium text-[#5C5537]">
-                                    {spotifyUser?.display_name || "Guest User"}
+                                    {spotifyUser?.name || "Guest User"}
                                 </span>
 
                                 <ChevronDown
@@ -842,13 +842,13 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                     {user.avatar ? (
                                         <img
                                             src={user.avatar}
-                                            alt={spotifyUser?.display_name}
+                                            alt={spotifyUser?.name}
                                             className="w-full h-full rounded-full object-cover"
                                         />
                                     ) : (
                                         <span className="text-[#FFFBEb] text-base font-semibold">
                                             {getInitials(
-                                                spotifyUser?.display_name ||
+                                                spotifyUser?.name ||
                                                     "Guest User"
                                             )}
                                         </span>
@@ -857,7 +857,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                             </div>
                             <div>
                                 <div className="font-medium text-[#5C5537]">
-                                    {spotifyUser?.display_name || "Guest User"}
+                                    {spotifyUser?.name || "Guest User"}
                                 </div>
                                 <div className="text-sm text-[#5C5537]/70">
                                     {spotifyUser?.email || "guest@example.com"}

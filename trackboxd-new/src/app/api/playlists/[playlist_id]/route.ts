@@ -48,7 +48,7 @@ export async function GET(
     const session = await getServerSession(authOptions);
 
     // Add type assertion and proper null check for accessToken
-    if (!session?.accessToken || typeof session.accessToken !== "string") {
+    if (!session?.user?.id) {
         return NextResponse.json(
             { error: "Valid access token required" },
             { status: 401 }
@@ -58,7 +58,7 @@ export async function GET(
     try {
         const playlistId = params.playlist_id;
         // Now TypeScript knows accessToken is definitely a string
-        const accessToken = session.accessToken;
+        // Remove accessToken usage since we're using client credentials for Spotify
 
         // Get playlist metadata
         const playlist = await getPlaylistDetails(playlistId);
