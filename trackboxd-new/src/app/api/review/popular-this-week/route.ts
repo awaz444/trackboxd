@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
             
             reviews.map(async (review) => {
                 try {
-                    const trackDetails = await getTrackDetails(accessToken, review.item_id);
+                    const trackDetails = await getTrackDetails( review.item_id);
                     return {
                         ...review,
                         track_details: trackDetails

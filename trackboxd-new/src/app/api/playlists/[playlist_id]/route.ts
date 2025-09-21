@@ -63,10 +63,9 @@ export async function GET(
         // Get playlist metadata
         const playlist = await getPlaylistDetails(playlistId);
 
-        // Get playlist tracks (only IDs first to minimize data transfer)
         const itemsResponse = await getPlaylistItems(playlistId, {
             limit: 50,
-            fields: "items(track(id))", // Only get track IDs initially
+            fields: "items(track(id))"
         });
 
         // Filter out null tracks and extract IDs
@@ -76,7 +75,7 @@ export async function GET(
 
         // Get detailed information for each track in parallel
         const trackDetailsPromises = trackIds.map((trackId: string) =>
-            getTrackDetails(accessToken, trackId).catch((error) => {
+            getTrackDetails(trackId).catch((error) => {
                 console.error(
                     `Failed to fetch details for track ${trackId}:`,
                     error

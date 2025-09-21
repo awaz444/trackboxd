@@ -139,7 +139,7 @@ export async function GET(req: NextRequest) {
           
           try {
             // Fetch track details from Spotify
-            const trackDetails = await getTrackDetails(accessToken, review.item_id);
+            const trackDetails = await getTrackDetails(review.item_id);
             
             return {
               ...base,
@@ -164,7 +164,7 @@ export async function GET(req: NextRequest) {
           
           try {
             // Fetch track details from Spotify
-            const trackDetails = await getTrackDetails(accessToken, annotation.track_id);
+            const trackDetails = await getTrackDetails(annotation.track_id);
             
             return {
               ...base,

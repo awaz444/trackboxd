@@ -36,7 +36,7 @@ export async function GET(
     }
 
     // 1. Get track details from Spotify
-    const trackDetails = await getTrackDetails(session.accessToken,trackId);
+    const trackDetails = await getTrackDetails(trackId);
 
     // 2. Initialize Supabase client with cookies
     const cookieStore = cookies();

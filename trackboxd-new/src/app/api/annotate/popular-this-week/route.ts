@@ -61,7 +61,6 @@ export async function GET(req: NextRequest) {
                   }
                 try {
                     const trackDetails = await getTrackDetails(
-                        session.accessToken,
                         annotation.track_id
                     );
                     return {

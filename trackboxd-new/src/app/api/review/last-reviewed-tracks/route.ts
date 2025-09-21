@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
                   }
 
                 try {
-                    const trackDetails = await getTrackDetails( session.accessToken, review.item_id);
+                    const trackDetails = await getTrackDetails( review.item_id);
                     console.log(`Fetched details for track ${review.item_id}`);
                     return {
                         ...review,

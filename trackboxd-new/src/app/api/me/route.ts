@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { getCurrentUserProfile } from "@/lib/spotify";
+import { getCurrentUserProfile } from "@/lib/oldSpotify";
 import { NextResponse } from "next/server";
 
 export async function GET() {

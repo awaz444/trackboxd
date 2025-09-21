@@ -8,15 +8,6 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q') || '';
 
-  const session = await getServerSession(authOptions);
-  
-  if (!session?.accessToken) {
-    return NextResponse.json(
-      { error: "Not authenticated" },
-      { status: 401 }
-    );
-  }
-
   if (!query) {
     return NextResponse.json(
       { error: 'Missing query parameter' },
@@ -25,7 +16,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const response = await searchTracks(session.accessToken, query);
+    const response = await searchTracks(query);
     return NextResponse.json(response);
   } catch (error) {
     console.error('Spotify search error:', error);

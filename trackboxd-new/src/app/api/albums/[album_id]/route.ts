@@ -84,7 +84,6 @@ export async function GET(
                         throw new Error("No access token available");
                     }
                     const trackDetails = await getTrackDetails(
-                        session.accessToken,
                         track.id
                     );
                     return {
