@@ -16,7 +16,6 @@ import { useCallback } from "react";
 
 import { PlaylistCard } from "@/components/playlists/PlaylistCard";
 import { PlaylistListItem } from "@/components/playlists/PlaylistListItem";
-import CreatePlaylistModal from "@/components/playlists/CreatePlaylistModal"; // Import the modal
 
 interface Playlist {
     id: string;
@@ -468,10 +467,6 @@ const Playlists = () => {
                 )}
             </div>
             <Footer variant="light" />
-            <CreatePlaylistModal
-                isOpen={showCreateModal}
-                onClose={() => setShowCreateModal(false)}
-            />
         </div>
     );
 };
