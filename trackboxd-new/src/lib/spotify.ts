@@ -203,15 +203,32 @@ export const searchAlbums = async (query: string, limit = 20, offset = 0, market
 };
 
 // Combined search for tracks, albums, playlists
-export const searchTracksAlbumsAndPlaylists = async (query: string) => {
+interface SearchTracksAlbumsAndPlaylistsOptions {
+  trackLimit?: number;
+  albumLimit?: number;
+  playlistLimit?: number;
+  market?: string;
+}
+
+export const searchTracksAlbumsAndPlaylists = async (
+  query: string, 
+  options: SearchTracksAlbumsAndPlaylistsOptions = {}
+) => {
   const token = await getAccessToken();
+  const { 
+    trackLimit = 4, 
+    albumLimit = 2, 
+    playlistLimit = 2, 
+    market = 'US' 
+  } = options;
+
   const url = (type: string, limit: number) =>
-    `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=${type}&limit=${limit}`;
+    `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=${type}&limit=${limit}&market=${market}`;
 
   const [tracksRes, albumsRes, playlistsRes] = await Promise.all([
-    fetch(url("track", 7), { headers: { Authorization: `Bearer ${token}` } }),
-    fetch(url("album", 4), { headers: { Authorization: `Bearer ${token}` } }),
-    fetch(url("playlist", 4), { headers: { Authorization: `Bearer ${token}` } }),
+    fetch(url("track", trackLimit), { headers: { Authorization: `Bearer ${token}` } }),
+    fetch(url("album", albumLimit), { headers: { Authorization: `Bearer ${token}` } }),
+    fetch(url("playlist", playlistLimit), { headers: { Authorization: `Bearer ${token}` } }),
   ]);
 
   if (!tracksRes.ok || !albumsRes.ok || !playlistsRes.ok) {
@@ -228,5 +245,38 @@ export const searchTracksAlbumsAndPlaylists = async (query: string) => {
     tracks: tracks.tracks?.items || [],
     albums: albums.albums?.items || [],
     playlists: playlists.playlists?.items || [],
+  };
+};
+
+interface SearchTracksAndAlbumsOptions {
+  trackLimit?: number;
+  albumLimit?: number;
+  market?: string;
+}
+
+export const searchTracksAndAlbums = async (query: string, options: SearchTracksAndAlbumsOptions = {}) => {
+  const token = await getAccessToken();
+  const { trackLimit = 5, albumLimit = 5, market = 'US' } = options;
+
+  const url = (type: string, limit: number) =>
+    `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=${type}&limit=${limit}&market=${market}`;
+
+  const [tracksRes, albumsRes] = await Promise.all([
+    fetch(url("track", trackLimit), { headers: { Authorization: `Bearer ${token}` } }),
+    fetch(url("album", albumLimit), { headers: { Authorization: `Bearer ${token}` } }),
+  ]);
+
+  if (!tracksRes.ok || !albumsRes.ok) {
+    throw new Error("Spotify search failed");
+  }
+
+  const [tracks, albums] = await Promise.all([
+    tracksRes.json(),
+    albumsRes.json(),
+  ]);
+
+  return {
+    tracks: tracks.tracks?.items || [],
+    albums: albums.albums?.items || [],
   };
 };
