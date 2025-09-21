@@ -27,6 +27,7 @@
     "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.2",
     "geist": "^1.4.2",
     "lucide-react": "^0.534.0",
     "next": "14.2.3",
