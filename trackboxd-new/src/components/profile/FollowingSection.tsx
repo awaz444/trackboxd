@@ -32,7 +32,7 @@ const FollowingSection: React.FC<FollowingSectionProps> = ({
       
       <div className="flex space-x-6 overflow-x-auto pb-4 -mx-4 px-4">
         {following.map((user) => (
-          <Link key={user.id} href={`/profile/${user.username}`}>
+          <Link key={user.id} href={`/profile/${user.name}`}>
             <div className="flex-shrink-0 flex flex-col items-center cursor-pointer">
               <div className="relative">
                 <img
@@ -41,9 +41,9 @@ const FollowingSection: React.FC<FollowingSectionProps> = ({
                   className="w-16 h-16 rounded-full object-cover border-2 border-[#FFFBEb]"
                 />
               </div>
-              <div className="mt-2 text-sm font-medium text-[#5C5537] truncate max-w-[80px]">
-                {user.username}
-              </div>
+                <div className="mt-2 text-sm font-medium text-[#5C5537] truncate max-w-[80px]">
+                  {user.name}
+                </div>
             </div>
           </Link>
         ))}

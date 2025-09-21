@@ -1,8 +1,11 @@
+"use client";
+
 // FavoriteTracks.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import FavoriteTracksEditor from "./FavoriteTracksEditor";
 
 interface Track {
   id: string;
@@ -22,6 +25,20 @@ const FavoriteTracks: React.FC<FavoriteTracksProps> = ({
   isOwnProfile = false,
   onEditClick,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentTracks, setCurrentTracks] = useState(tracks);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleTracksUpdate = (updatedTracks: Track[]) => {
+    setCurrentTracks(updatedTracks);
+  };
+
+  const handleCloseEditor = () => {
+    setIsEditing(false);
+  };
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-6">
@@ -30,7 +47,7 @@ const FavoriteTracks: React.FC<FavoriteTracksProps> = ({
           <Button 
             variant="outline" 
             className="border-[#5C5537]/20 bg-[#FFFBEb] text-[#5C5537] hover:bg-[#5C5537]/10"
-            onClick={onEditClick}
+            onClick={handleEditClick}
           >
             <Plus className="w-4 h-4 mr-2" />
             Edit
@@ -39,7 +56,7 @@ const FavoriteTracks: React.FC<FavoriteTracksProps> = ({
       </div>
       
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {tracks.map((track) => (
+        {currentTracks.map((track) => (
           <Link key={track.id} href={`/songs/${track.id}`}>
             <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg overflow-hidden group cursor-pointer">
               <div className="relative aspect-square">
@@ -57,6 +74,15 @@ const FavoriteTracks: React.FC<FavoriteTracksProps> = ({
           </Link>
         ))}
       </div>
+
+      {/* Favorite Tracks Editor Modal */}
+      {isEditing && (
+        <FavoriteTracksEditor
+          tracks={currentTracks}
+          onTracksUpdate={handleTracksUpdate}
+          onClose={handleCloseEditor}
+        />
+      )}
     </div>
   );
 };

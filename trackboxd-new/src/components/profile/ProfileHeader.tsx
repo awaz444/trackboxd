@@ -1,7 +1,11 @@
 // ProfileHeader.tsx
+"use client";
+
 import React from "react";
+import { useRouter } from "next/navigation";
 import { UserPlus, Users, MoreHorizontal, Star, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useFollow } from "@/hooks/useFollow";
 
 interface ProfileHeaderProps {
   user: {
@@ -10,6 +14,8 @@ interface ProfileHeaderProps {
     username: string;
     image_url?: string;
     country?: string;
+    created_at: string;
+    spotify_url?: string;
   };
   stats: {
     followers: number;
@@ -17,20 +23,30 @@ interface ProfileHeaderProps {
     reviews: number;
     annotations: number;
   };
-  isFollowing?: boolean;
-  isOwnProfile?: boolean;
-  onFollowToggle?: () => void;
-  onEditClick?: () => void;
+  isOwnProfile: boolean;
+  username: string;
+  initialIsFollowing?: boolean;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   user,
   stats,
-  isFollowing = false,
   isOwnProfile = false,
-  onFollowToggle,
-  onEditClick,
+  username,
+  initialIsFollowing = false,
 }) => {
+  const router = useRouter();
+  
+  const { isFollowing, followerCount, isLoading, toggleFollow } = useFollow({
+    userId: user.id,
+    initialIsFollowing,
+    initialFollowerCount: stats.followers,
+  });
+  
+  const handleEditClick = () => {
+    router.push(`/profile/${username}/edit`);
+  };
+
   const StatCard = ({ icon, value, label }: { icon: React.ReactNode; value: number; label: string }) => (
     <div className="p-4 text-center">
       <div className="flex justify-center mb-2 text-[#5C5537]">
@@ -57,37 +73,47 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Profile Info */}
       <div className="flex-1 w-full">
         <div className="flex flex-col items-center md:items-start md:flex-row md:justify-between gap-4 mb-6">
-          <div className="text-center md:text-left">
-            <h1 className="text-2xl md:text-3xl font-bold text-[#5C5537]">@{user.name}</h1>
-            {/* {user.name && (
-              <p className="text-lg text-[#5C5537]/70 mt-1">{user.name}</p>
-            )} */}
-            {user.country && (
-              <p className="text-sm text-[#5C5537]/70 mt-1">📍 {user.country}</p>
-            )}
-          </div>
+            <div className="text-center md:text-left">
+              <h1 className="text-2xl md:text-3xl font-bold text-[#5C5537]">@{user.name}</h1>
+              {user.country && (
+                <p className="text-sm text-[#5C5537]/70 mt-1">📍 {user.country}</p>
+              )}
+              {user.spotify_url && (
+                <a 
+                  href={user.spotify_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-[#1DB954] hover:text-[#1ed760] mt-1 block"
+                >
+                  🎵 Spotify Profile
+                </a>
+              )}
+            </div>
           
           <div className="flex gap-3">
             {isOwnProfile ? (
               <Button 
-                onClick={onEditClick}
+                onClick={handleEditClick}
                 className="bg-[#5C5537] hover:bg-[#3E3725] text-white"
               >
                 Edit Profile
               </Button>
             ) : (
               <Button 
-                onClick={onFollowToggle}
+                onClick={toggleFollow}
+                disabled={isLoading}
                 className={`flex items-center gap-2 ${isFollowing ? "text-[#FFFBEb] bg-[#5C5537] hover:bg-[#3E3725]" : "text-[#FFFBEb] bg-[#5C5537] hover:bg-[#3E3725]"}`}
               >
-                {isFollowing ? <Users className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-                {isFollowing ? "Following" : "Follow"}
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                ) : (
+                  <>
+                    {isFollowing ? <Users className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                    {isFollowing ? "Following" : "Follow"}
+                  </>
+                )}
               </Button>
             )}
-            
-            {/* <Button variant="outline" className="border-[#5C5537]/20 bg-[#FFFBEb] text-[#5C5537] hover:bg-[#5C5537]/10">
-              <MoreHorizontal className="w-4 h-4" />
-            </Button> */}
           </div>
         </div>
 
@@ -95,7 +121,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           <StatCard 
             icon={<Users className="w-6 h-6 mx-auto" />} 
-            value={stats.followers} 
+            value={followerCount} 
             label="Followers" 
           />
           <StatCard 

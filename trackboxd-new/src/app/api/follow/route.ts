@@ -1,0 +1,139 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+
+export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { error: "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const body = await request.json();
+    const { followingId } = body;
+
+    if (!followingId) {
+      return NextResponse.json(
+        { error: "Following ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (followingId === session.user.id) {
+      return NextResponse.json(
+        { error: "Cannot follow yourself" },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createClient(cookies());
+
+    // Check if already following
+    const { data: existingFollow, error: checkError } = await supabase
+      .from("follows")
+      .select("follower_id, following_id")
+      .eq("follower_id", session.user.id)
+      .eq("following_id", followingId)
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking existing follow:', checkError);
+      return NextResponse.json(
+        { error: "Failed to check existing follow" },
+        { status: 500 }
+      );
+    }
+
+    if (existingFollow) {
+      return NextResponse.json(
+        { error: "Already following this user" },
+        { status: 400 }
+      );
+    }
+
+    // Create follow relationship
+    const { data: newFollow, error: insertError } = await supabase
+      .from("follows")
+      .insert({
+        follower_id: session.user.id,
+        following_id: followingId,
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('Failed to create follow:', insertError);
+      return NextResponse.json(
+        { error: "Failed to follow user" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      follow: newFollow
+    });
+  } catch (error) {
+    console.error('Failed to follow user:', error);
+    return NextResponse.json(
+      { error: "Failed to follow user" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  const session = await getServerSession(authOptions);
+  
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { error: "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const body = await request.json();
+    const { followingId } = body;
+
+    if (!followingId) {
+      return NextResponse.json(
+        { error: "Following ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createClient(cookies());
+
+    // Remove follow relationship
+    const { error: deleteError } = await supabase
+      .from("follows")
+      .delete()
+      .eq("follower_id", session.user.id)
+      .eq("following_id", followingId);
+
+    if (deleteError) {
+      console.error('Failed to remove follow:', deleteError);
+      return NextResponse.json(
+        { error: "Failed to unfollow user" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true
+    });
+  } catch (error) {
+    console.error('Failed to unfollow user:', error);
+    return NextResponse.json(
+      { error: "Failed to unfollow user" },
+      { status: 500 }
+    );
+  }
+}

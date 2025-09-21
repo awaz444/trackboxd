@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { name, username, country, image_url } = body;
+    const { name, username, country, image_url, spotify_url } = body;
 
     // Validate required fields
     if (!name || !username) {
@@ -68,6 +68,7 @@ export async function POST(request: Request) {
         username,
         country: country || null,
         image_url: image_url || null,
+        spotify_url: spotify_url || null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", session.user.id)

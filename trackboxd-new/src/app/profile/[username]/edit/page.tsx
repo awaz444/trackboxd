@@ -25,6 +25,7 @@ interface ProfileData {
     username: string;
     image_url?: string;
     country?: string;
+    spotify_url?: string;
     created_at: string;
   };
   stats: {
@@ -73,6 +74,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
     username: "",
     country: "",
     image_url: "",
+    spotify_url: "",
   });
 
   // Check if user is authorized to edit this profile
@@ -105,6 +107,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
           username: data.user.username || "",
           country: data.user.country || "",
           image_url: data.user.image_url || "",
+          spotify_url: data.user.spotify_url || "",
         });
       } catch (error) {
         console.error("Failed to fetch profile data:", error);
@@ -159,7 +162,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
 
       // Redirect to the updated profile
       setTimeout(() => {
-        router.push(`/profile/${formData.username}`);
+        router.push(`/profile/${formData.name}`);
       }, 1500);
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -287,6 +290,18 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                     value={formData.image_url}
                     onChange={handleInputChange}
                     placeholder="Enter image URL"
+                    className="w-full md:w-80"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-[#0C3B2E] mb-2">
+                    Spotify Profile URL
+                  </label>
+                  <Input
+                    name="spotify_url"
+                    value={formData.spotify_url}
+                    onChange={handleInputChange}
+                    placeholder="https://open.spotify.com/user/..."
                     className="w-full md:w-80"
                   />
                 </div>
