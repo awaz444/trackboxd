@@ -49,12 +49,11 @@ export async function GET(req: NextRequest) {
   const supabase = createClient(cookieStore);
 
   try {
-    // Get server session for Spotify access
+    // Get server session for user authentication
     const session = await getServerSession(authOptions);
-    if (!session?.accessToken) {
+    if (!session?.user?.id) {
       return new NextResponse("Not authenticated", { status: 401 });
     }
-    const accessToken = session.accessToken;
 
     // Fetch activity data
     const { data: activities, error: activityError } = await supabase
@@ -139,7 +138,7 @@ export async function GET(req: NextRequest) {
           
           try {
             // Fetch track details from Spotify
-            const trackDetails = await getTrackDetails(accessToken, review.item_id);
+            const trackDetails = await getTrackDetails(review.item_id);
             
             return {
               ...base,
@@ -164,7 +163,7 @@ export async function GET(req: NextRequest) {
           
           try {
             // Fetch track details from Spotify
-            const trackDetails = await getTrackDetails(accessToken, annotation.track_id);
+            const trackDetails = await getTrackDetails(annotation.track_id);
             
             return {
               ...base,

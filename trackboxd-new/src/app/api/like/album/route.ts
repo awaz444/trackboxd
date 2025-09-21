@@ -46,8 +46,10 @@ export async function GET(req: NextRequest) {
   }
 }
 
+import { getAlbumDetails } from '@/lib/spotify';
+
 async function handleAlbumLikeRequest(req: NextRequest, method: 'POST' | 'DELETE') {
-  const { userId, albumId } = await req.json();  // Changed to albumId
+  const { userId, albumId } = await req.json();
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
 
@@ -59,94 +61,83 @@ async function handleAlbumLikeRequest(req: NextRequest, method: 'POST' | 'DELETE
   }
 
   try {
-    // Start transaction
-    await supabase.rpc('begin');
-
-    // Ensure album exists in spotify_items
-    const { data: itemExists, error: itemError } = await supabase
-      .from('spotify_items')
-      .select('id')
-      .eq('id', albumId)  // Changed to albumId
-      .single();
-
-    if (itemError || !itemExists) {
-      // Create entry if it doesn't exist
-      const { error: createError } = await supabase
-        .from('spotify_items')
-        .insert({
-          id: albumId,  // Changed to albumId
-          type: 'album', // Changed to album
-          like_count: 0,
-          review_count: 0,
-          annotation_count: 0,
-          avg_rating: 0.00
-        });
-
-      if (createError) {
-        console.error('Error creating spotify item:', createError);
-        await supabase.rpc('rollback');
-        return NextResponse.json(
-          { error: 'Failed to initialize album data' },  // Updated message
-          { status: 500 }
-        );
-      }
-    }
-
     if (method === 'POST') {
-      // Like album logic
+      // 1. Ensure album exists in spotify_items
+      const { data: existingItem, error: fetchError } = await supabase
+        .from('spotify_items')
+        .select('id')
+        .eq('id', albumId)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        throw fetchError;
+      }
+
+      if (!existingItem) {
+        // 2. Fetch from Spotify
+        const album = await getAlbumDetails(albumId);
+
+        // 3. Extract essentials
+        const newItem = {
+          id: album.id,
+          type: 'album',
+          name: album.name,
+          artist: album.artists?.map((a: any) => a.name).join(', '),
+          duration_ms: null, // albums don’t have a duration
+          album: null,       // not applicable
+          cover_url: album.images?.[0]?.url ?? null,
+          spotify_url: album.external_urls?.spotify,
+        };
+
+        // 4. Insert into spotify_items
+        const { error: insertError } = await supabase
+          .from('spotify_items')
+          .insert(newItem);
+
+        if (insertError) throw insertError;
+      }
+
+      // 5. Like album
       const { error: likeError } = await supabase
         .from('likes')
-        .insert({ 
-          user_id: userId, 
-          target_type: 'album',  // Changed to album
-          target_id: albumId      // Changed to albumId
+        .insert({
+          user_id: userId,
+          target_type: 'album',
+          target_id: albumId,
         });
 
       if (likeError) {
         if (likeError.code === '23505') {
-          await supabase.rpc('rollback');
           return NextResponse.json(
-            { error: 'You already liked this album' },  // Updated message
+            { error: 'You already liked this album' },
             { status: 400 }
           );
         }
         throw likeError;
       }
 
-      // Update album's like count
-      const { error: countError } = await supabase.rpc('increment_spotify_item_like_count', { 
-        item_id: albumId  // Changed to albumId
-      });
-      if (countError) throw countError;
+      // 6. Increment like count
+      await supabase.rpc('increment_like_count', { item_id: albumId });
 
-      await supabase.rpc('commit');
       return NextResponse.json({ success: true });
-    } 
-    else { // DELETE
-      // Unlike album logic
+    } else {
+      // DELETE branch
       const { error: deleteError } = await supabase
         .from('likes')
         .delete()
-        .match({ 
-          user_id: userId, 
-          target_type: 'album',  // Changed to album
-          target_id: albumId     // Changed to albumId
+        .match({
+          user_id: userId,
+          target_type: 'album',
+          target_id: albumId,
         });
 
       if (deleteError) throw deleteError;
-      
-      // Update album's like count
-      const { error: countError } = await supabase.rpc('decrement_spotify_item_like_count', { 
-        item_id: albumId  // Changed to albumId
-      });
-      if (countError) throw countError;
 
-      await supabase.rpc('commit');
+      await supabase.rpc('decrement_like_count', { item_id: albumId });
       return NextResponse.json({ success: true });
     }
   } catch (error) {
-    await supabase.rpc('rollback');
-    console.error('Album like API error:', error);  // Updated log
+    console.error('Album like API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

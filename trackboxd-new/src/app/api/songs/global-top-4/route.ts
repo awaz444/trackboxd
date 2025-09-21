@@ -1,5 +1,4 @@
-// app/api/songs/global-top-4/route.ts
-import { getPlaylistTracks } from '@/lib/spotify';
+import { getPlaylistItems } from '@/lib/spotify';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -10,7 +9,8 @@ export async function GET() {
   
   try {
     // 1. Get tracks from Spotify
-    const tracks = await getPlaylistTracks(playlistId, 4);
+    const response = await getPlaylistItems(playlistId, 4);
+    const tracks = response.items;
     const trackIds = tracks.map((t: SpotifyPlaylistTrack) => t.track.id);
 
     // 2. Initialize Supabase client with cookies

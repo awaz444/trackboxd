@@ -9,14 +9,12 @@ export async function GET(req: NextRequest) {
 
     const session = await getServerSession(authOptions);
 
-    if (!session?.accessToken) {
+    if (!session?.user?.id) {
         return NextResponse.json(
             { error: "Not authenticated" },
             { status: 401 }
         );
     }
-
-    const accessToken = session.accessToken;
 
     try {
         const cookieStore = cookies();
@@ -70,7 +68,7 @@ export async function GET(req: NextRequest) {
             
             reviews.map(async (review) => {
                 try {
-                    const trackDetails = await getTrackDetails(accessToken, review.item_id);
+                    const trackDetails = await getTrackDetails( review.item_id);
                     return {
                         ...review,
                         track_details: trackDetails

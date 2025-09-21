@@ -1,4 +1,3 @@
-// app/page.tsx
 "use client"
 
 import React, { useState } from 'react';
@@ -9,18 +8,31 @@ import Image from "next/image";
 
 const LandingPage = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
   return (
     <div className="min-h-screen max-h-screen bg-[#FFFBEb] flex flex-col relative overflow-hidden">
-      {/* Header with Spotify login (for development) */}
-      <div className="absolute top-6 right-6 z-20">
+      {/* Header with Auth buttons */}
+      {/* <div className="absolute top-6 right-6 z-20 flex gap-3">
         <button
           className="text-sm text-[#5C5537]/70 hover:text-[#5C5537] transition-colors"
-          onClick={() => setShowAuthModal(true)}
+          onClick={() => {
+            setAuthMode('login');
+            setShowAuthModal(true);
+          }}
         >
-          Login / Signup
+          Sign In
         </button>
-      </div>
+        <button
+          className="text-sm bg-[#5C5537] text-white px-3 py-1 rounded hover:bg-[#3E3725] transition-colors"
+          onClick={() => {
+            setAuthMode('signup');
+            setShowAuthModal(true);
+          }}
+        >
+          Sign Up
+        </button>
+      </div> */}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
@@ -52,7 +64,10 @@ const LandingPage = () => {
         <div className="animate-fade-in-up">
           <button
             className="text-lg text-[#5C5537] hover:text-[#3E3725] transition-colors font-medium px-6 py-3 rounded-md hover:bg-[#5C5537]/5"
-            onClick={() => setShowAuthModal(true)}
+            onClick={() => {
+              setAuthMode('signup');
+              setShowAuthModal(true);
+            }}
           >
             Begin Your Journey →
           </button>
@@ -60,9 +75,10 @@ const LandingPage = () => {
       </div>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultMode={authMode}
       />
 
       {/* Animation Styles */}

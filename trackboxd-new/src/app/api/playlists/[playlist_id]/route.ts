@@ -48,7 +48,7 @@ export async function GET(
     const session = await getServerSession(authOptions);
 
     // Add type assertion and proper null check for accessToken
-    if (!session?.accessToken || typeof session.accessToken !== "string") {
+    if (!session?.user?.id) {
         return NextResponse.json(
             { error: "Valid access token required" },
             { status: 401 }
@@ -58,15 +58,14 @@ export async function GET(
     try {
         const playlistId = params.playlist_id;
         // Now TypeScript knows accessToken is definitely a string
-        const accessToken = session.accessToken;
+        // Remove accessToken usage since we're using client credentials for Spotify
 
         // Get playlist metadata
         const playlist = await getPlaylistDetails(playlistId);
 
-        // Get playlist tracks (only IDs first to minimize data transfer)
         const itemsResponse = await getPlaylistItems(playlistId, {
             limit: 50,
-            fields: "items(track(id))", // Only get track IDs initially
+            fields: "items(track(id))"
         });
 
         // Filter out null tracks and extract IDs
@@ -76,7 +75,7 @@ export async function GET(
 
         // Get detailed information for each track in parallel
         const trackDetailsPromises = trackIds.map((trackId: string) =>
-            getTrackDetails(accessToken, trackId).catch((error) => {
+            getTrackDetails(trackId).catch((error) => {
                 console.error(
                     `Failed to fetch details for track ${trackId}:`,
                     error

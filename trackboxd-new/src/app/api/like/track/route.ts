@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
+import { getTrackDetails } from '@/lib/spotify';
 
 export async function POST(req: NextRequest) {
   return handleLikeRequest(req, 'POST');
@@ -57,16 +58,43 @@ async function handleLikeRequest(req: NextRequest, method: 'POST' | 'DELETE') {
     const supabase = createClient(cookieStore);
 
     if (method === 'POST') {
-      // Like track logic
-      const { error: upsertError } = await supabase
+      // Step 1: Check if track already exists
+      const { data: existingItem, error: fetchError } = await supabase
         .from('spotify_items')
-        .upsert(
-          { id: trackId, type: 'track' },
-          { onConflict: 'id' }
-        );
+        .select('id')
+        .eq('id', trackId)
+        .single();
 
-      if (upsertError) throw upsertError;
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        // PGRST116 = "no rows found" → safe to ignore
+        throw fetchError;
+      }
 
+      if (!existingItem) {
+        // Step 2: Fetch from Spotify
+        const track = await getTrackDetails(trackId);
+
+        // Step 3: Extract essentials
+        const newItem = {
+          id: track.id,
+          type: 'track',
+          name: track.name,
+          artist: track.artists?.map((a: any) => a.name).join(', '),
+          album: track.album?.name,
+          duration_ms: track.duration_ms,
+          cover_url: track.album?.images?.[0]?.url ?? null,
+          spotify_url: track.external_urls?.spotify,
+        };
+
+        // Step 4: Insert into spotify_items
+        const { error: insertError } = await supabase
+          .from('spotify_items')
+          .insert(newItem);
+
+        if (insertError) throw insertError;
+      }
+
+      // Step 5: Insert like
       const { error: likeError } = await supabase
         .from('likes')
         .insert({ user_id: userId, target_type: 'track', target_id: trackId });
@@ -81,17 +109,19 @@ async function handleLikeRequest(req: NextRequest, method: 'POST' | 'DELETE') {
         throw likeError;
       }
 
+      // Step 6: Increment like count
       await supabase.rpc('increment_like_count', { item_id: trackId });
+
       return NextResponse.json({ success: true });
-    } 
-    else { // DELETE
+    } else {
+      // DELETE branch (unchanged)
       const { error: deleteError } = await supabase
         .from('likes')
         .delete()
         .match({ user_id: userId, target_type: 'track', target_id: trackId });
 
       if (deleteError) throw deleteError;
-      
+
       await supabase.rpc('decrement_like_count', { item_id: trackId });
       return NextResponse.json({ success: true });
     }

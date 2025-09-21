@@ -1,171 +1,106 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAuthClient } from "@/lib/supabase/auth-server";
 import NextAuth, {
     type NextAuthOptions,
     DefaultSession,
-    Profile,
 } from "next-auth";
-import SpotifyProvider from "next-auth/providers/spotify";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { cookies } from "next/headers";
 
 declare module "next-auth" {
     interface Session extends DefaultSession {
-        accessToken?: string;
-        spotifyId?: string;
-        error?: string;
+        user: {
+            id: string;
+            email: string;
+            name: string;
+            image?: string | null;
+        };
     }
-    interface Profile {
+    interface User {
         id: string;
-    }
-}
-
-const SPOTIFY_SCOPES = [
-    "user-read-email",
-    "user-read-private",
-    "user-library-read",
-    "user-top-read",
-    "user-read-recently-played",
-    "playlist-read-private",
-    "playlist-modify-public",
-    "playlist-modify-private",
-].join(",");
-
-async function refreshAccessToken(token: any) {
-    try {
-        const response = await fetch("https://accounts.spotify.com/api/token", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                Authorization: `Basic ${Buffer.from(
-                    `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
-                ).toString("base64")}`,
-            },
-            body: new URLSearchParams({
-                grant_type: "refresh_token",
-                refresh_token: token.refreshToken,
-            }),
-        });
-
-        const refreshedTokens = await response.json();
-
-        if (!response.ok) throw refreshedTokens;
-
-        return {
-            ...token,
-            accessToken: refreshedTokens.access_token,
-            expiresAt: Date.now() + refreshedTokens.expires_in * 1000,
-            refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
-        };
-    } catch (error) {
-        console.error("RefreshAccessTokenError", error);
-        return {
-            ...token,
-            error: "RefreshAccessTokenError",
-        };
+        email: string;
+        name: string;
+        image?: string | null;
     }
 }
 
 export const authOptions: NextAuthOptions = {
     providers: [
-        SpotifyProvider({
-            clientId: process.env.SPOTIFY_CLIENT_ID!,
-            clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
-            authorization: {
-                params: {
-                    scope: SPOTIFY_SCOPES,
-                    show_dialog: true,
-                },
+        CredentialsProvider({
+            name: "credentials",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                password: { label: "Password", type: "password" },
+            },
+            async authorize(credentials) {
+                if (!credentials?.email || !credentials?.password) {
+                    console.log("Missing credentials");
+                    return null;
+                }
+
+                try {
+                    const supabaseAuth = createAuthClient();
+                    const supabase = createClient(cookies());
+                    
+                    console.log("Attempting to sign in with email:", credentials.email);
+                    
+                    // Sign in with Supabase Auth using service role
+                    const { data, error } = await supabaseAuth.auth.signInWithPassword({
+                        email: credentials.email,
+                        password: credentials.password,
+                    });
+
+                    if (error) {
+                        console.error("Supabase auth error:", error);
+                        return null;
+                    }
+
+                    if (!data.user) {
+                        console.log("No user data returned from Supabase");
+                        return null;
+                    }
+
+                    console.log("Supabase auth successful, user ID:", data.user.id);
+
+                    // Get user profile from public.users table using regular client
+                    const { data: userProfile, error: profileError } = await supabase
+                        .from("users")
+                        .select("*")
+                        .eq("id", data.user.id)
+                        .single();
+
+                    if (profileError) {
+                        console.error("Error fetching user profile:", profileError);
+                        return null;
+                    }
+
+                    console.log("User profile found:", userProfile);
+
+                    return {
+                        id: data.user.id,
+                        email: data.user.email!,
+                        name: userProfile.name,
+                        image: userProfile.image_url,
+                    };
+                } catch (error) {
+                    console.error("Auth error:", error);
+                    return null;
+                }
             },
         }),
     ],
     callbacks: {
-        async signIn({ user, account, profile }: any) {
-            try {
-                const supabase = createClient(cookies());
-
-                // Get the Spotify profile data
-                const { data: existingUser, error: fetchError } = await supabase
-                    .from("users")
-                    .select()
-                    .eq("id", profile.id)
-                    .single();
-
-                if (fetchError && fetchError.code !== "PGRST116") {
-                    console.error("Error fetching user:", fetchError);
-                    return false;
-                }
-
-                if (!existingUser) {
-                    // Create new user if doesn't exist
-                    const { error: insertError } = await supabase
-                        .from("users")
-                        .insert({
-                            id: profile.id,
-                            email: profile.email,
-                            name: profile.display_name,
-                            image_url: profile.images?.[0]?.url || null,
-                            spotify_url: profile.external_urls?.spotify || null,
-                            country: profile.country || null,
-                            created_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString(),
-                        });
-
-                    if (insertError) {
-                        console.error("Error creating user:", insertError);
-                        return false;
-                    }
-                } else {
-                    // Update existing user
-                    const { error: updateError } = await supabase
-                        .from("users")
-                        .update({
-                            email: profile.email,
-                            name: profile.display_name,
-                            image_url: profile.images?.[0]?.url || null,
-                            spotify_url: profile.external_urls?.spotify || null,
-                            country: profile.country || null,
-                            updated_at: new Date().toISOString(),
-                        })
-                        .eq("id", profile.id);
-
-                    if (updateError) {
-                        console.error("Error updating user:", updateError);
-                        return false;
-                    }
-                }
-
-                return true;
-            } catch (error) {
-                console.error("Auth error:", error);
-                return false;
+        async jwt({ token, user }) {
+            if (user) {
+                token.id = user.id;
             }
+            return token;
         },
-        async jwt({ token, account, profile }) {
-            if (account && profile) {
-                token.accessToken = account.access_token;
-                token.refreshToken = account.refresh_token;
-                token.spotifyId = profile.id;
-                token.expiresAt = account.expires_at
-                    ? account.expires_at * 1000
-                    : Date.now() + 3600 * 1000;
+        async session({ session, token }) {
+            if (token) {
+                session.user.id = token.id as string;
             }
-
-            if (token.expiresAt && Date.now() < token.expiresAt) {
-                return token;
-            }
-
-            return refreshAccessToken(token);
-        },
-        async session({ session, token, user }) {
-            return {
-                ...session,
-                user: {
-                    ...session.user,
-                    id: token.spotifyId,
-                },
-                accessToken: token.accessToken,
-                spotifyId: token.spotifyId,
-                error: token.error,
-            };
+            return session;
         },
     },
     cookies: {
