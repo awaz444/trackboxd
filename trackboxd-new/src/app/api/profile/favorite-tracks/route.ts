@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/authOptions";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getTrackDetails } from "@/lib/spotify";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -26,6 +27,55 @@ export async function POST(request: Request) {
     }
 
     const supabase = createClient(cookies());
+
+    // Enforce max 4 favorites per user
+    const { count, error: countError } = await supabase
+      .from("user_favorite_tracks")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", session.user.id);
+    if (countError) {
+      console.error('Error counting favorites:', countError);
+      return NextResponse.json({ error: "Failed to validate favorites" }, { status: 500 });
+    }
+    if ((count || 0) >= 4) {
+      return NextResponse.json(
+        { error: "You can only have up to 4 favorite tracks" },
+        { status: 400 }
+      );
+    }
+
+    // Ensure spotify_items has this track with metadata
+    const { data: existingItem, error: itemFetchError } = await supabase
+      .from("spotify_items")
+      .select("id")
+      .eq("id", trackId)
+      .single();
+    if (itemFetchError && itemFetchError.code !== 'PGRST116') {
+      console.error('Error fetching spotify item:', itemFetchError);
+      return NextResponse.json({ error: "Failed validating track" }, { status: 500 });
+    }
+    if (!existingItem) {
+      try {
+        const track = await getTrackDetails(trackId);
+        const newItem = {
+          id: track.id,
+          type: 'track' as const,
+          name: track.name,
+          artist: track.artists?.map((a: any) => a.name).join(', '),
+          album: track.album?.name,
+          duration_ms: track.duration_ms,
+          cover_url: track.album?.images?.[0]?.url ?? null,
+          spotify_url: track.external_urls?.spotify,
+        };
+        const { error: insertItemError } = await supabase
+          .from('spotify_items')
+          .insert(newItem);
+        if (insertItemError) throw insertItemError;
+      } catch (e) {
+        console.error('Failed to upsert spotify item:', e);
+        return NextResponse.json({ error: "Failed to fetch track metadata" }, { status: 500 });
+      }
+    }
 
     // Check if track already exists in favorites
     const { data: existingFavorite, error: checkError } = await supabase

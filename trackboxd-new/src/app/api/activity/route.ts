@@ -213,6 +213,12 @@ export async function GET(req: NextRequest) {
         };
       }
 
+      // Extend: include likes on reviews/annotations as simple activity entries (optional)
+      if (activity.action === 'like') {
+        // We can optionally show likes in the feed later
+        return null;
+      }
+
       return null;
     });
 

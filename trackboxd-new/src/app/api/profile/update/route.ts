@@ -16,56 +16,55 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { name, username, country, image_url, spotify_url } = body;
+    const { name, country, image_url, spotify_url } = body; // Remove username
 
-    // Validate required fields
-    if (!name || !username) {
+    // Validate required fields - only name is required now
+    if (!name) {
       return NextResponse.json(
-        { error: "Name and username are required" },
+        { error: "Name is required" },
         { status: 400 }
       );
     }
 
-    // Validate username format (alphanumeric and underscores only)
-    const usernameRegex = /^[a-zA-Z0-9_]+$/;
-    if (!usernameRegex.test(username)) {
+    // Validate name format (alphanumeric and underscores only)
+    const nameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!nameRegex.test(name)) {
       return NextResponse.json(
-        { error: "Username can only contain letters, numbers, and underscores" },
+        { error: "Name can only contain letters, numbers, and underscores" },
         { status: 400 }
       );
     }
 
     const supabase = createClient(cookies());
 
-    // Check if username is already taken by another user
+    // Check if name is already taken by another user
     const { data: existingUser, error: checkError } = await supabase
       .from("users")
       .select("id")
-      .eq("username", username)
+      .eq("name", name) // Changed from username to name
       .neq("id", session.user.id)
       .single();
 
     if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('Error checking username:', checkError);
+      console.error('Error checking name:', checkError);
       return NextResponse.json(
-        { error: "Failed to check username availability" },
+        { error: "Failed to check name availability" },
         { status: 500 }
       );
     }
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "Username is already taken" },
+        { error: "Name is already taken, please try another one" }, // New error message
         { status: 400 }
       );
     }
 
-    // Update user profile
+    // Update user profile - remove username field
     const { data: updatedUser, error: updateError } = await supabase
       .from("users")
       .update({
-        name,
-        username,
+        name, // Only update name, not username
         country: country || null,
         image_url: image_url || null,
         spotify_url: spotify_url || null,
@@ -77,6 +76,15 @@ export async function POST(request: Request) {
 
     if (updateError) {
       console.error('Failed to update user profile:', updateError);
+      
+      // Handle unique constraint violation for name
+      if (updateError.code === '23505' && updateError.details?.includes('name')) {
+        return NextResponse.json(
+          { error: "Name is already taken, please try another one" },
+          { status: 400 }
+        );
+      }
+      
       return NextResponse.json(
         { error: "Failed to update profile" },
         { status: 500 }
@@ -88,7 +96,6 @@ export async function POST(request: Request) {
       user: {
         id: updatedUser.id,
         name: updatedUser.name,
-        username: updatedUser.username,
         image_url: updatedUser.image_url,
         country: updatedUser.country,
         updated_at: updatedUser.updated_at,

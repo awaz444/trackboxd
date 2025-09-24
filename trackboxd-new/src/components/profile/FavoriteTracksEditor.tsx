@@ -4,7 +4,8 @@
 import React, { useState } from "react";
 import { Plus, X, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AnnotationForm from "@/components/log/forms/AnnotationForm";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 
 interface Track {
   id: string;
@@ -25,9 +26,16 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
   onClose,
 }) => {
   const [isAddingTrack, setIsAddingTrack] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isRemoving, setIsRemoving] = useState<string | null>(null);
 
   const handleAddTrack = async (track: any) => {
+    if (tracks.length >= 4) {
+      alert("You can only select up to 4 favorite tracks.");
+      return;
+    }
     try {
       const response = await fetch("/api/profile/favorite-tracks", {
         method: "POST",
@@ -53,6 +61,8 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
 
       onTracksUpdate([...tracks, newTrack]);
       setIsAddingTrack(false);
+      setSearchQuery("");
+      setSearchResults([]);
     } catch (error) {
       console.error("Failed to add favorite track:", error);
     }
@@ -141,11 +151,11 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
             ))}
           </div>
 
-          {/* Add Track Form */}
+          {/* Add Track Modal-like Section */}
           {isAddingTrack && (
             <div className="mt-6 p-4 border border-[#5C5537]/20 rounded-lg">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-medium text-[#5C5537]">Add New Track</h3>
+                <h3 className="font-medium text-[#5C5537]">Pick up to 4 tracks</h3>
                 <Button
                   variant="outline"
                   onClick={() => setIsAddingTrack(false)}
@@ -154,14 +164,71 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-              <AnnotationForm
-                onClose={() => setIsAddingTrack(false)}
-                onSave={(annotation) => {
-                  if (annotation.track) {
-                    handleAddTrack(annotation.track);
-                  }
-                }}
-              />
+
+              <div className="relative mb-4">
+                <Input
+                  type="search"
+                  placeholder="Search tracks..."
+                  value={searchQuery}
+                  onChange={async (e) => {
+                    const q = e.target.value;
+                    setSearchQuery(q);
+                    if (!q.trim()) {
+                      setSearchResults([]);
+                      return;
+                    }
+                    setIsSearching(true);
+                    try {
+                      const res = await fetch(`/api/songs/search?q=${encodeURIComponent(q)}`);
+                      const data = await res.json();
+                      // Now single search endpoints return arrays
+                      const results = (Array.isArray(data) ? data : data?.tracks?.items || []).map((track: any) => ({
+                        id: track.id,
+                        name: track.name,
+                        artists: track.artists?.map((a: any) => a.name).join(', '),
+                        album: track.album?.name,
+                        cover: track.album?.images?.[0]?.url,
+                      }));
+                      setSearchResults(results);
+                    } catch (e) {
+                      setSearchResults([]);
+                    } finally {
+                      setIsSearching(false);
+                    }
+                  }}
+                  className="pl-3 pr-10"
+                />
+                {isSearching && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <Loader2 className="w-5 h-5 text-[#5C5537] animate-spin" />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {searchResults.length === 0 && !isSearching && (
+                  <div className="text-center py-8 text-[#5C5537]/50">
+                    <Music className="w-12 h-12 mx-auto mb-2" />
+                    <p>{searchQuery ? `No results for "${searchQuery}"` : 'Search for tracks to add'}</p>
+                  </div>
+                )}
+                {searchResults.map((t) => (
+                  <div
+                    key={t.id}
+                    className="flex items-center gap-3 p-3 hover:bg-[#5C5537]/5 rounded-lg cursor-pointer"
+                    onClick={() => handleAddTrack({ id: t.id, name: t.name, artist: t.artists, coverArt: t.cover })}
+                  >
+                    <div className="w-16 h-16 relative overflow-hidden rounded-lg bg-[#5C5537]/10 flex-shrink-0">
+                      <img src={t.cover || '/default-avatar.jpg'} alt={`${t.name} cover`} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-medium text-[#5C5537] truncate">{t.name}</h4>
+                      <p className="text-sm text-[#5C5537]/70 truncate">{t.artists}</p>
+                      <p className="text-xs text-[#5C5537]/50 truncate">{t.album}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

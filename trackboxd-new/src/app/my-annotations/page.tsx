@@ -67,7 +67,7 @@ const MyAnnotationsPage = () => {
   if (userLoading) {
     return (
       <div className="min-h-screen bg-[#FFFBEb]">
-        <Header />
+        {/* <Header /> */}
         <div className="max-w-5xl mx-auto px-4 py-8 flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
         </div>
@@ -79,7 +79,7 @@ const MyAnnotationsPage = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-[#FFFBEb]">
-        <Header />
+        {/* <Header /> */}
         <div className="max-w-5xl mx-auto px-4 py-8 text-center">
           <p className="text-lg mb-4 text-[#5C5537]">You need to be logged in to view your annotations</p>
           <a 
@@ -96,7 +96,7 @@ const MyAnnotationsPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFBEb]">
-      <Header />
+      {/* <Header /> */}
       
       <div className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-[#5C5537] mb-2">My Annotations</h1>
