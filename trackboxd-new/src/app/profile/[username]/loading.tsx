@@ -17,7 +17,7 @@ export default function ProfileLoading() {
               <div className="h-4 bg-gray-200 rounded w-32 mb-6"></div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-gray-200 rounded-lg h-20"></div>
+                  <div key={i} className="bg-[#5C5537]/10 rounded-lg h-20"></div>
                 ))}
               </div>
             </div>
