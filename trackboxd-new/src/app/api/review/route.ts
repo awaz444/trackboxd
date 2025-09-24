@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { getAlbumDetails, getTrackDetails } from "@/lib/spotify";
 
 export async function POST(req: NextRequest) {
     return handleReviewRequest(req, "POST");
@@ -142,11 +143,54 @@ async function createReview(body: any, supabase: any, userId: string) {
     const { data, error } = await supabase.rpc('begin');
 
     try {
-        // Upsert the spotify item
-        const { error: upsertError } = await supabase
+        // Ensure the spotify item exists with metadata
+        const { data: existingItem, error: fetchItemError } = await supabase
             .from("spotify_items")
-            .upsert({ id: itemId, type: itemType }, { onConflict: "id" });
-        if (upsertError) throw upsertError;
+            .select("id")
+            .eq("id", itemId)
+            .single();
+        if (fetchItemError && fetchItemError.code !== "PGRST116") {
+            throw fetchItemError;
+        }
+
+        if (!existingItem) {
+            if (itemType === "track") {
+                const track = await getTrackDetails(itemId);
+                const newItem = {
+                    id: track.id,
+                    type: "track",
+                    name: track.name,
+                    artist: track.artists?.map((a: any) => a.name).join(", "),
+                    album: track.album?.name,
+                    duration_ms: track.duration_ms,
+                    cover_url: track.album?.images?.[0]?.url ?? null,
+                    spotify_url: track.external_urls?.spotify,
+                };
+                const { error: insertTrackErr } = await supabase
+                    .from("spotify_items")
+                    .insert(newItem);
+                if (insertTrackErr) throw insertTrackErr;
+            } else if (itemType === "album") {
+                const album = await getAlbumDetails(itemId);
+                const newItem = {
+                    id: album.id,
+                    type: "album",
+                    name: album.name,
+                    artist: album.artists?.map((a: any) => a.name).join(", "),
+                    album: null,
+                    duration_ms: null,
+                    cover_url: album.images?.[0]?.url ?? null,
+                    spotify_url: album.external_urls?.spotify,
+                };
+                const { error: insertAlbumErr } = await supabase
+                    .from("spotify_items")
+                    .insert(newItem);
+                if (insertAlbumErr) throw insertAlbumErr;
+            } else {
+                // Should not happen due to earlier validation
+                throw new Error("Unsupported itemType for review");
+            }
+        }
 
         // Create the review
         const { data: review, error: reviewError } = await supabase

@@ -4,8 +4,8 @@ import Footer from "@/components/Footer";
 
 export default function ProfileLoading() {
   return (
-    <div className="min-h-screen bg-[#FFFFF0]">
-      <Header />
+    <div className="min-h-screen bg-[#FFFBEb]">
+      {/* <Header /> */}
       
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="animate-pulse">
@@ -56,3 +56,4 @@ export default function ProfileLoading() {
     </div>
   );
 }
+

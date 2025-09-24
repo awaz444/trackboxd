@@ -17,7 +17,8 @@ export async function GET(request: Request) {
 
   try {
     const response = await searchPlaylists(query);
-    return NextResponse.json(response);
+    const items = response?.playlists?.items || [];
+    return NextResponse.json(items);
   } catch (error) {
     console.error('Spotify search error:', error);
     return NextResponse.json(

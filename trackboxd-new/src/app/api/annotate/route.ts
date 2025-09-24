@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { getTrackDetails } from "@/lib/spotify";
 
 export async function POST(req: NextRequest) {
     return handleAnnotationRequest(req, "POST");
@@ -152,11 +153,33 @@ async function createAnnotation(body: any, supabase: any, userId: string) {
         // Start transaction
         await supabase.rpc('begin');
 
-        // Ensure the track exists in spotify_items
-        const { error: upsertError } = await supabase
+        // Ensure the track exists in spotify_items with metadata
+        const { data: existingItem, error: fetchError } = await supabase
             .from("spotify_items")
-            .upsert({ id: trackId, type: "track" }, { onConflict: "id" });
-        if (upsertError) throw upsertError;
+            .select("id")
+            .eq("id", trackId)
+            .single();
+        if (fetchError && fetchError.code !== 'PGRST116') {
+            throw fetchError;
+        }
+
+        if (!existingItem) {
+            const track = await getTrackDetails(trackId);
+            const newItem = {
+                id: track.id,
+                type: 'track',
+                name: track.name,
+                artist: track.artists?.map((a: any) => a.name).join(', '),
+                album: track.album?.name,
+                duration_ms: track.duration_ms,
+                cover_url: track.album?.images?.[0]?.url ?? null,
+                spotify_url: track.external_urls?.spotify,
+            };
+            const { error: insertError } = await supabase
+                .from('spotify_items')
+                .insert(newItem);
+            if (insertError) throw insertError;
+        }
 
         // Create annotation
         const { data: annotation, error: annotationError } = await supabase

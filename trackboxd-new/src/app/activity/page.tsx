@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ActivityItem, { ActivityItem as ActivityItemType } from "@/components/activity/ActivityItem";
 import useUser from "@/hooks/useUser";
@@ -34,7 +33,7 @@ export default function ActivityPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FFFBEb]">
-        <Header />
+
         <div className="max-w-5xl mx-auto px-4 py-8">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
@@ -47,7 +46,6 @@ export default function ActivityPage() {
 
   return (
     <div className="min-h-screen bg-[#FFFBEb]">
-      <Header />
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>

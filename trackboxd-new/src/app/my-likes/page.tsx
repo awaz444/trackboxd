@@ -271,7 +271,7 @@ const LikeItem = ({
 export default function LikesPage() {
   return (
     <div className="min-h-screen bg-[#FFFFF0]">
-      <Header />
+
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">

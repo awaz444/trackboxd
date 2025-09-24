@@ -179,7 +179,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FFFFF0]">
-        <Header />
+
         <div className="max-w-5xl mx-auto px-4 py-8 text-center">
           <div className="animate-pulse">
             <div className="rounded-full bg-gray-200 h-32 w-32 mx-auto mb-4"></div>
@@ -199,7 +199,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
   if (!profileData) {
     return (
       <div className="min-h-screen bg-[#FFFFF0]">
-        <Header />
+
         <div className="max-w-5xl mx-auto px-4 py-8 text-center">
           <h1 className="text-2xl font-bold text-[#0C3B2E] mb-4">Profile Not Found</h1>
           <p className="text-[#A0A0A0]">The profile you're looking for doesn't exist.</p>
@@ -212,8 +212,8 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
   const { user, stats, favoriteTracks, recentActivity, following } = profileData;
 
   return (
-    <div className="min-h-screen bg-[#FFFFF0]">
-      <Header />
+    <div className="min-h-screen bg-[#FFFBEb]">
+      {/* <Header /> */}
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Success/Error Messages */}
@@ -311,7 +311,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                 <Button 
                   onClick={handleSave}
                   disabled={saving}
-                  className="bg-[#0C3B2E] hover:bg-[#1F2C24] text-white"
+                  className="bg-[#5C5537] hover:bg-[#5C5537] text-[#FFFBEb]"
                 >
                   {saving ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -324,7 +324,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                 <Button 
                   variant="outline" 
                   onClick={handleCancel}
-                  className="border-[#D9D9D9] bg-[#FFFFF5] text-[#0C3B2E] hover:bg-[#F2F3EF]"
+                  className="border-[#5C5537] bg-[#FFFBEb] text-[#5C5537] hover:bg-[#F2F3EF]"
                 >
                   <X className="w-4 h-4 mr-2" />
                   Cancel
@@ -333,7 +333,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
             </div>
 
             {/* Stats Grid - Read Only */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
               <div className="p-4 text-center">
                 <div className="flex justify-center mb-2 text-[#6D9773]">
                   <span className="text-2xl">👥</span>
@@ -362,7 +362,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                 <div className="text-2xl font-bold text-[#0C3B2E]">{stats.annotations}</div>
                 <div className="text-sm text-[#A0A0A0]">Annotations</div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 

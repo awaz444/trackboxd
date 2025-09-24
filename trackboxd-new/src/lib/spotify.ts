@@ -1,5 +1,3 @@
-// spotify.ts (refactored for Client Credentials Flow)
-
 const client_id = process.env.SPOTIFY_CLIENT_ID!;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET!;
 
@@ -19,18 +17,16 @@ const ALBUMS_ENDPOINT = `https://api.spotify.com/v1/albums`;
 let cachedToken: string | null = null;
 let tokenExpiry: number | null = null;
 
-// in-memory token cache
+// ------------------ Token Management ------------------
 
-async function getAccessToken() {
-  const resp = await fetch("https://accounts.spotify.com/api/token", {
+async function fetchNewAccessToken() {
+  const resp = await fetch(TOKEN_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization:
         "Basic " +
-        Buffer.from(
-          `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
-        ).toString("base64"),
+        Buffer.from(`${client_id}:${client_secret}`).toString("base64"),
     },
     body: "grant_type=client_credentials",
   });
@@ -41,16 +37,28 @@ async function getAccessToken() {
   }
 
   const data = await resp.json();
-  return data.access_token; // always fresh
+
+  cachedToken = data.access_token;
+  tokenExpiry = Date.now() + (data.expires_in - 60) * 1000; 
+  // expire 60s early to be safe
+
+  return cachedToken;
+}
+
+async function getAccessToken() {
+  if (!cachedToken || !tokenExpiry || Date.now() >= tokenExpiry) {
+    return await fetchNewAccessToken();
+  }
+  return cachedToken;
 }
 
 // ------------------ Spotify API Helpers ------------------
 
 export const searchTracks = async (query: string, limit = 5) => {
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
   const response = await fetch(
     `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${cachedToken}` } }
   );
   if (!response.ok) throw new Error(`Spotify error: ${response.statusText}`);
   return response.json();
@@ -62,12 +70,18 @@ export async function getTrackDetails(trackId: string) {
     throw new Error(`Invalid track ID format: "${trackId}"`);
   }
 
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
   const url = `https://api.spotify.com/v1/tracks/${trackId}`;
 
   const resp = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${cachedToken}` },
   });
+
+  if (resp.status === 401) {
+    // Token expired unexpectedly → refresh + retry
+    await fetchNewAccessToken();
+    return getTrackDetails(trackId);
+  }
 
   // Always try to log Spotify's actual error body
   if (!resp.ok) {
@@ -85,15 +99,21 @@ export async function searchPlaylists(query: string) {
     throw new Error("Spotify search query cannot be empty");
   }
 
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
 
   const url = new URL("https://api.spotify.com/v1/search");
   url.searchParams.set("q", query);
-  url.searchParams.set("type", "playlist"); // ✅ required
+  url.searchParams.set("type", "playlist");
 
   const resp = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${cachedToken}` },
   });
+
+  if (resp.status === 401) {
+    // Token expired unexpectedly → refresh + retry
+    await fetchNewAccessToken();
+    return searchPlaylists(query);
+  }
 
   if (!resp.ok) {
     const body = await resp.text();
@@ -105,12 +125,12 @@ export async function searchPlaylists(query: string) {
   return resp.json();
 }
 
-
 export const getPlaylistDetails = async (playlistId: string) => {
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
   const response = await fetch(`${PLAYLISTS_ENDPOINT}/${playlistId}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${cachedToken}` },
   });
+
   if (!response.ok) throw new Error(`Spotify error: ${response.statusText}`);
   return response.json();
 };
@@ -122,7 +142,7 @@ interface PlaylistItemsOptions {
 }
 
 export const getPlaylistItems = async (playlistId: string, options?: PlaylistItemsOptions | number) => {
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
   const url = new URL(`${PLAYLISTS_ENDPOINT}/${playlistId}/tracks`);
   
   // Handle both new options object and legacy number parameter
@@ -135,7 +155,7 @@ export const getPlaylistItems = async (playlistId: string, options?: PlaylistIte
   }
 
   const response = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${cachedToken}` },
   });
   if (!response.ok) throw new Error(`Spotify error: ${response.statusText}`);
   return response.json();
@@ -143,9 +163,9 @@ export const getPlaylistItems = async (playlistId: string, options?: PlaylistIte
 
 export const getAlbumDetails = async (albumId: string) => {
   if (!albumId) throw new Error("Album ID is required");
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
   const response = await fetch(`${ALBUMS_ENDPOINT}/${albumId}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${cachedToken}` },
   });
   if (!response.ok) throw new Error(`Spotify error: ${response.statusText}`);
   return response.json();
@@ -158,7 +178,7 @@ interface AlbumTracksOptions {
 
 export const getAlbumTracks = async (albumId: string, options?: AlbumTracksOptions | number) => {
   if (!albumId) throw new Error("Album ID is required");
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
   const url = new URL(`${ALBUMS_ENDPOINT}/${albumId}/tracks`);
   
   // Handle both new options object and legacy number parameter
@@ -170,14 +190,14 @@ export const getAlbumTracks = async (albumId: string, options?: AlbumTracksOptio
   }
 
   const response = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${cachedToken}` },
   });
   if (!response.ok) throw new Error(`Spotify error: ${response.statusText}`);
   return response.json();
 };
 
 export const searchAlbums = async (query: string, limit = 20, offset = 0, market = "US") => {
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
   const url = new URL(SEARCH_ENDPOINT);
   url.searchParams.append("q", query);
   url.searchParams.append("type", "album");
@@ -186,7 +206,7 @@ export const searchAlbums = async (query: string, limit = 20, offset = 0, market
   url.searchParams.append("market", market);
 
   const response = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${cachedToken}` },
   });
   if (!response.ok) throw new Error(`Spotify error: ${response.statusText}`);
   const data = await response.json();
@@ -205,7 +225,7 @@ export const searchTracksAlbumsAndPlaylists = async (
   query: string, 
   options: SearchTracksAlbumsAndPlaylistsOptions = {}
 ) => {
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
   const { 
     trackLimit = 4, 
     albumLimit = 2, 
@@ -217,9 +237,9 @@ export const searchTracksAlbumsAndPlaylists = async (
     `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=${type}&limit=${limit}&market=${market}`;
 
   const [tracksRes, albumsRes, playlistsRes] = await Promise.all([
-    fetch(url("track", trackLimit), { headers: { Authorization: `Bearer ${token}` } }),
-    fetch(url("album", albumLimit), { headers: { Authorization: `Bearer ${token}` } }),
-    fetch(url("playlist", playlistLimit), { headers: { Authorization: `Bearer ${token}` } }),
+    fetch(url("track", trackLimit), { headers: { Authorization: `Bearer ${cachedToken}` } }),
+    fetch(url("album", albumLimit), { headers: { Authorization: `Bearer ${cachedToken}` } }),
+    fetch(url("playlist", playlistLimit), { headers: { Authorization: `Bearer ${cachedToken}` } }),
   ]);
 
   if (!tracksRes.ok || !albumsRes.ok || !playlistsRes.ok) {
@@ -246,15 +266,15 @@ interface SearchTracksAndAlbumsOptions {
 }
 
 export const searchTracksAndAlbums = async (query: string, options: SearchTracksAndAlbumsOptions = {}) => {
-  const token = await getAccessToken();
+  await getAccessToken(); // Ensure token is available
   const { trackLimit = 5, albumLimit = 5, market = 'US' } = options;
 
   const url = (type: string, limit: number) =>
     `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=${type}&limit=${limit}&market=${market}`;
 
   const [tracksRes, albumsRes] = await Promise.all([
-    fetch(url("track", trackLimit), { headers: { Authorization: `Bearer ${token}` } }),
-    fetch(url("album", albumLimit), { headers: { Authorization: `Bearer ${token}` } }),
+    fetch(url("track", trackLimit), { headers: { Authorization: `Bearer ${cachedToken}` } }),
+    fetch(url("album", albumLimit), { headers: { Authorization: `Bearer ${cachedToken}` } }),
   ]);
 
   if (!tracksRes.ok || !albumsRes.ok) {

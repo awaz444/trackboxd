@@ -13,8 +13,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const response = await searchAlbums(query);
-    return NextResponse.json(response);
+    const items = await searchAlbums(query);
+    return NextResponse.json(items || []);
   } catch (error) {
     console.error('Spotify search error:', error);
     return NextResponse.json(

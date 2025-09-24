@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Music, Album, Clock } from "lucide-react";
+import { Music, Album, Clock, Heart } from "lucide-react";
+import useUser from "@/hooks/useUser";
 
 export interface ActivityItem {
   id: string;
@@ -19,6 +20,11 @@ export interface ActivityItem {
   timestamp?: number;
   cover_url?: string;
   spotify_url?: string;
+  // Added for linking and likes
+  item_id?: string;
+  item_type?: "track" | "album" | "playlist" | null;
+  like_count?: number;
+  target_id?: string; // review id or annotation id
 }
 
 interface ActivityItemProps {
@@ -56,7 +62,72 @@ const formatDuration = (seconds: number): string => {
 };
 
 const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
+  const { user } = useUser();
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(activity.like_count || 0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  useEffect(() => {
+    const checkLikeStatus = async () => {
+      if (!user || !activity.target_id) {
+        setInitialLoad(false);
+        return;
+      }
+      try {
+        let url = "";
+        if (activity.type === "review") {
+          url = `/api/like/review?userId=${user.id}&reviewId=${activity.target_id}`;
+        } else if (activity.type === "annotation") {
+          url = `/api/like/annotation?userId=${user.id}&annotationId=${activity.target_id}`;
+        }
+        if (!url) return;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch like status");
+        const data = await res.json();
+        setIsLiked(!!data.isLiked);
+      } catch (e) {
+        // noop
+      } finally {
+        setInitialLoad(false);
+      }
+    };
+    checkLikeStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, activity.target_id, activity.type]);
+
+  const handleToggleLike = async () => {
+    if (!user || !activity.target_id || isLoading || initialLoad) return;
+    setIsLoading(true);
+    const next = !isLiked;
+    const optimistic = next ? likeCount + 1 : Math.max(0, likeCount - 1);
+    setIsLiked(next);
+    setLikeCount(optimistic);
+    try {
+      const endpoint = activity.type === "review" ? "/api/like/review" : "/api/like/annotation";
+      const body = activity.type === "review" 
+        ? { userId: user.id, reviewId: activity.target_id }
+        : { userId: user.id, annotationId: activity.target_id };
+      const res = await fetch(endpoint, {
+        method: next ? "POST" : "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error("Failed to toggle like");
+    } catch (e) {
+      // revert
+      setIsLiked(!next);
+      setLikeCount(activity.like_count || 0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const timeAgo = formatTimeAgo(activity.created_at);
+  const isAlbum = activity.type === "review" && activity.item_type === "album";
+  const itemHref = activity.item_type === "album"
+    ? `/albums/${activity.item_id}`
+    : `/songs/${activity.item_id}`;
 
   const renderContent = () => {
     switch (activity.type) {
@@ -70,9 +141,15 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                 className="w-6 h-6 rounded-full"
               />
               <span className="text-sm text-[#5C5537]/70">
-                {activity.user.name} reviewed
+                <Link href={`/profile/${encodeURIComponent(activity.user.name)}`} className="hover:underline">
+                  {activity.user.name}
+                </Link> reviewed
               </span>
-              <Music className="w-4 h-4 text-[#5C5537]" />
+              {isAlbum ? (
+                <Album className="w-4 h-4 text-[#5C5537]" />
+              ) : (
+                <Music className="w-4 h-4 text-[#5C5537]" />
+              )}
             </div>
             <div className="mb-3 flex items-start gap-3">
               {activity.cover_url ? (
@@ -88,7 +165,9 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
               )}
               <div>
                 <h4 className="font-medium text-[#5C5537]">
-                  {activity.title}
+                  <Link href={itemHref} className="hover:underline">
+                    {activity.title}
+                  </Link>
                 </h4>
                 <p className="text-sm text-[#5C5537]/70">
                   by {activity.artist}
@@ -127,7 +206,9 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                 className="w-6 h-6 rounded-full"
               />
               <span className="text-sm text-[#5C5537]/70">
-                {activity.user.name} annotated
+                <Link href={`/profile/${encodeURIComponent(activity.user.name)}`} className="hover:underline">
+                  {activity.user.name}
+                </Link> annotated
               </span>
               <Clock className="w-4 h-4 text-[#5C5537]" />
             </div>
@@ -145,7 +226,9 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
               )}
               <div>
                 <h4 className="font-medium text-[#5C5537]">
-                  {activity.title}
+                  <Link href={`/songs/${activity.item_id}`} className="hover:underline">
+                    {activity.title}
+                  </Link>
                 </h4>
                 <p className="text-sm text-[#5C5537]/70">
                   by {activity.artist} {activity.timestamp !== undefined && 
@@ -182,8 +265,23 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
             {timeAgo}
           </span>
           <div className="flex items-center gap-4">
-            <button className="flex items-center gap-1 text-sm text-[#5C5537]/70 hover:text-[#5C5537]">
-              <span className="text-xs"></span>
+            <button
+              onClick={handleToggleLike}
+              disabled={isLoading || initialLoad || !user}
+              className={`group flex items-center gap-1 text-sm focus:outline-none ${
+                isLoading || initialLoad || !user
+                  ? "cursor-not-allowed text-[#5C5537]/40"
+                  : "cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]"
+              }`}
+            >
+              <Heart
+                className={`w-4 h-4 transition-all duration-200 ${
+                  isLiked ? 'text-[#5C5537] fill-[#5C5537]' : ''
+                }`}
+              />
+              <span className={`${isLiked ? 'text-[#5C5537] font-medium' : ''}`}>
+                {likeCount}
+              </span>
             </button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
+import { getPlaylistDetails } from '@/lib/spotify';
 
 export async function POST(req: NextRequest) {
   return handlePlaylistLikeRequest(req, 'POST');
@@ -62,34 +63,34 @@ async function handlePlaylistLikeRequest(req: NextRequest, method: 'POST' | 'DEL
     // Start transaction
     await supabase.rpc('begin');
 
-    // Ensure playlist exists in spotify_items
+    // Ensure playlist exists in spotify_items with metadata
     const { data: itemExists, error: itemError } = await supabase
       .from('spotify_items')
       .select('id')
       .eq('id', playlistId)
       .single();
 
-    if (itemError || !itemExists) {
-      // Create entry if it doesn't exist
+    if (itemError && itemError.code !== 'PGRST116') {
+      throw itemError;
+    }
+
+    if (!itemExists) {
+      const playlist = await getPlaylistDetails(playlistId);
+      const newItem = {
+        id: playlist.id,
+        type: 'playlist',
+        name: playlist.name,
+        artist: null,
+        album: null,
+        duration_ms: null,
+        cover_url: playlist.images?.[0]?.url ?? null,
+        spotify_url: playlist.external_urls?.spotify,
+        description: playlist.description ?? null,
+      };
       const { error: createError } = await supabase
         .from('spotify_items')
-        .insert({
-          id: playlistId,
-          type: 'playlist',
-          like_count: 0,
-          review_count: 0,
-          annotation_count: 0,
-          avg_rating: 0.00
-        });
-
-      if (createError) {
-        console.error('Error creating spotify item:', createError);
-        await supabase.rpc('rollback');
-        return NextResponse.json(
-          { error: 'Failed to initialize playlist data' },
-          { status: 500 }
-        );
-      }
+        .insert(newItem);
+      if (createError) throw createError;
     }
 
     if (method === 'POST') {

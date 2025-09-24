@@ -92,7 +92,7 @@ export async function generateMetadata({ params }: ProfilePageProps) {
     }
 
     return {
-        title: `${profileData.user.username} - Trackboxd`,
+        title: `${profileData.user.name} - Trackboxd`,
         description: `View ${profileData.user.username}'s music profile on Trackboxd. See their reviews, annotations, and favorite tracks.`,
         openGraph: {
             title: `${profileData.user.username} - Trackboxd`,
@@ -156,7 +156,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
     return (
         <div className="min-h-screen bg-[#FFFBEb]">
-            <Header />
+            {/* <Header /> */}
 
             <div className="max-w-5xl mx-auto px-4 py-8">
                 <ProfileHeader

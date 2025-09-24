@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Lora } from "next/font/google";
 import "./globals.css";
+import SessionProvider from "@/components/SessionProvider";
+import React from "react";
+import ClientShell from "./shell";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -20,7 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${lora.className} bg-[#FFFFF0] text-[#1F2C24]`}>
-        {children}
+        <SessionProvider>
+          <ClientShell>
+            {children}
+          </ClientShell>
+        </SessionProvider>
       </body>
     </html>
   );

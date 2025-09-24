@@ -147,7 +147,7 @@ const Profile = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-[#FFFFF0]">
-        <Header />
+
         <div className="max-w-5xl mx-auto px-4 py-8 text-center">
           <div className="animate-pulse">
             <div className="rounded-full bg-gray-200 h-32 w-32 mx-auto mb-4"></div>
@@ -208,7 +208,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFFF0]">
-      <Header />
+
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Profile Header - Improved responsiveness */}

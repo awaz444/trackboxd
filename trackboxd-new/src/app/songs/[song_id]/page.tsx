@@ -495,7 +495,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
     if (loading) {
         return (
             <div className="min-h-screen bg-[#FFFBEb]">
-                <Header />
+
                 <div className="max-w-5xl mx-auto px-4 py-8 flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
                 </div>
@@ -507,7 +507,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
     if (error) {
         return (
             <div className="min-h-screen bg-[#FFFBEb]">
-                <Header />
+
                 <div className="max-w-5xl mx-auto px-4 py-8 text-center">
                     <p className="text-red-500">{error}</p>
                 </div>
@@ -519,7 +519,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
     if (!track) {
         return (
             <div className="min-h-screen bg-[#FFFBEb]">
-                <Header />
+
                 <div className="max-w-5xl mx-auto px-4 py-8 text-center">
                     <p className="text-[#5C5537]">Track not found</p>
                 </div>
@@ -530,7 +530,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
 
     return (
         <div className="min-h-screen bg-[#FFFBEb]">
-            <Header />
+
 
             <div className="max-w-5xl mx-auto px-4 py-6">
                 {/* Compact Track Header */}
