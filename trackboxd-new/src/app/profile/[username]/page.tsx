@@ -93,10 +93,10 @@ export async function generateMetadata({ params }: ProfilePageProps) {
 
     return {
         title: `${profileData.user.name} - Trackboxd`,
-        description: `View ${profileData.user.username}'s music profile on Trackboxd. See their reviews, annotations, and favorite tracks.`,
+        description: `View ${profileData.user.name}'s music profile on Trackboxd. See their reviews, annotations, and favorite tracks.`,
         openGraph: {
-            title: `${profileData.user.username} - Trackboxd`,
-            description: `View ${profileData.user.username}'s music profile on Trackboxd.`,
+            title: `${profileData.user.name} - Trackboxd`,
+            description: `View ${profileData.user.name}'s music profile on Trackboxd.`,
             images: profileData.user.image_url
                 ? [profileData.user.image_url]
                 : [],
