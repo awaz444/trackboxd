@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { X, Eye, EyeOff, User, Mail, Lock, Image, Music } from 'lucide-react';
+import { X, Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
 import { signIn } from "next-auth/react";
 import { createClient } from "@/lib/supabase/client";
 import { findUserByNameOrEmail } from "@/lib/auth-utils";
@@ -18,8 +18,6 @@ interface FormData {
   password: string;
   confirmPassword: string;
   name: string;
-  imageUrl: string;
-  spotifyUrl: string;
 }
 
 interface FormErrors {
@@ -27,8 +25,6 @@ interface FormErrors {
   password?: string;
   confirmPassword?: string;
   name?: string;
-  imageUrl?: string;
-  spotifyUrl?: string;
   general?: string;
 }
 
@@ -45,8 +41,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
     password: '',
     confirmPassword: '',
     name: '',
-    imageUrl: '',
-    spotifyUrl: '',
   });
 
   const supabase = createClient();
@@ -64,8 +58,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
     // Password validation
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
     }
 
     if (mode === 'signup') {
@@ -85,14 +79,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
         newErrors.confirmPassword = 'Passwords do not match';
       }
 
-      // Optional field validation
-      if (formData.imageUrl && !/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(formData.imageUrl)) {
-        newErrors.imageUrl = 'Please enter a valid image URL';
-      }
-
-      if (formData.spotifyUrl && !/^https:\/\/open\.spotify\.com\/user\/.+$/.test(formData.spotifyUrl)) {
-        newErrors.spotifyUrl = 'Please enter a valid Spotify profile URL';
-      }
     }
 
     setErrors(newErrors);
@@ -118,23 +104,32 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
     setErrors({});
 
     try {
+      // Normalize inputs
+      const email = formData.email.trim().toLowerCase();
+      const name = formData.name.trim();
+
       // Sign up with Supabase Auth
       const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
+        email,
         password: formData.password,
         options: {
           data: {
-            name: formData.name,
-            image_url: formData.imageUrl || null,
+            name,
           }
         }
       });
 
       if (error) {
-        if (error.message.includes('already registered')) {
+        console.error('Supabase signup error:', error);
+        const message = error.message || 'Unable to sign up';
+        if (/already\s*registered|exists/i.test(message)) {
           setErrors({ email: 'An account with this email already exists' });
+        } else if (/password/i.test(message)) {
+          setErrors({ password: message });
+        } else if (/email/i.test(message)) {
+          setErrors({ email: message });
         } else {
-          setErrors({ general: error.message });
+          setErrors({ general: message });
         }
         return;
       }
@@ -146,10 +141,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
           .from('users')
           .insert({
             id: data.user.id,
-            email: formData.email,
-            name: formData.name,
-            image_url: formData.imageUrl || null,
-            spotify_url: formData.spotifyUrl || null,
+            email,
+            name,
+            image_url: null,
+            spotify_url: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           });
@@ -174,8 +169,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
             password: '',
             confirmPassword: '',
             name: '',
-            imageUrl: '',
-            spotifyUrl: '',
           });
           // Redirect to activity page
           router.push('/activity');
@@ -223,13 +216,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       } else if (result?.ok) {
         onClose();
         // Reset form
-        setFormData({
+          setFormData({
           email: '',
           password: '',
           confirmPassword: '',
           name: '',
-          imageUrl: '',
-          spotifyUrl: '',
         });
         // Redirect to activity page
         router.push('/activity');
@@ -250,15 +241,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       password: '',
       confirmPassword: '',
       name: '',
-      imageUrl: '',
-      spotifyUrl: '',
     });
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-5">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-[#5C5537]/20 backdrop-blur-sm"
@@ -318,36 +307,38 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
 
-          {/* Password Field */}
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-[#5C5537] mb-2">
-              Password *
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                className={`w-full pl-10 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                  errors.password 
-                    ? 'border-red-300 focus:ring-red-500' 
-                    : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                }`}
-                placeholder="Enter your password"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+          {/* Password Field (login only) */}
+          {mode === 'login' && (
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-[#5C5537] mb-2">
+                Password *
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  className={`w-full pl-10 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
+                    errors.password 
+                      ? 'border-red-300 focus:ring-red-500' 
+                      : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                  }`}
+                  placeholder="Enter your password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             </div>
-            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-          </div>
+          )}
 
           {/* Signup-only fields */}
           {mode === 'signup' && (
@@ -375,8 +366,37 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                 </div>
                 {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
               </div>
+              {/* Move Password + Confirm Password to bottom */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-[#5C5537] mb-2">
+                  Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    className={`w-full pl-10 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
+                      errors.password 
+                        ? 'border-red-300 focus:ring-red-500' 
+                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                    }`}
+                    placeholder="Enter your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              </div>
 
-              {/* Confirm Password Field */}
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#5C5537] mb-2">
                   Confirm Password *
@@ -405,52 +425,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   </button>
                 </div>
                 {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
-              </div>
-
-              {/* Profile Image URL Field */}
-              <div>
-                <label htmlFor="imageUrl" className="block text-sm font-medium text-[#5C5537] mb-2">
-                  Profile Image URL (optional)
-                </label>
-                <div className="relative">
-                  <Image className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
-                  <input
-                    type="url"
-                    id="imageUrl"
-                    value={formData.imageUrl}
-                    onChange={(e) => handleInputChange('imageUrl', e.target.value)}
-                    className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                      errors.imageUrl 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                    }`}
-                    placeholder="https://example.com/your-image.jpg"
-                  />
-                </div>
-                {errors.imageUrl && <p className="text-red-500 text-xs mt-1">{errors.imageUrl}</p>}
-              </div>
-
-              {/* Spotify URL Field */}
-              <div>
-                <label htmlFor="spotifyUrl" className="block text-sm font-medium text-[#5C5537] mb-2">
-                  Spotify Profile URL (optional)
-                </label>
-                <div className="relative">
-                  <Music className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
-                  <input
-                    type="url"
-                    id="spotifyUrl"
-                    value={formData.spotifyUrl}
-                    onChange={(e) => handleInputChange('spotifyUrl', e.target.value)}
-                    className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                      errors.spotifyUrl 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                    }`}
-                    placeholder="https://open.spotify.com/user/your-username"
-                  />
-                </div>
-                {errors.spotifyUrl && <p className="text-red-500 text-xs mt-1">{errors.spotifyUrl}</p>}
               </div>
             </>
           )}

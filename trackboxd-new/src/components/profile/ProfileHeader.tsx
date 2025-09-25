@@ -73,7 +73,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   return (
     <div className="flex flex-col items-center md:flex-row gap-6 mb-6">
       {/* Profile Image - Smaller */}
-      <div className="flex-shrink-0 flex justify-center md:justify-start">
+      <div className="flex-shrink-0 flex justify-center md:justify-start mb-2">
         <div className="relative">
           <img 
             src={user.image_url || "/default-avatar.jpg"} 

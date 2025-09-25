@@ -261,16 +261,16 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#FFFFF0]">
+            <div className="min-h-screen bg-[#FFFBEb]">
                 <div className="max-w-5xl mx-auto px-4 py-8 text-center">
                     <div className="animate-pulse">
-                        <div className="rounded-full bg-gray-200 h-32 w-32 mx-auto mb-4"></div>
-                        <div className="h-6 bg-gray-200 rounded w-48 mx-auto mb-4"></div>
+                        <div className="rounded-full bg-[#5C5537]/10 h-32 w-32 mx-auto mb-4"></div>
+                        <div className="h-6 bg-[#5C5537]/10 rounded w-48 mx-auto mb-4"></div>
                         <div className="grid grid-cols-4 gap-4 mt-8">
                             {[...Array(4)].map((_, i) => (
                                 <div
                                     key={i}
-                                    className="bg-gray-200 rounded-lg aspect-square"></div>
+                                    className="bg-[#5C5537]/10 rounded-lg aspect-square"></div>
                             ))}
                         </div>
                     </div>
@@ -474,7 +474,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                 <Button
                                     variant="outline"
                                     onClick={handleCancel}
-                                    className="border-[#5C5537] bg-[#FFFBEb] text-[#5C5537] hover:bg-[#F2F3EF]">
+                                    className="border-[#5C5537] bg-[#FFFBEb] text-[#5C5537] hover:bg-[#FFFBEb]">
                                     <X className="w-4 h-4 mr-2" />
                                     Cancel
                                 </Button>
