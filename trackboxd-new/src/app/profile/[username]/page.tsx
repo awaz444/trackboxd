@@ -23,9 +23,9 @@ interface ProfileData {
     user: {
         id: string;
         name: string;
-        username: string;
         image_url?: string;
         country?: string;
+        spotify_url?: string;  // Make sure this exists
         created_at: string;
     };
     stats: {
@@ -61,15 +61,16 @@ interface ProfileData {
 
 async function getProfileData(username: string): Promise<ProfileData | null> {
     try {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/profile/${username}`,
-            {
-                cache: "no-store", // Prevent caching
-            }
-        );
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+        const url = `${baseUrl}/api/profile/${encodeURIComponent(username)}`;
+        const response = await fetch(url, { cache: "no-store" });
 
         if (!response.ok) {
             return null;
+        }
+
+        if (process.env.NODE_ENV === "development") {
+            console.log("Raw response from profile API:", await response.clone().text());
         }
 
         return await response.json();
@@ -111,10 +112,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         notFound();
     }
 
+    // ADD THIS DEBUG LOG to see what's actually coming from the API
+    console.log("Fetched profile data - USER OBJECT:", profileData.user);
+    console.log("Spotify URL:", profileData.user.spotify_url);
+    console.log("Full response:", JSON.stringify(profileData, null, 2));
+
     // Get current session to determine if this is the user's own profile
     const session = await getServerSession(authOptions);
     const isOwnProfile = session?.user?.id === profileData.user.id;
-    
+
     // Check if current user is following this profile owner
     let initialIsFollowing = false;
     if (!isOwnProfile && session?.user?.id) {
@@ -126,10 +132,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 .eq("follower_id", session.user.id)
                 .eq("following_id", profileData.user.id)
                 .single();
-            
+
             initialIsFollowing = !!follow;
         } catch (error) {
-            console.error('Failed to check follow status:', error);
+            console.error("Failed to check follow status:", error);
         }
     }
 
@@ -160,7 +166,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
             <div className="max-w-5xl mx-auto px-4 py-8">
                 <ProfileHeader
-                    user={user}
+                    user={{
+                        id: user.id,
+                        name: user.name,
+                        image_url: user.image_url,
+                        country: user.country,
+            spotify_url: user.spotify_url,
+            instagram_url: (user as any).instagram_url,
+                        created_at: user.created_at
+                    }}
                     stats={stats}
                     isOwnProfile={isOwnProfile}
                     username={params.username}

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { name, country, image_url, spotify_url } = body; // Remove username
+    const { name, country, image_url, spotify_url, instagram_url } = body; // Remove username
 
     // Validate required fields - only name is required now
     if (!name) {
@@ -68,6 +68,7 @@ export async function POST(request: Request) {
         country: country || null,
         image_url: image_url || null,
         spotify_url: spotify_url || null,
+        instagram_url: instagram_url || null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", session.user.id)

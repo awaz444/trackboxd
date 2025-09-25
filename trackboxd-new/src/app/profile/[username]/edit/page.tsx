@@ -84,6 +84,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
         country: "",
         image_url: "",
         spotify_url: "",
+        instagram_url: "",
     });
 
     // Check if user is authorized to edit this profile
@@ -116,6 +117,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                     country: data.user.country || "",
                     image_url: data.user.image_url || "",
                     spotify_url: data.user.spotify_url || "",
+                    instagram_url: data.user.instagram_url || "",
                 });
             } catch (error) {
                 console.error("Failed to fetch profile data:", error);
@@ -360,7 +362,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                     <Select
                                         value={formData.country}
                                         onValueChange={handleCountryChange}>
-                                        <SelectTrigger className="w-full md:w-80">
+                                    <SelectTrigger className="w-full md:w-80 bg-[#FFFBEb]">
                                             <SelectValue placeholder="Select your country" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -438,6 +440,19 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                         value={formData.spotify_url}
                                         onChange={handleInputChange}
                                         placeholder="https://open.spotify.com/user/..."
+                                        className="w-full md:w-80"
+                                    />
+                                </div>
+
+                                <div className="mb-4">
+                                    <label className="block text-sm text-left font-medium text-[#0C3B2E] mb-2 ml-1">
+                                        Instagram Profile URL
+                                    </label>
+                                    <Input
+                                        name="instagram_url"
+                                        value={formData.instagram_url}
+                                        onChange={handleInputChange}
+                                        placeholder="https://instagram.com/your_handle"
                                         className="w-full md:w-80"
                                     />
                                 </div>

@@ -28,6 +28,8 @@ interface FollowingUser {
   id: string;
   name: string;
   image_url?: string;
+  spotify_url?: string; // Add spotify_url here
+  instagram_url?: string;
 }
 
 interface ProfileData {
@@ -36,6 +38,8 @@ interface ProfileData {
     name: string;
     image_url?: string;
     country?: string;
+    spotify_url?: string; // Ensure this is included
+    instagram_url?: string;
     created_at: string;
   };
   stats: {
@@ -245,7 +249,7 @@ export async function GET(
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, 20);
 
-    // Get following
+    // Get following - include spotify_url and instagram_url in the select
     const { data: following, error: followingError } = await supabase
       .from("follows")
       .select(`
@@ -253,7 +257,9 @@ export async function GET(
         users!follows_following_id_fkey (
           id,
           name,
-          image_url
+          image_url,
+          spotify_url,
+          instagram_url
         )
       `)
       .eq("follower_id", user.id)
@@ -267,6 +273,8 @@ export async function GET(
         name: user.name,
         image_url: user.image_url || undefined,
         country: user.country || undefined,
+        spotify_url: user.spotify_url || undefined, // Include user's spotify_url
+        instagram_url: (user as any).instagram_url || undefined,
         created_at: user.created_at,
       },
       stats: {
@@ -294,12 +302,14 @@ export async function GET(
         return {
           id: u.id,
           name: u.name,
-          image_url: u.image_url
+          image_url: u.image_url,
+          spotify_url: u.spotify_url || undefined,
+          instagram_url: u.instagram_url || undefined
         } as FollowingUser;
       }).filter(Boolean) as FollowingUser[] || [],
     };
 
-    console.log('Profile data fetched:', profileData);
+    // console.log('Profile data fetched:', profileData);
 
     return NextResponse.json(profileData);
   } catch (error) {
