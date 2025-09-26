@@ -69,9 +69,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
     const pathname = usePathname();
 
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState<SearchResults | null>(
-        null
-    );
+    const [searchResults, setSearchResults] = useState<any | null>(null);
     const [isSearching, setIsSearching] = useState(false);
     const [showResults, setShowResults] = useState(false);
     const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -91,9 +89,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
 
             try {
                 const res = await fetch(
-                    `/api/search/tracksAlbumsAndPlaylists?q=${encodeURIComponent(
-                        searchQuery
-                    )}&trackLimit=3&albumLimit=2&playlistLimit=2`
+                    `/api/search/all?q=${encodeURIComponent(searchQuery)}&trackLimit=2&albumLimit=1&playlistLimit=1&userLimit=2`
                 );
 
                 if (!res.ok) throw new Error("Search failed");
@@ -156,12 +152,25 @@ const Header: React.FC<HeaderProps> = ({}) => {
             case "playlist":
                 router.push(`/playlists/${id}`);
                 break;
+            case "user":
+                router.push(`/profile/${id}`);
+                break;
             default:
                 console.warn("Unknown type:", type);
                 return;
         }
         setSearchQuery("");
         setShowResults(false);
+    };
+
+    const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (searchQuery.trim()) {
+                router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                setShowResults(false);
+            }
+        }
     };
 
     useEffect(() => {
@@ -386,6 +395,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                         e.target.value
                                                     )
                                                 }
+                                                onKeyDown={handleEnter}
                                                 className="w-full border border-[#5C5537]/30 text-[#5C5537] rounded-lg pl-3 pr-8 py-2 h-10 bg-[#FFFBEb] focus:outline-none"
                                                 onFocus={() =>
                                                     setShowResults(true)
@@ -421,7 +431,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                 </div>
                                             ) : searchResults ? (
                                                 <div className="py-2">
-                                                    {searchResults.tracks.filter(
+                                                    {searchResults.tracks?.filter(
                                                         Boolean
                                                     ).length > 0 && (
                                                         <>
@@ -433,23 +443,48 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                     .filter(
                                                                         Boolean
                                                                     )
-                                                                    .map(
-                                                                        (
-                                                                            track
-                                                                        ) => (
+                                                                    .map((track: any) => (
                                                                             <SearchResultItem
                                                                                 key={`track-${track.id}`}
                                                                                 item={
                                                                                     track
                                                                                 }
                                                                             />
-                                                                        )
-                                                                    )}
+                                                                        ))}
                                                             </div>
                                                         </>
                                                     )}
 
-                                                    {searchResults.albums.filter(
+                                                    {searchResults.users?.filter(Boolean).length > 0 && (
+                                                        <>
+                                                            <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
+                                                            <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                Users
+                                                            </div>
+                                                            <div className="mb-2">
+                                                                {searchResults.users
+                                                                    .filter(Boolean)
+                                                                    .map((u: any) => (
+                                                                        <div
+                                                                            key={`user-${u.id}`}
+                                                                            className="flex items-center gap-3 p-3 hover:bg-[#5C5537]/10 rounded-lg cursor-pointer"
+                                                                            onClick={() => handleResultClick("user", u.name)}
+                                                                        >
+                                                                            <img src={u.image_url || "/default-avatar.jpg"} alt={u.name} className="w-8 h-8 rounded-full object-cover" />
+                                                                            <div className="flex-1 min-w-0">
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <h4 className="font-medium text-[#5C5537] truncate">{u.name}</h4>
+                                                                                    <span className="text-xs px-2 py-1 rounded-full bg-[#5C5537]/10 text-[#5C5537]">USER</span>
+                                                                                </div>
+                                                                                {u.country && <p className="text-xs text-[#5C5537]/70 truncate">{u.country}</p>}
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                            </div>
+                                                        </>
+                                                    )}
+
+                                                    {searchResults.albums?.filter(
                                                         Boolean
                                                     ).length > 0 && (
                                                         <>
@@ -462,23 +497,19 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                     .filter(
                                                                         Boolean
                                                                     )
-                                                                    .map(
-                                                                        (
-                                                                            album
-                                                                        ) => (
+                                                                    .map((album: any) => (
                                                                             <SearchResultItem
                                                                                 key={`album-${album.id}`}
                                                                                 item={
                                                                                     album
                                                                                 }
                                                                             />
-                                                                        )
-                                                                    )}
+                                                                        ))}
                                                             </div>
                                                         </>
                                                     )}
 
-                                                    {searchResults.playlists.filter(
+                                                    {searchResults.playlists?.filter(
                                                         Boolean
                                                     ).length > 0 && (
                                                         <>
@@ -491,18 +522,14 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                     .filter(
                                                                         Boolean
                                                                     )
-                                                                    .map(
-                                                                        (
-                                                                            playlist
-                                                                        ) => (
+                                                                    .map((playlist: any) => (
                                                                             <SearchResultItem
                                                                                 key={`playlist-${playlist.id}`}
                                                                                 item={
                                                                                     playlist
                                                                                 }
                                                                             />
-                                                                        )
-                                                                    )}
+                                                                        ))}
                                                             </div>
                                                         </>
                                                     )}
@@ -653,6 +680,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                             onChange={(e) =>
                                                 setSearchQuery(e.target.value)
                                             }
+                                            onKeyDown={handleEnter}
                                             className="w-full border border-[#5C5537]/30 text-[#5C5537] rounded-lg pl-3 pr-8 py-2 h-10 bg-[#FFFBEb] focus:outline-none"
                                             onFocus={() => setShowResults(true)}
                                             autoFocus
@@ -668,7 +696,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                         </div>
                                                     ) : searchResults ? (
                                                         <div className="py-2">
-                                                            {searchResults.tracks.filter(
+                                                            {searchResults.tracks?.filter(
                                                                 Boolean
                                                             ).length > 0 && (
                                                                 <>
@@ -680,23 +708,48 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                             .filter(
                                                                                 Boolean
                                                                             )
-                                                                            .map(
-                                                                                (
-                                                                                    track
-                                                                                ) => (
+                                                                            .map((track: any) => (
                                                                                     <SearchResultItem
                                                                                         key={`track-${track.id}`}
                                                                                         item={
                                                                                             track
                                                                                         }
                                                                                     />
-                                                                                )
-                                                                            )}
+                                                                                ))}
                                                                     </div>
                                                                 </>
                                                             )}
 
-                                                            {searchResults.albums.filter(
+                                                            {searchResults.users?.filter(Boolean).length > 0 && (
+                                                                <>
+                                                                    <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
+                                                                    <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                        Users
+                                                                    </div>
+                                                                    <div className="mb-2">
+                                                                        {searchResults.users
+                                                                            .filter(Boolean)
+                                                                            .map((u: any) => (
+                                                                                <div
+                                                                                    key={`user-${u.id}`}
+                                                                                    className="flex items-center gap-3 p-3 hover:bg-[#5C5537]/10 rounded-lg cursor-pointer"
+                                                                                    onClick={() => handleResultClick("user", u.name)}
+                                                                                >
+                                                                                    <img src={u.image_url || "/default-avatar.jpg"} alt={u.name} className="w-8 h-8 rounded-full object-cover" />
+                                                                                    <div className="flex-1 min-w-0">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <h4 className="font-medium text-[#5C5537] truncate">{u.name}</h4>
+                                                                                            <span className="text-xs px-2 py-1 rounded-full bg-[#5C5537]/10 text-[#5C5537]">USER</span>
+                                                                                        </div>
+                                                                                        {u.country && <p className="text-xs text-[#5C5537]/70 truncate">{u.country}</p>}
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))}
+                                                                    </div>
+                                                                </>
+                                                            )}
+
+                                                            {searchResults.albums?.filter(
                                                                 Boolean
                                                             ).length > 0 && (
                                                                 <>
@@ -709,23 +762,19 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                             .filter(
                                                                                 Boolean
                                                                             )
-                                                                            .map(
-                                                                                (
-                                                                                    album
-                                                                                ) => (
+                                                                            .map((album: any) => (
                                                                                     <SearchResultItem
                                                                                         key={`album-${album.id}`}
                                                                                         item={
                                                                                             album
                                                                                         }
                                                                                     />
-                                                                                )
-                                                                            )}
+                                                                                ))}
                                                                     </div>
                                                                 </>
                                                             )}
 
-                                                            {searchResults.playlists.filter(
+                                                            {searchResults.playlists?.filter(
                                                                 Boolean
                                                             ).length > 0 && (
                                                                 <>
@@ -738,18 +787,14 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                             .filter(
                                                                                 Boolean
                                                                             )
-                                                                            .map(
-                                                                                (
-                                                                                    playlist
-                                                                                ) => (
+                                                                            .map((playlist: any) => (
                                                                                     <SearchResultItem
                                                                                         key={`playlist-${playlist.id}`}
                                                                                         item={
                                                                                             playlist
                                                                                         }
                                                                                     />
-                                                                                )
-                                                                            )}
+                                                                                ))}
                                                                     </div>
                                                                 </>
                                                             )}
