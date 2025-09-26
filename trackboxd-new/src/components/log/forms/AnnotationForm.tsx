@@ -6,10 +6,8 @@ import { Search, X, Music, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useUser from "@/hooks/useUser";
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import ToggleButton from '@mui/material/ToggleButton';
-import PublicIcon from '@mui/icons-material/Public';
-import LockIcon from '@mui/icons-material/Lock';
+import { Lock } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface InitialAnnotation {
   id: string;
@@ -427,37 +425,25 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
 
             {/* Visibility Toggle */}
             <div className="pt-2">
-              <label className="block text-sm font-medium text-[#5C5537] mb-2">
-                Visibility
-              </label>
-              <ToggleButtonGroup
-                value={visibility}
-                exclusive
-                onChange={(e, newVisibility) => {
-                  if (newVisibility) setVisibility(newVisibility);
-                }}
-                aria-label="annotation visibility"
-                className="w-full"
-              >
-                <ToggleButton
-                  value="public"
-                  className={`flex-1 py-2 ${visibility === 'public' ? 'bg-[#5C5537] text-white' : 'bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/20'}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <PublicIcon fontSize="small" />
-                    <span>Public</span>
-                  </div>
-                </ToggleButton>
-                <ToggleButton
-                  value="private"
-                  className={`flex-1 py-2 ${visibility === 'private' ? 'bg-[#5C5537] text-white' : 'bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/20'}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <LockIcon fontSize="small" />
-                    <span>Private</span>
-                  </div>
-                </ToggleButton>
-              </ToggleButtonGroup>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="private-toggle" 
+                  checked={visibility === 'private'}
+                  onCheckedChange={(checked) => {
+                    setVisibility(checked ? 'private' : 'public');
+                  }}
+                  className="border-[#5C5537]/50 data-[state=checked]:bg-[#5C5537] data-[state=checked]:border-[#5C5537]"
+                />
+                <div className="flex items-center gap-1.5">
+                  <Lock className="h-4 w-4 text-[#5C5537]" />
+                  <label 
+                    htmlFor="private-toggle" 
+                    className="text-sm font-medium leading-none text-[#5C5537] cursor-pointer"
+                  >
+                    Make this annotation private
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
