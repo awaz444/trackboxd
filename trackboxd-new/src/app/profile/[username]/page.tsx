@@ -83,7 +83,10 @@ async function getProfileData(username: string): Promise<ProfileData | null> {
         }
 
         if (process.env.NODE_ENV === "development") {
-            console.log("Raw response from profile API:", await response.clone().text());
+            console.log(
+                "Raw response from profile API:",
+                await response.clone().text()
+            );
         }
 
         return await response.json();
@@ -166,7 +169,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         following = [],
     } = profileData;
 
-    const reviewAndAnnotations = (recentActivity || []).filter(a => a && a.type !== "like").slice(0, 10);
+    const reviewAndAnnotations = (recentActivity || [])
+        .filter((a) => a && a.type !== "like")
+        .slice(0, 10);
 
     return (
         <div className="min-h-screen bg-[#FFFBEb]">
@@ -179,9 +184,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         name: user.name,
                         image_url: user.image_url,
                         country: user.country,
-            spotify_url: user.spotify_url,
-            instagram_url: (user as any).instagram_url,
-                        created_at: user.created_at
+                        spotify_url: user.spotify_url,
+                        instagram_url: (user as any).instagram_url,
+                        created_at: user.created_at,
                     }}
                     stats={stats}
                     isOwnProfile={isOwnProfile}
@@ -197,60 +202,188 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
                 {/* Reviews & Annotations */}
                 <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-[#5C5537] mb-4">Reviews & Annotations</h2>
+                    <h2 className="text-2xl font-bold text-[#5C5537] mb-4">
+                        Reviews & Annotations
+                    </h2>
                     <div className="space-y-3">
                         {reviewAndAnnotations.map((a) => (
-                            <div key={a.id} className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4">
+                            <div
+                                key={a.id}
+                                className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <div className="text-sm text-[#5C5537]/70">{a.timestamp}</div>
-                                    <div className="text-xs uppercase text-[#5C5537]/60">{a.type}</div>
+                                    <div className="text-sm text-[#5C5537]/70">
+                                        {a.timestamp}
+                                    </div>
+                                    <div className="text-xs uppercase text-[#5C5537]/60">
+                                        {a.type}
+                                    </div>
                                 </div>
                                 <div className="mb-1 text-sm text-[#5C5537]">
-                                    <span className="font-semibold">{a.track.title}</span>
-                                    <span className="text-[#5C5537]/70"> by {a.track.artist}</span>
+                                    <span className="font-semibold">
+                                        {a.track.title}
+                                    </span>
+                                    <span className="text-[#5C5537]/70">
+                                        {" "}
+                                        by {a.track.artist}
+                                    </span>
                                 </div>
-                                {a.type === 'review' && a.rating !== undefined && (
-                                    <div className="flex items-center text-[#FFBA00] text-sm mb-1">
-                                        <Star className="h-4 w-4 mr-1" />
-                                        <span>{a.rating}</span>
+                                {a.type === "review" &&
+                                    a.rating !== undefined && (
+                                        <div className="flex items-center text-[#FFBA00] text-sm mb-1">
+                                            <Star className="h-4 w-4 mr-1" />
+                                            <span>{a.rating}</span>
+                                        </div>
+                                    )}
+                                {a.text && (
+                                    <div className="text-sm text-[#5C5537]/90 line-clamp-3">
+                                        {a.text}
                                     </div>
                                 )}
-                                {a.text && (
-                                    <div className="text-sm text-[#5C5537]/90 line-clamp-3">{a.text}</div>
-                                )}
                                 <div className="mt-2 text-xs">
-                                    <Link href={`/songs/${a.track.id}`} className="text-[#5C5537]/70 hover:text-[#5C5537]">View track</Link>
+                                    <Link
+                                        href={`/songs/${a.track.id}`}
+                                        className="text-[#5C5537]/70 hover:text-[#5C5537]">
+                                        View track
+                                    </Link>
                                 </div>
                             </div>
                         ))}
                         {reviewAndAnnotations.length === 0 && (
-                            <div className="text-center text-[#5C5537]/70 py-8">No recent reviews or annotations</div>
+                            <div className="text-center text-[#5C5537]/70 py-8">
+                                No recent reviews or annotations
+                            </div>
                         )}
                     </div>
                 </div>
 
                 {/* Likes */}
                 <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-[#5C5537] mb-4">Recent Likes</h2>
-                    <div className="space-y-2">
-                        {(likesActivity || []).map((l) => (
-                            <div key={l.id} className="text-sm text-[#5C5537]">
-                                <Link href={l.links.subjectProfile} className="font-semibold hover:underline">{user.name}</Link>
-                                <span className="text-[#5C5537]/70"> {l.sentence.replace(user.name, '').trim()}</span>
-                                {l.links.targetProfile && (
-                                    <>
-                                        {' '}<Link href={l.links.targetProfile} className="font-medium hover:underline">profile</Link>
-                                    </>
-                                )}
-                                {l.links.itemHref && (
-                                    <>
-                                        {' '}<Link href={l.links.itemHref} className="font-medium hover:underline">item</Link>
-                                    </>
-                                )}
-                            </div>
-                        ))}
+                    <h2 className="text-2xl font-bold text-[#5C5537] mb-4">
+                        Recent Likes
+                    </h2>
+                    <div className="space-y-3">
+                        {(likesActivity || []).map((l) => {
+                            const renderSentenceWithEmbeddedLinks = () => {
+                                const sentence = l.sentence;
+                                const links = l.links;
+
+                                const parts = sentence.split(" ");
+                                const subject = parts[0]; // Always the profile owner
+                                const verb = parts[1]; // Always "liked"
+
+                                let remainingParts = parts.slice(2);
+                                let result = [];
+
+                                // Just render the subject as plain text, but keep it semibold
+                                result.push(
+                                    <span
+                                        key="subject"
+                                        className="font-semibold text-[#5C5537]">
+                                        {subject}
+                                    </span>
+                                );
+                                result.push(" ");
+                                result.push(
+                                    <span className="font-medium text-[#5C5537]/70">{verb}</span>
+                                );
+                                result.push(" ");
+
+                                // Check if there's a target user (contains apostrophe s)
+                                const targetIndex = remainingParts.findIndex(
+                                    (part) => part.includes("'s")
+                                );
+                                if (
+                                    targetIndex !== -1 &&
+                                    links.targetProfile
+                                ) {
+                                    const targetName =
+                                        remainingParts[targetIndex].replace(
+                                            "'s",
+                                            ""
+                                        );
+
+                                    // Add target user link with semibold
+                                    result.push(
+                                        <Link
+                                            key="target"
+                                            href={links.targetProfile}
+                                            className="font-semibold text-[#5C5537] hover:underline">
+                                            {targetName}
+                                        </Link>
+                                    );
+                                    result.push("'s ");
+
+                                    remainingParts = [
+                                        ...remainingParts.slice(0, targetIndex),
+                                        ...remainingParts.slice(
+                                            targetIndex + 1
+                                        ),
+                                    ];
+                                }
+
+                                // Add the type (playlist, album, annotation, review, etc.) with medium weight
+                                if (remainingParts.length > 0) {
+                                    result.push(
+                                        <span className="font-medium text-[#5C5537]/70">
+                                            {remainingParts[0]}
+                                        </span>
+                                    );
+                                    result.push(" ");
+                                    remainingParts = remainingParts.slice(1);
+                                }
+
+                                // Handle "on" or "of" prepositions with medium weight
+                                if (
+                                    remainingParts.length > 0 &&
+                                    (remainingParts[0] === "on" ||
+                                        remainingParts[0] === "of")
+                                ) {
+                                    result.push(
+                                        <span className="font-medium text-[#5C5537]/70">
+                                            {remainingParts[0]}
+                                        </span>
+                                    );
+                                    result.push(" ");
+                                    remainingParts = remainingParts.slice(1);
+                                }
+
+                                // The remaining parts are the item name - link them with semibold
+                                if (
+                                    remainingParts.length > 0 &&
+                                    links.itemHref
+                                ) {
+                                    const itemText =
+                                        remainingParts.join(" ");
+                                    result.push(
+                                        <Link
+                                            key="item"
+                                            href={links.itemHref}
+                                            className="font-semibold text-[#5C5537] hover:underline">
+                                            {itemText}
+                                        </Link>
+                                    );
+                                } else if (remainingParts.length > 0) {
+                                    // If no item link, just add the text with medium weight
+                                    result.push(
+                                        <span className="font-medium text-[#5C5537]/70">
+                                            {remainingParts.join(" ")}
+                                        </span>
+                                    );
+                                }
+
+                                return result;
+                            };
+
+                            return (
+                                <div className="text-sm text-[#5C5537]">
+                                    {renderSentenceWithEmbeddedLinks()}
+                                </div>
+                            );
+                        })}
                         {(!likesActivity || likesActivity.length === 0) && (
-                            <div className="text-center text-[#5C5537]/70 py-8">No recent likes</div>
+                            <div className="text-center text-[#5C5537]/70 py-8">
+                                No recent likes
+                            </div>
                         )}
                     </div>
                 </div>
