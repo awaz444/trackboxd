@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
         albumArray.sort((a, b) => b.count - a.count);
 
         // Get top 3 album IDs
-        const topAlbumIds = albumArray.slice(0, 3).map(item => item.id);
+        const topAlbumIds = albumArray.slice(0, 4).map(item => item.id);
 
         // Fetch and enrich album details
         const enrichedAlbums = await Promise.all(
@@ -133,7 +133,9 @@ export async function GET(req: NextRequest) {
                         spotify_url: dbAlbum?.spotify_url || spotifyAlbum?.external_urls?.spotify || null,
                         creator: dbAlbum?.artist || 
                             (spotifyAlbum?.artists?.map((a: SpotifyArtist) => a.name).join(", ") || "Unknown"),
-                        tracks: dbAlbum?.tracks || spotifyAlbum?.tracks?.total || 0,
+                        tracks: typeof (dbAlbum as any)?.tracks === 'number'
+                            ? (dbAlbum as any).tracks
+                            : (spotifyAlbum?.tracks?.total ?? 0),
                         release_date: dbAlbum?.release_date || spotifyAlbum?.release_date || "",
                         like_count: dbAlbum?.like_count || 0,
                         weekly_likes: albumCounts[id] || 0

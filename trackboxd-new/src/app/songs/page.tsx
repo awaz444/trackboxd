@@ -438,7 +438,7 @@ const Songs = () => {
                             ) : topTracksError ? (
                                 <p className="text-[#5C5537]">{topTracksError}</p>
                             ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6">
                                     {trendingTracks.map((track) => (
                                         <TrackCard
                                             key={`trending-${track.id}`}

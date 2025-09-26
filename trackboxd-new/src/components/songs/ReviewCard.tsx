@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { Review } from "@/app/songs/types";
 import useUser from "@/hooks/useUser";
 
@@ -45,24 +45,17 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
         checkLikeStatus();
     }, [user, review.id]);
 
-    const renderStars = (rating: number) => {
-        return (
-            <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <div key={star} className="relative">
-                        <div className="w-4 h-4 mb-2 text-[#5C5537]/30">★</div>
-                        <div
-                            className="absolute top-0 left-0 w-5 h-5 text-[#FFBA00] overflow-hidden"
-                            style={{
-                                width: `${Math.max(0, Math.min(1, rating - star + 1)) * 100}%`,
-                            }}>
-                            ★
-                        </div>
-                    </div>
-                ))}
-                <span className="text-sm text-[#5C5537] ml-1">{rating}</span>
-            </div>
-        );
+    const formatTimeAgo = (dateString: string) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const secondsAgo = Math.floor((now.getTime() - date.getTime()) / 1000);
+        if (secondsAgo < 60) return secondsAgo === 1 ? "1 second ago" : `${secondsAgo} seconds ago`;
+        const minutesAgo = Math.floor(secondsAgo / 60);
+        if (minutesAgo < 60) return minutesAgo === 1 ? "1 minute ago" : `${minutesAgo} minutes ago`;
+        const hoursAgo = Math.floor(minutesAgo / 60);
+        if (hoursAgo < 24) return hoursAgo === 1 ? "1 hour ago" : `${hoursAgo} hours ago`;
+        const daysAgo = Math.floor(hoursAgo / 24);
+        return daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`;
     };
 
     const handleLikeClick = async () => {
@@ -102,57 +95,56 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
 
     const trackName = review.track_details?.name || "Unknown Track";
     const artistNames = review.track_details?.artists?.map(a => a.name).join(", ") || "Unknown Artist";
-    const albumCover = review.track_details?.album?.images?.[0]?.url || "./default-avatar.jpg";
     const userImage = review.users.image_url || "./default-avatar.jpg";
+    const timeAgo = formatTimeAgo(review.created_at);
     
     return (
         <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
-            <div className="flex items-start gap-3">
-                <div className="w-16 h-16 relative overflow-hidden rounded-lg bg-[#5C5537]/10 flex-shrink-0">
-                    <img
-                        src={albumCover}
-                        alt={`${trackName} cover`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            e.currentTarget.src = "./default-avatar.jpg";
-                        }}
-                    />
-                </div>
-                
+            <div className="flex items-start gap-2">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                         <img 
                             src={userImage} 
                             alt={review.users.name}
-                            className="w-6 h-6 rounded-full"
+                            className="w-6 h-6 rounded-full object-cover"
                             onError={(e) => {
                                 e.currentTarget.src = "./default-avatar.jpg";
                             }}
                         />
                         <div className="font-medium text-[#5C5537]">
-                            {review.users.name}
+                            <Link href={`/profile/${encodeURIComponent(review.users.name)}`} className="hover:underline">
+                                {review.users.name}
+                            </Link>
                         </div>
-                        {renderStars(review.rating)}
+                        <div className="flex items-center text-[#FFBA00] text-sm">
+                            <Star className="h-4 w-4 mr-0.5 inline" />
+                            <span>{review.rating}</span>
+                        </div>
                     </div>
 
-                    <h3 className="font-semibold text-[#5C5537]">{trackName}</h3>
-                    <p className="text-[#5C5537]/70 text-sm">{artistNames}</p>
-                    
+                    <div className="mb-2">
+                        <h3 className="font-semibold text-[#5C5537] text-sm">{trackName}</h3>
+                        <p className="text-[#5C5537]/70 text-xs">{artistNames}</p>
+                    </div>
+
                     {review.text && (
-                        <p className="text-[#5C5537] text-sm mt-2 line-clamp-2">
+                        <p className="text-[#5C5537] text-sm line-clamp-2 mb-2">
                             {review.text}
                         </p>
                     )}
 
-                    <div className="flex justify-between items-center mt-2">
-                        <div className="flex items-center space-x-2">
+                    <div className="flex justify-between items-center">
+                        <span className="text-xs text-[#5C5537]/70">
+                            {timeAgo}
+                        </span>
+                        <div className="flex items-center gap-3">
                             <button 
                                 onClick={handleLikeClick}
                                 disabled={isLoading || initialLoad || !user}
-                                className={`group flex items-center space-x-1 focus:outline-none ${
-                                    isLoading || initialLoad 
-                                        ? 'cursor-not-allowed' 
-                                        : user ? 'cursor-pointer' : 'cursor-default'
+                                className={`group flex items-center gap-1 text-xs focus:outline-none ${
+                                    isLoading || initialLoad || !user
+                                        ? 'cursor-not-allowed text-[#5C5537]/40'
+                                        : 'cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]'
                                 }`}
                             >
                                 {initialLoad ? (
@@ -161,35 +153,22 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
                                     </div>
                                 ) : (
                                     <Heart 
-                                        className={`w-4 h-4 transition-all duration-200 ${
-                                            isLiked 
-                                                ? 'text-[#5C5537] fill-[#5C5537]' 
-                                                : user 
-                                                    ? 'text-[#5C5537]/70 group-hover:text-[#5C5537]' 
-                                                    : 'text-[#5C5537]/70'
+                                        className={`w-4 h-4 ${
+                                            isLiked ? 'text-[#5C5537] fill-[#5C5537]' : ''
                                         }`}
                                     />
                                 )}
-                                <span className={`text-sm transition-colors duration-200 ${
-                                    isLiked 
-                                        ? 'text-[#5C5537] font-medium' 
-                                        : user 
-                                            ? 'text-[#5C5537]/70 group-hover:text-[#5C5537]' 
-                                            : 'text-[#5C5537]/70'
-                                }`}>
+                                <span className={`${isLiked ? 'text-[#5C5537] font-medium' : ''}`}>
                                     {likeCount}
                                 </span>
                             </button>
-                            <span className="text-xs text-[#5C5537]/70">
-                                {new Date(review.created_at).toLocaleDateString()}
-                            </span>
+                            <Link
+                                href={`/songs/${review.item_id}`}
+                                className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
+                            >
+                                View track
+                            </Link>
                         </div>
-                        <Link
-                            href={`/songs/${review.item_id}`}
-                            className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
-                        >
-                            View track
-                        </Link>
                     </div>
                 </div>
             </div>

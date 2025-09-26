@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
         playlistArray.sort((a, b) => b.count - a.count);
 
         // Get top 3 playlist IDs
-        const topPlaylistIds = playlistArray.slice(0, 3).map(item => item.id);
+        const topPlaylistIds = playlistArray.slice(0, 4).map(item => item.id);
 
         // Fetch and enrich playlist details
         const enrichedPlaylists = await Promise.all(
@@ -54,6 +54,8 @@ export async function GET(req: NextRequest) {
                     if (dbPlaylist?.name && dbPlaylist?.cover_url) {
                         return {
                             ...dbPlaylist,
+                            creator: dbPlaylist.creator || "Unknown",
+                            tracks: typeof (dbPlaylist as any).tracks === 'number' ? (dbPlaylist as any).tracks : 0,
                             weekly_likes: playlistCounts[id] || 0
                         };
                     }
@@ -70,7 +72,7 @@ export async function GET(req: NextRequest) {
                         cover_url: spotifyPlaylist.images?.[0]?.url || null,
                         spotify_url: spotifyPlaylist.external_urls?.spotify || null,
                         creator: spotifyPlaylist.owner?.display_name || "Unknown",
-                        tracks: spotifyPlaylist.tracks?.total || 0,
+                        tracks: spotifyPlaylist.tracks?.total ?? 0,
                         like_count: dbPlaylist?.like_count || 0, // Keep DB like count if available
                         weekly_likes: playlistCounts[id] || 0
                     };

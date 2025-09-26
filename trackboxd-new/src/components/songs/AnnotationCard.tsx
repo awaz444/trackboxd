@@ -48,7 +48,6 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({ annotation }) => {
     const timeAgo = formatTimeAgo(annotation.created_at);
     const trackName = annotation.track_details?.name || "Unknown Track";
     const artistNames = annotation.track_details?.artists?.map(a => a.name).join(", ") || "Unknown Artist";
-    const albumCover = annotation.track_details?.album?.images?.[0]?.url || "./default-avatar.jpg";
     const albumName = annotation.track_details?.album?.name || "Unknown Album";
     const timestamp = formatDuration(annotation.timestamp || 0);
     const userImage = annotation.users.image_url || "./default-avatar.jpg";
@@ -117,65 +116,52 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({ annotation }) => {
     
     return (
         <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
-            <div className="flex items-start gap-3">
-                <div className="w-16 h-16 relative overflow-hidden rounded-lg bg-[#5C5537]/10 flex-shrink-0">
-                    <img
-                        src={albumCover}
-                        alt={`${trackName} cover`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            e.currentTarget.src = "./default-avatar.jpg";
-                        }}
-                    />
-                </div>
-                
+            <div className="flex items-start gap-2">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                         <img 
                             src={userImage} 
                             alt={annotation.users.name}
-                            className="w-6 h-6 rounded-full"
+                            className="w-6 h-6 rounded-full object-cover"
                             onError={(e) => {
                                 e.currentTarget.src = "./default-avatar.jpg";
                             }}
                         />
                         <div className="font-medium text-[#5C5537]">
-                            {annotation.users.name}
+                            <Link href={`/profile/${encodeURIComponent(annotation.users.name)}`} className="hover:underline">
+                                {annotation.users.name}
+                            </Link>
                         </div>
-                        <span className="text-xs text-[#5C5537]/70">
-                            annotated
-                        </span>
+                        <div className="flex items-center text-[#5C5537]/70 text-xs">
+                            <Clock className="h-4 w-4 mr-1" />
+                            <span>{timestamp}</span>
+                        </div>
                     </div>
 
                     <div className="mb-2">
-                        <div className="flex items-center justify-between">
-                            <h3 className="font-semibold text-[#5C5537]">{trackName}</h3>
-                            <div className="flex items-center text-[#5C5537]/70 text-sm">
-                                <Clock className="w-4 h-4 mr-1" />
-                                <span>{timestamp}</span>
-                            </div>
-                        </div>
-                        <p className="text-[#5C5537]/70 text-sm">{artistNames}</p>
-                        <p className="text-[#5C5537]/70 text-xs italic">{albumName}</p>
+                        <h3 className="font-semibold text-[#5C5537] text-sm">{trackName}</h3>
+                        <p className="text-[#5C5537]/70 text-xs">{artistNames}</p>
+                        {albumName && <p className="text-[#5C5537]/60 text-xs italic">{albumName}</p>}
                     </div>
-                    
+
                     {annotation.text && (
-                        <div className="mt-2 bg-[#5C5537]/10 rounded-md p-3 text-sm text-[#5C5537]">
-                            <p className="line-clamp-3">
-                                {annotation.text}
-                            </p>
-                        </div>
+                        <p className="text-[#5C5537] text-sm line-clamp-2 mb-2">
+                            {annotation.text}
+                        </p>
                     )}
 
-                    <div className="flex justify-between items-center mt-3">
-                        <div className="flex items-center space-x-2">
+                    <div className="flex justify-between items-center">
+                        <span className="text-xs text-[#5C5537]/70">
+                            {timeAgo}
+                        </span>
+                        <div className="flex items-center gap-3">
                             <button 
                                 onClick={handleLikeClick}
                                 disabled={isLoading || initialLoad || !user}
-                                className={`group flex items-center space-x-1 focus:outline-none ${
-                                    isLoading || initialLoad 
-                                        ? 'cursor-not-allowed' 
-                                        : user ? 'cursor-pointer' : 'cursor-default'
+                                className={`group flex items-center gap-1 text-xs focus:outline-none ${
+                                    isLoading || initialLoad || !user
+                                        ? 'cursor-not-allowed text-[#5C5537]/40'
+                                        : 'cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]'
                                 }`}
                             >
                                 {initialLoad ? (
@@ -184,35 +170,22 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({ annotation }) => {
                                     </div>
                                 ) : (
                                     <Heart 
-                                        className={`w-4 h-4 transition-all duration-200 ${
-                                            isLiked 
-                                                ? 'text-[#5C5537] fill-[#5C5537]' 
-                                                : user 
-                                                    ? 'text-[#5C5537]/70 group-hover:text-[#5C5537]' 
-                                                    : 'text-[#5C5537]/70'
+                                        className={`w-4 h-4 ${
+                                            isLiked ? 'text-[#5C5537] fill-[#5C5537]' : ''
                                         }`}
                                     />
                                 )}
-                                <span className={`text-sm transition-colors duration-200 ${
-                                    isLiked 
-                                        ? 'text-[#5C5537] font-medium' 
-                                        : user 
-                                            ? 'text-[#5C5537]/70 group-hover:text-[#5C5537]' 
-                                            : 'text-[#5C5537]/70'
-                                }`}>
+                                <span className={`${isLiked ? 'text-[#5C5537] font-medium' : ''}`}>
                                     {likeCount}
                                 </span>
                             </button>
-                            <span className="text-xs text-[#5C5537]/70">
-                                {timeAgo}
-                            </span>
+                            <Link
+                                href={`/songs/${annotation.track_id}`}
+                                className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
+                            >
+                                View track
+                            </Link>
                         </div>
-                        <Link
-                            href={`/songs/${annotation.track_id}`}
-                            className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
-                        >
-                            View track
-                        </Link>
                     </div>
                 </div>
             </div>

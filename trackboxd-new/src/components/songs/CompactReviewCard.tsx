@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Review } from "@/app/songs/types";
-import { Star } from "lucide-react";
+import { Star, Heart } from "lucide-react";
+import useUser from "@/hooks/useUser";
 
 interface CompactReviewCardProps {
   review: Review;
@@ -31,6 +32,56 @@ const formatTimeAgo = (dateString: string) => {
 };
 
 const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
+  const { user } = useUser();
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState<number>((review as any).like_count || 0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  useEffect(() => {
+    const checkLikeStatus = async () => {
+      const targetId = (review as any).id;
+      if (!user || !targetId) {
+        setInitialLoad(false);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/like/review?userId=${user.id}&reviewId=${targetId}`);
+        if (!res.ok) throw new Error("Failed to fetch like status");
+        const data = await res.json();
+        setIsLiked(!!data.isLiked);
+      } catch (_e) {
+        // noop
+      } finally {
+        setInitialLoad(false);
+      }
+    };
+    checkLikeStatus();
+  }, [user, review]);
+
+  const handleToggleLike = async () => {
+    const targetId = (review as any).id;
+    if (!user || !targetId || isLoading || initialLoad) return;
+    setIsLoading(true);
+    const next = !isLiked;
+    const optimistic = next ? likeCount + 1 : Math.max(0, likeCount - 1);
+    setIsLiked(next);
+    setLikeCount(optimistic);
+    try {
+      const res = await fetch(`/api/like/review`, {
+        method: next ? "POST" : "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, reviewId: targetId }),
+      });
+      if (!res.ok) throw new Error("Failed to toggle like");
+    } catch (_e) {
+      setIsLiked(!next);
+      setLikeCount((review as any).like_count || 0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const timeAgo = formatTimeAgo(review.created_at);
   const trackName = review.track_details?.name || "Unknown Track";
   
@@ -55,7 +106,9 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
               }}
             />
             <div className="font-medium text-[#5C5537]">
-              {review.users.name}
+              <Link href={`/profile/${encodeURIComponent(review.users.name)}`} className="hover:underline">
+                {review.users.name}
+              </Link>
             </div>
             <div className="flex items-center text-[#FFBA00] text-sm">
               <Star className="h-4 w-4 mr-0.5 inline" />
@@ -78,12 +131,28 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
             <span className="text-xs text-[#5C5537]/70">
               {timeAgo}
             </span>
-            <Link 
-              href={`/songs/${review.item_id}`} 
-              className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
-            >
-              View track
-            </Link>
+            <div className="flex items-center gap-3">
+              {(review as any).id && (
+                <button
+                  onClick={handleToggleLike}
+                  disabled={isLoading || initialLoad || !user}
+                  className={`group flex items-center gap-1 text-xs focus:outline-none ${
+                    isLoading || initialLoad || !user
+                      ? "cursor-not-allowed text-[#5C5537]/40"
+                      : "cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]"
+                  }`}
+                >
+                  <Heart className={`w-4 h-4 ${isLiked ? 'text-[#5C5537] fill-[#5C5537]' : ''}`} />
+                  <span className={`${isLiked ? 'text-[#5C5537] font-medium' : ''}`}>{likeCount}</span>
+                </button>
+              )}
+              <Link 
+                href={`/songs/${review.item_id}`} 
+                className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
+              >
+                View track
+              </Link>
+            </div>
           </div>
         </div>
       </div>

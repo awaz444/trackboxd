@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Annotation } from "@/app/songs/types";
-import { Clock } from "lucide-react";
+import { Clock, Heart } from "lucide-react";
+import useUser from "@/hooks/useUser";
 
 const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -39,6 +40,55 @@ interface CompactAnnotationCardProps {
 const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({
     annotation,
 }) => {
+    const { user } = useUser();
+    const [isLiked, setIsLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState<number>((annotation as any).like_count || 0);
+    const [isLoading, setIsLoading] = useState(false);
+    const [initialLoad, setInitialLoad] = useState(true);
+
+    useEffect(() => {
+        const checkLikeStatus = async () => {
+            const targetId = (annotation as any).id;
+            if (!user || !targetId) {
+                setInitialLoad(false);
+                return;
+            }
+            try {
+                const res = await fetch(`/api/like/annotation?userId=${user.id}&annotationId=${targetId}`);
+                if (!res.ok) throw new Error("Failed to fetch like status");
+                const data = await res.json();
+                setIsLiked(!!data.isLiked);
+            } catch (_e) {
+                // noop
+            } finally {
+                setInitialLoad(false);
+            }
+        };
+        checkLikeStatus();
+    }, [user, annotation]);
+
+    const handleToggleLike = async () => {
+        const targetId = (annotation as any).id;
+        if (!user || !targetId || isLoading || initialLoad) return;
+        setIsLoading(true);
+        const next = !isLiked;
+        const optimistic = next ? likeCount + 1 : Math.max(0, likeCount - 1);
+        setIsLiked(next);
+        setLikeCount(optimistic);
+        try {
+            const res = await fetch(`/api/like/annotation`, {
+                method: next ? "POST" : "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: user.id, annotationId: targetId }),
+            });
+            if (!res.ok) throw new Error("Failed to toggle like");
+        } catch (_e) {
+            setIsLiked(!next);
+            setLikeCount((annotation as any).like_count || 0);
+        } finally {
+            setIsLoading(false);
+        }
+    };
     const timeAgo = formatTimeAgo(annotation.created_at);
     const trackName = annotation.track_details?.name || "Unknown Track";
     const timestamp = formatDuration(annotation.timestamp || 0);
@@ -67,7 +117,9 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({
                             }}
                         />
                         <div className="font-medium text-[#5C5537]">
-                            {annotation.users.name}
+                            <Link href={`/profile/${encodeURIComponent(annotation.users.name)}`} className="hover:underline">
+                                {annotation.users.name}
+                            </Link>
                         </div>
                         <div className="flex items-center text-[#5C5537]/70 text-xs">
                             <Clock className="h-4 w-4 mr-1" />
@@ -94,11 +146,27 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({
                         <span className="text-xs text-[#5C5537]/70">
                             {timeAgo}
                         </span>
-                        <Link
-                            href={`/songs/${annotation.track_id}`}
-                            className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]">
-                            View track
-                        </Link>
+                        <div className="flex items-center gap-3">
+                            {(annotation as any).id && (
+                                <button
+                                    onClick={handleToggleLike}
+                                    disabled={isLoading || initialLoad || !user}
+                                    className={`group flex items-center gap-1 text-xs focus:outline-none ${
+                                        isLoading || initialLoad || !user
+                                            ? "cursor-not-allowed text-[#5C5537]/40"
+                                            : "cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]"
+                                    }`}
+                                >
+                                    <Heart className={`w-4 h-4 ${isLiked ? 'text-[#5C5537] fill-[#5C5537]' : ''}`} />
+                                    <span className={`${isLiked ? 'text-[#5C5537] font-medium' : ''}`}>{likeCount}</span>
+                                </button>
+                            )}
+                            <Link
+                                href={`/songs/${annotation.track_id}`}
+                                className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]">
+                                View track
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>

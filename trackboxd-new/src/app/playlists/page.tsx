@@ -356,7 +356,7 @@ const Playlists = () => {
                             </button>
                         </div>
                         {searchResults.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                                 {searchResults.map((playlist) => (
                                     <PlaylistCard
                                         key={`search-${playlist.id}`}
@@ -393,15 +393,15 @@ const Playlists = () => {
                             </div>
 
                             {loadingPopular ? (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    {[...Array(3)].map((_, i) => (
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                    {[...Array(4)].map((_, i) => (
                                         <SkeletonPlaylistCard
                                             key={`skeleton-popular-${i}`}
                                         />
                                     ))}
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                     {popularPlaylists.map((playlist) => (
                                         <PlaylistCard
                                             key={`popular-${playlist.id}`}
