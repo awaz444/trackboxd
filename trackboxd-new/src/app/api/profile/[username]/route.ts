@@ -15,6 +15,8 @@ interface RecentActivity {
   type: "like" | "review" | "annotation";
   track: ActivityTrack;
   timestamp: string;
+  rating?: number;
+  text?: string;
 }
 
 interface FavoriteTrack {
@@ -50,6 +52,16 @@ interface ProfileData {
   };
   favoriteTracks: FavoriteTrack[];
   recentActivity: RecentActivity[];
+  likesActivity: Array<{
+    id: string;
+    timestamp: string;
+    sentence: string;
+    links: {
+      subjectProfile: string;
+      targetProfile?: string;
+      itemHref?: string;
+    };
+  }>;
   following: FollowingUser[];
 }
 
@@ -157,6 +169,8 @@ export async function GET(
               cover_url: track.cover_url,
             },
             timestamp: new Date(review.created_at).toLocaleDateString(),
+            rating: (review as any).rating ?? undefined,
+            text: (review as any).text ?? undefined,
           };
           recentActivity.push(activity);
         }
@@ -198,48 +212,105 @@ export async function GET(
               cover_url: track.cover_url,
             },
             timestamp: new Date(annotation.created_at).toLocaleDateString(),
+            text: (annotation as any).text ?? undefined,
           };
           recentActivity.push(activity);
         }
       });
     }
 
-    // Get like activities (likes on tracks)
-    const { data: likeActivities, error: likeError } = await supabase
+    // Get last 20 likes across all target types
+    const { data: likesAll, error: likesAllError } = await supabase
       .from("likes")
-      .select(`
-        id,
-        user_id,
-        target_id,
-        created_at,
-        spotify_items!likes_target_id_fkey (
-          id,
-          name,
-          artist,
-          cover_url
-        )
-      `)
+      .select("id, target_id, target_type, created_at")
       .eq("user_id", user.id)
-      .eq("target_type", "track")
       .order("created_at", { ascending: false })
-      .limit(10);
+      .limit(20);
 
-    if (!likeError && likeActivities) {
-      likeActivities.forEach(like => {
-        const track = Array.isArray(like.spotify_items) ? like.spotify_items[0] : like.spotify_items;
-        if (track) {
-          const activity: RecentActivity = {
-            id: like.id,
-            type: "like",
-            track: {
-              id: track.id,
-              title: track.name,
-              artist: track.artist,
-              cover_url: track.cover_url,
-            },
-            timestamp: new Date(like.created_at).toLocaleDateString(),
-          };
-          recentActivity.push(activity);
+    const likesActivity: Array<{ id: string; timestamp: string; sentence: string; links: { subjectProfile: string; targetProfile?: string; itemHref?: string; } }> = [];
+
+    if (!likesAllError && likesAll && likesAll.length > 0) {
+      const trackLikeIds = likesAll.filter(l => ["track","album","playlist"].includes(l.target_type)).map(l => l.target_id);
+      const reviewLikeIds = likesAll.filter(l => l.target_type === "review").map(l => l.target_id);
+      const annotationLikeIds = likesAll.filter(l => l.target_type === "annotation").map(l => l.target_id);
+
+      // Fetch spotify items for track/album/playlist
+      let spotifyMap: Record<string, any> = {};
+      if (trackLikeIds.length > 0) {
+        const { data: spItems } = await supabase
+          .from("spotify_items")
+          .select("id, type, name, artist")
+          .in("id", trackLikeIds);
+        (spItems || []).forEach(it => { spotifyMap[it.id] = it; });
+      }
+
+      // Fetch reviews
+      let reviewMap: Record<string, any> = {};
+      if (reviewLikeIds.length > 0) {
+        const { data: revs } = await supabase
+          .from("reviews")
+          .select(`id, item_id, rating, users(name), spotify_items!reviews_item_id_fkey(id, name, artist)`) 
+          .in("id", reviewLikeIds);
+        (revs || []).forEach(r => { reviewMap[r.id] = r; });
+      }
+
+      // Fetch annotations
+      let annotationMap: Record<string, any> = {};
+      if (annotationLikeIds.length > 0) {
+        const { data: ann } = await supabase
+          .from("annotations")
+          .select(`id, track_id, users(name), spotify_items!annotations_track_id_fkey(id, name, artist)`) 
+          .in("id", annotationLikeIds);
+        (ann || []).forEach(a => { annotationMap[a.id] = a; });
+      }
+
+      likesAll.slice(0, 10).forEach(like => {
+        const ts = new Date(like.created_at).toLocaleDateString();
+        if (["track","album","playlist"].includes(like.target_type)) {
+          const item = spotifyMap[like.target_id];
+          if (item) {
+            const sentence = `${user.name} liked ${item.type} ${item.name}${item.artist ? ' by ' + item.artist : ''}`;
+            likesActivity.push({
+              id: like.id,
+              timestamp: ts,
+              sentence,
+              links: { subjectProfile: `/profile/${user.name}`, itemHref: `/${item.type === 'track' ? 'songs' : item.type + 's'}/${item.id}` }
+            });
+          }
+        } else if (like.target_type === "review") {
+          const r = reviewMap[like.target_id];
+          if (r) {
+            const sp = Array.isArray(r.spotify_items) ? r.spotify_items[0] : r.spotify_items;
+            const reviewer = Array.isArray(r.users) ? r.users[0] : r.users;
+            const sentence = `${user.name} liked ${reviewer?.name}'s review of ${sp?.name}${sp?.artist ? ' by ' + sp.artist : ''} (${r.rating}★)`;
+            likesActivity.push({
+              id: like.id,
+              timestamp: ts,
+              sentence,
+              links: {
+                subjectProfile: `/profile/${user.name}`,
+                targetProfile: reviewer?.name ? `/profile/${reviewer.name}` : undefined,
+                itemHref: sp?.id ? `/songs/${sp.id}` : undefined,
+              }
+            });
+          }
+        } else if (like.target_type === "annotation") {
+          const a = annotationMap[like.target_id];
+          if (a) {
+            const sp = Array.isArray(a.spotify_items) ? a.spotify_items[0] : a.spotify_items;
+            const annotator = Array.isArray(a.users) ? a.users[0] : a.users;
+            const sentence = `${user.name} liked ${annotator?.name}'s annotation on ${sp?.name}${sp?.artist ? ' by ' + sp.artist : ''}`;
+            likesActivity.push({
+              id: like.id,
+              timestamp: ts,
+              sentence,
+              links: {
+                subjectProfile: `/profile/${user.name}`,
+                targetProfile: annotator?.name ? `/profile/${annotator.name}` : undefined,
+                itemHref: sp?.id ? `/songs/${sp.id}` : undefined,
+              }
+            });
+          }
         }
       });
     }
@@ -295,6 +366,7 @@ export async function GET(
       }).filter(Boolean) as FavoriteTrack[] || [],
       
       recentActivity: sortedRecentActivity,
+      likesActivity,
       
       following: following?.map(f => {
         const u = Array.isArray(f.users) ? f.users[0] : f.users;

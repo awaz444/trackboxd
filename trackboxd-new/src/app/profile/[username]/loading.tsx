@@ -25,7 +25,7 @@ export default function ProfileLoading() {
           
           {/* Favorite Songs Skeleton */}
           <div className="mb-8">
-            <div className="h-6 bg-gray-200 rounded w-48 mb-6"></div>
+            <div className="h-6 bg-[#5C5537]/10 rounded w-48 mb-6"></div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="bg-[#5C5537]/10 rounded-lg aspect-square"></div>

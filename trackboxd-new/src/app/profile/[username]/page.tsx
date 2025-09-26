@@ -25,7 +25,8 @@ interface ProfileData {
         name: string;
         image_url?: string;
         country?: string;
-        spotify_url?: string;  // Make sure this exists
+        spotify_url?: string;
+        instagram_url?: string;
         created_at: string;
     };
     stats: {
@@ -50,6 +51,18 @@ interface ProfileData {
             cover_url?: string;
         };
         timestamp: string;
+        rating?: number;
+        text?: string;
+    }>;
+    likesActivity: Array<{
+        id: string;
+        timestamp: string;
+        sentence: string;
+        links: {
+            subjectProfile: string;
+            targetProfile?: string;
+            itemHref?: string;
+        };
     }>;
     following: Array<{
         id: string;
@@ -149,16 +162,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         },
         favoriteTracks = [],
         recentActivity = [],
+        likesActivity = [],
         following = [],
     } = profileData;
 
-    const likedActivity =
-        recentActivity?.filter((a) => a?.type === "like")?.slice(0, 4) || [];
-    const reviewedActivity =
-        recentActivity?.filter((a) => a?.type === "review")?.slice(0, 4) || [];
-    const annotatedActivity =
-        recentActivity?.filter((a) => a?.type === "annotation")?.slice(0, 4) ||
-        [];
+    const reviewAndAnnotations = (recentActivity || []).filter(a => a && a.type !== "like").slice(0, 10);
 
     return (
         <div className="min-h-screen bg-[#FFFBEb]">
@@ -187,92 +195,63 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     isOwnProfile={isOwnProfile}
                 />
 
-                {/* Recent Activity */}
+                {/* Reviews & Annotations */}
                 <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-[#5C5537] mb-6">
-                        Recent Activity
-                    </h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Recently Liked */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <Heart className="text-[#5C5537] w-5 h-5" />
-                                <h3 className="font-bold text-[#5C5537]">
-                                    Recently Liked
-                                </h3>
-                            </div>
-                            <div className="space-y-3">
-                                {likedActivity?.map(
-                                    (activity) =>
-                                        activity && (
-                                            <ActivityCard
-                                                key={activity.id}
-                                                activity={activity}
-                                            />
-                                        )
-                                )}
-                                {(!likedActivity ||
-                                    likedActivity.length === 0) && (
-                                    <div className="text-center text-[#5C5537]/70 py-8">
-                                        No recent likes
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Recently Reviewed */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <Star className="text-[#5C5537] w-5 h-5" />
-                                <h3 className="font-bold text-[#5C5537]">
-                                    Recently Reviewed
-                                </h3>
-                            </div>
-                            <div className="space-y-3">
-                                {reviewedActivity?.map(
-                                    (activity) =>
-                                        activity && (
-                                            <ActivityCard
-                                                key={activity.id}
-                                                activity={activity}
-                                            />
-                                        )
-                                )}
-                                {(!reviewedActivity ||
-                                    reviewedActivity.length === 0) && (
-                                    <div className="text-center text-[#5C5537]/70 py-8">
-                                        No recent reviews
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-6">
-                        <div className="flex items-center gap-2 mb-4">
-                            <MessageCircle className="text-[#5C5537] w-5 h-5" />
-                            <h3 className="font-bold text-[#5C5537]">
-                                Recently Annotated
-                            </h3>
-                        </div>
-                        <div className="space-y-3">
-                            {annotatedActivity?.map(
-                                (activity) =>
-                                    activity && (
-                                        <ActivityCard
-                                            key={activity.id}
-                                            activity={activity}
-                                        />
-                                    )
-                            )}
-                            {(!annotatedActivity ||
-                                annotatedActivity.length === 0) && (
-                                <div className="text-center text-[#5C5537]/70 py-8">
-                                    No recent annotations
+                    <h2 className="text-2xl font-bold text-[#5C5537] mb-4">Reviews & Annotations</h2>
+                    <div className="space-y-3">
+                        {reviewAndAnnotations.map((a) => (
+                            <div key={a.id} className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="text-sm text-[#5C5537]/70">{a.timestamp}</div>
+                                    <div className="text-xs uppercase text-[#5C5537]/60">{a.type}</div>
                                 </div>
-                            )}
-                        </div>
+                                <div className="mb-1 text-sm text-[#5C5537]">
+                                    <span className="font-semibold">{a.track.title}</span>
+                                    <span className="text-[#5C5537]/70"> by {a.track.artist}</span>
+                                </div>
+                                {a.type === 'review' && a.rating !== undefined && (
+                                    <div className="flex items-center text-[#FFBA00] text-sm mb-1">
+                                        <Star className="h-4 w-4 mr-1" />
+                                        <span>{a.rating}</span>
+                                    </div>
+                                )}
+                                {a.text && (
+                                    <div className="text-sm text-[#5C5537]/90 line-clamp-3">{a.text}</div>
+                                )}
+                                <div className="mt-2 text-xs">
+                                    <Link href={`/songs/${a.track.id}`} className="text-[#5C5537]/70 hover:text-[#5C5537]">View track</Link>
+                                </div>
+                            </div>
+                        ))}
+                        {reviewAndAnnotations.length === 0 && (
+                            <div className="text-center text-[#5C5537]/70 py-8">No recent reviews or annotations</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Likes */}
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-[#5C5537] mb-4">Recent Likes</h2>
+                    <div className="space-y-2">
+                        {(likesActivity || []).map((l) => (
+                            <div key={l.id} className="text-sm text-[#5C5537]">
+                                <Link href={l.links.subjectProfile} className="font-semibold hover:underline">{user.name}</Link>
+                                <span className="text-[#5C5537]/70"> {l.sentence.replace(user.name, '').trim()}</span>
+                                {l.links.targetProfile && (
+                                    <>
+                                        {' '}<Link href={l.links.targetProfile} className="font-medium hover:underline">profile</Link>
+                                    </>
+                                )}
+                                {l.links.itemHref && (
+                                    <>
+                                        {' '}<Link href={l.links.itemHref} className="font-medium hover:underline">item</Link>
+                                    </>
+                                )}
+                            </div>
+                        ))}
+                        {(!likesActivity || likesActivity.length === 0) && (
+                            <div className="text-center text-[#5C5537]/70 py-8">No recent likes</div>
+                        )}
                     </div>
                 </div>
 
