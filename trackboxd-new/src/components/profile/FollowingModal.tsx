@@ -124,7 +124,9 @@ const FollowingModal: React.FC<FollowingModalProps> = ({
                       <div className="font-medium text-[#5C5537]">
                         {user.name}
                       </div>
-             
+                      <div className="text-sm text-[#5C5537]/70">
+                        @{user.username}
+                      </div>
                     </div>
                   </Link>
                   

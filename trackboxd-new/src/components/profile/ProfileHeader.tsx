@@ -118,7 +118,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               {/* Country and social icons below */}
               <div className="flex flex-col sm:flex-row items-center gap-2 mt-3">
                 {/* Country */}
-                {user.country && (
+                {user.country && user.country.toLowerCase() !== 'none' && (
                   <div className="flex h-8 items-center gap-1 bg-[#5C5537]/5 px-2 py-1 rounded-md">
                     <MapPin className="w-3 h-3 text-[#5C5537]/70" />
                     <span className="text-sm text-[#5C5537]/70">

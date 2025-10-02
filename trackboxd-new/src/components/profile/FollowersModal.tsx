@@ -126,7 +126,9 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
                       <div className="font-medium text-[#5C5537]">
                         {follower.name}
                       </div>
-                     
+                      <div className="text-sm text-[#5C5537]/70">
+                        @{follower.username}
+                      </div>
                     </div>
                   </Link>
 

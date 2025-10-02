@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
         user_id,
         item_id,
         is_public,
+        like_count,
         spotify_items!inner (id, type),
         users:user_id(id, name, image_url)
     `
