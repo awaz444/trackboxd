@@ -43,6 +43,7 @@ interface ProfileData {
     spotify_url?: string; // Ensure this is included
     instagram_url?: string;
     created_at: string;
+    likes_private: boolean;
   };
   stats: {
     followers: number;
@@ -347,6 +348,7 @@ export async function GET(
         spotify_url: user.spotify_url || undefined, // Include user's spotify_url
         instagram_url: (user as any).instagram_url || undefined,
         created_at: user.created_at,
+        likes_private: user.likes_private || false,
       },
       stats: {
         followers: followersCount || 0,

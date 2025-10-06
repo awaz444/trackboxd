@@ -10,8 +10,10 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 import ActivityCard from "@/components/profile/ActivityCard";
 import FavoriteTracks from "@/components/profile/FavoriteTracks";
 import FollowingSection from "@/components/profile/FollowingSection";
-import { Heart, Star, MessageCircle } from "lucide-react";
+import { Heart, Star, MessageCircle, Lock } from "lucide-react";
 import Link from "next/link";
+import { Checkbox } from "@/components/ui/checkbox";
+import LikesPrivacyToggle from "@/components/profile/LikesPrivacyToggle";
 
 interface ProfilePageProps {
     params: {
@@ -28,6 +30,7 @@ interface ProfileData {
         spotify_url?: string;
         instagram_url?: string;
         created_at: string;
+        likes_private?: boolean;
     };
     stats: {
         followers: number;
@@ -319,14 +322,20 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
                 {/* Likes */}
                 <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-[#5C5537] mb-4">
-                        Recent Likes
-                    </h2>
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-2xl font-bold text-[#5C5537]">
+                            Recent Likes
+                        </h2>
+                        {isOwnProfile && (
+                            <LikesPrivacyToggle initialPrivacy={!!user.likes_private} />
+                        )}
+                    </div>
                     <div className="space-y-3">
-                        {(likesActivity || []).map((l) => {
-                            const renderSentenceWithEmbeddedLinks = () => {
-                                const sentence = l.sentence;
-                                const links = l.links;
+                        {(!user.likes_private || isOwnProfile) ? (
+                            (likesActivity || []).map((l) => {
+                                const renderSentenceWithEmbeddedLinks = () => {
+                                    const sentence = l.sentence;
+                                    const links = l.links;
 
                                 const parts = sentence.split(" ");
                                 const subject = parts[0]; // Always the profile owner
@@ -436,8 +445,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                     {renderSentenceWithEmbeddedLinks()}
                                 </div>
                             );
-                        })}
-                        {(!likesActivity || likesActivity.length === 0) && (
+                        }))
+                        : (
+                            <div className="text-center text-[#5C5537]/70 py-8">
+                                This user has set their likes to private
+                            </div>
+                        )}
+                        {(!likesActivity || likesActivity.length === 0) && (!user.likes_private || isOwnProfile) && (
                             <div className="text-center text-[#5C5537]/70 py-8">
                                 No recent likes
                             </div>
