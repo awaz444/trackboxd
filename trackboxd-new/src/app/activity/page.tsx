@@ -3,13 +3,33 @@
 import { useState, useEffect } from "react";
 import Footer from "@/components/Footer";
 import ActivityItem, { ActivityItem as ActivityItemType } from "@/components/activity/ActivityItem";
+import SuggestedUsers from "@/components/activity/SuggestedUsers";
 import useUser from "@/hooks/useUser";
 import { Music } from "lucide-react";
 
+interface User {
+  id: string;
+  name: string;
+  username: string;
+  image_url?: string;
+}
+
 export default function ActivityPage() {
   const [activities, setActivities] = useState<ActivityItemType[]>([]);
+  const [suggestedUsers, setSuggestedUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
+
+  const fetchSuggestedUsers = async () => {
+    try {
+      const res = await fetch("/api/users/recent");
+      if (!res.ok) throw new Error("Failed to fetch suggested users");
+      const data = await res.json();
+      setSuggestedUsers(data);
+    } catch (error) {
+      console.error("Suggested users fetch error:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -20,6 +40,11 @@ export default function ActivityPage() {
         const data = await res.json();
 
         setActivities(data);
+        
+        // If there are fewer than 5 activities, fetch suggested users
+        if (data.length < 5) {
+          fetchSuggestedUsers();
+        }
       } catch (error) {
         console.error("Activity fetch error:", error);
       } finally {
@@ -44,6 +69,12 @@ export default function ActivityPage() {
     );
   }
 
+  // Handler for when a user is successfully followed
+  const handleFollowSuccess = () => {
+    // No longer refreshing the suggested users list after a follow
+    // This allows the 5 suggested users to stay until the page is manually refreshed
+  };
+
   return (
     <div className="min-h-screen bg-[#FFFBEb]">
       <div className="max-w-5xl mx-auto px-4 py-8">
@@ -57,6 +88,14 @@ export default function ActivityPage() {
             </p>
           </div>
         </div>
+
+        {/* Show suggested users if there are fewer than 5 activities */}
+        {activities.length < 5 && suggestedUsers.length > 0 && (
+          <SuggestedUsers 
+            users={suggestedUsers} 
+            onFollowSuccess={handleFollowSuccess} 
+          />
+        )}
 
         <div>
           <h2 className="text-2xl font-semibold text-[#5C5537] mb-6">
