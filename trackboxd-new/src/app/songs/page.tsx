@@ -337,7 +337,8 @@ const Songs = () => {
             }
 
             const data = await res.json();
-            setSearchResults(data.tracks?.items || []);
+            const items = Array.isArray(data) ? data : data?.tracks?.items || [];
+            setSearchResults(items);
             setShowSearchResults(true);
 
             if (user && searchResults.length > 0) {

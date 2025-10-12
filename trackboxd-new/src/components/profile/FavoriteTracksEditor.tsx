@@ -181,8 +181,8 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
                     try {
                       const res = await fetch(`/api/songs/search?q=${encodeURIComponent(q)}`);
                       const data = await res.json();
-                      // Now single search endpoints return arrays
-                      const results = (Array.isArray(data) ? data : data?.tracks?.items || []).map((track: any) => ({
+                      const items = Array.isArray(data) ? data : data?.tracks?.items || [];
+                      const results = items.map((track: any) => ({
                         id: track.id,
                         name: track.name,
                         artists: track.artists?.map((a: any) => a.name).join(', '),

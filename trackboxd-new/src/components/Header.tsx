@@ -265,7 +265,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
     const dropdownItems = [
         { label: "Profile", href: `/profile/${user.name}`, icon: User, link: true },
         { type: "divider" },
-        { label: "My Likes", href: "/my-likes", icon: Heart },
+        // { label: "My Likes", href: "/my-likes", icon: Heart },
         {
             label: "My Reviews",
             href: "/my-reviews",

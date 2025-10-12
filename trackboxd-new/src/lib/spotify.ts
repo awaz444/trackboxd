@@ -54,14 +54,45 @@ async function getAccessToken() {
 
 // ------------------ Spotify API Helpers ------------------
 
-export const searchTracks = async (query: string, limit = 5) => {
+export const searchTracks = async (
+  query: string,
+  options: { limit?: number; market?: string } = {}
+) => {
+  // Basic validation
+  if (!query || !query.trim()) {
+    throw new Error("Spotify search query cannot be empty");
+  }
+
   await getAccessToken(); // Ensure token is available
-  const response = await fetch(
-    `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
-    { headers: { Authorization: `Bearer ${cachedToken}` } }
-  );
-  if (!response.ok) throw new Error(`Spotify error: ${response.statusText}`);
-  return response.json();
+  const { limit = 20, market = 'US' } = options;
+  const url = new URL(SEARCH_ENDPOINT);
+  url.searchParams.append('q', query);
+  url.searchParams.append('type', 'track');
+  url.searchParams.append('limit', limit.toString());
+  url.searchParams.append('market', market);
+
+  const doRequest = async () =>
+    fetch(url.toString(), {
+      headers: { Authorization: `Bearer ${cachedToken}` },
+    });
+
+  let response = await doRequest();
+
+  // If token expired unexpectedly, refresh and retry once
+  if (response.status === 401) {
+    await fetchNewAccessToken();
+    response = await doRequest();
+  }
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(
+      `Spotify error: ${response.status} ${response.statusText}\n${body}`
+    );
+  }
+
+  const data = await response.json();
+  return data.tracks?.items || [];
 };
 
 export async function getTrackDetails(trackId: string) {

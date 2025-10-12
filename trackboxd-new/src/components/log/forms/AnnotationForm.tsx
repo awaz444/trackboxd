@@ -126,9 +126,9 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
         throw new Error("Failed to search");
       }
       const data = await res.json();
-      
+      const items = Array.isArray(data) ? data : data?.tracks?.items || [];
       // Convert Spotify tracks to simplified format
-      const results = data.tracks?.items?.map((track: any) => ({
+      const results = items.map((track: any) => ({
         id: track.id,
         name: track.name,
         artist: track.artists.map((a: any) => a.name).join(", "),
