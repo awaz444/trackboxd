@@ -34,10 +34,10 @@ export async function POST(request: Request) {
 
     const supabase = createClient(cookies());
 
-    // Check if already following
+    // Check if already following or have a pending request
     const { data: existingFollow, error: checkError } = await supabase
       .from("follows")
-      .select("follower_id, following_id")
+      .select("follower_id, following_id, accepted")
       .eq("follower_id", session.user.id)
       .eq("following_id", followingId)
       .single();
@@ -51,18 +51,43 @@ export async function POST(request: Request) {
     }
 
     if (existingFollow) {
+      if (existingFollow.accepted) {
+        return NextResponse.json(
+          { error: "Already following this user" },
+          { status: 400 }
+        );
+      } else {
+        return NextResponse.json(
+          { error: "Follow request already sent" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Check if the target user has a private profile
+    const { data: targetUser, error: userError } = await supabase
+      .from("users")
+      .select("profile_private")
+      .eq("id", followingId)
+      .single();
+
+    if (userError) {
+      console.error('Error fetching target user:', userError);
       return NextResponse.json(
-        { error: "Already following this user" },
-        { status: 400 }
+        { error: "Failed to fetch user information" },
+        { status: 500 }
       );
     }
 
-    // Create follow relationship
+    // Create follow relationship with appropriate accepted status
+    const accepted = !targetUser.profile_private; // true for public profiles, false for private
+    
     const { data: newFollow, error: insertError } = await supabase
       .from("follows")
       .insert({
         follower_id: session.user.id,
         following_id: followingId,
+        accepted: accepted,
       })
       .select()
       .single();
@@ -77,7 +102,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      follow: newFollow
+      follow: newFollow,
+      isRequest: !accepted // true if it's a follow request, false if immediate follow
     });
   } catch (error) {
     console.error('Failed to follow user:', error);

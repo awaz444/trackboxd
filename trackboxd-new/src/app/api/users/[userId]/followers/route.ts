@@ -12,11 +12,12 @@ export async function GET(
     const userId = params.userId;
     const supabase = createClient(cookies());
 
-    // Get followers from the database
+    // Get followers from the database (only accepted follows)
     const { data: followersData, error: followersError } = await supabase
       .from("follows")
       .select("follower_id")
-      .eq("following_id", userId);
+      .eq("following_id", userId)
+      .eq("accepted", true);
 
     if (followersError) {
       console.error("Error fetching followers:", followersError);

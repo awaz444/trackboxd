@@ -2,10 +2,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, X, Music, Disc, Disc3, Lock } from "lucide-react";
+import { Search, X, Music, Disc, Disc3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+// Removed private visibility toggle: no Checkbox needed
 import useUser from "@/hooks/useUser";
 import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
@@ -127,9 +127,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [trendingTracks, setTrendingTracks] = useState<SimplifiedTrack[]>([]);
     const [isLoadingTrending, setIsLoadingTrending] = useState(false);
-    const [visibility, setVisibility] = useState<"public" | "private">(
-        "public"
-    );
+    // Removed visibility state: reviews are public by default
     const [hover, setHover] = useState(-1);
 
     const { user, loading: userLoading, error: userError } = useUser();
@@ -173,7 +171,6 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
       if (initialReview) {
         setRating(initialReview.rating);
         setReviewText(initialReview.text);
-        setVisibility(initialReview.isPublic ? 'public' : 'private');
         setSelectedItem({
           id: initialReview.track?.id || '',
           name: initialReview.track?.name || '',
@@ -265,14 +262,14 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
           method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            // For edit mode, we don't send itemId and itemType
+            // For edit mode, we don't send itemId/itemType or privacy changes
             ...(initialReview ? {} : {
               itemId: selectedItem?.id,
-              itemType: selectedItem?.type
+              itemType: selectedItem?.type,
+              isPublic: true
             }),
             rating: rating,
             text: reviewText,
-            isPublic: visibility === 'public',
             userId: user?.id
           })
         });
@@ -289,7 +286,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
             ...initialReview,
             rating,
             text: reviewText,
-            isPublic: visibility === 'public'
+            // Preserve existing privacy on edit
+            isPublic: initialReview.isPublic
           });
         }
         
@@ -576,30 +574,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                             />
                         </div>
 
-                        <div className="pt-2">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox 
-                                    id="visibility" 
-                                    checked={visibility === "private"}
-                                    onCheckedChange={(checked) => {
-                                        setVisibility(checked ? "private" : "public");
-                                    }}
-                                    className="border-[#5C5537]/50 data-[state=checked]:bg-[#5C5537] data-[state=checked]:border-[#5C5537]"
-                                />
-                                <div className="flex items-center gap-1.5">
-                                    <Lock className="h-4 w-4 text-[#5C5537]" />
-                                    <label 
-                                        htmlFor="visibility" 
-                                        className="text-sm font-medium leading-none text-[#5C5537] cursor-pointer"
-                                    >
-                                        Make this review private
-                                    </label>
-                                </div>
-                            </div>
-                            {/* <p className="text-xs text-[#5C5537]/70 mt-1 ml-6">
-                                {visibility === "private" ? "Only you can see this review" : "Everyone can see this review"}
-                            </p> */}
-                        </div>
+                        {/* Private visibility option removed: reviews are always public */}
                     </div>
 
                     <div className="flex flex-col gap-3 pt-4">

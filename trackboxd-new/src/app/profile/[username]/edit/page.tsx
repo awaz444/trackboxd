@@ -17,7 +17,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Save, X, Upload, HelpCircle } from "lucide-react";
+import { Save, X, Upload, HelpCircle, Lock } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { COUNTRIES } from "./countries";
 
@@ -35,6 +36,8 @@ interface ProfileData {
         image_url?: string;
         country?: string;
         spotify_url?: string;
+        instagram_url?: string;
+        profile_private: boolean;
         created_at: string;
     };
     stats: {
@@ -85,6 +88,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
         image_url: "",
         spotify_url: "",
         instagram_url: "",
+        profile_private: false,
     });
 
     // Check if user is authorized to edit this profile
@@ -118,6 +122,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                     image_url: data.user.image_url || "",
                     spotify_url: data.user.spotify_url || "",
                     instagram_url: data.user.instagram_url || "",
+                    profile_private: data.user.profile_private || false,
                 });
             } catch (error) {
                 console.error("Failed to fetch profile data:", error);
@@ -143,6 +148,30 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
             ...prev,
             country: value,
         }));
+    };
+
+    const handleProfilePrivacyToggle = async (checked: boolean) => {
+        try {
+            const response = await fetch("/api/profile/update/profile-privacy", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ isPrivate: checked }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update profile privacy");
+            }
+
+            setFormData((prev) => ({
+                ...prev,
+                profile_private: checked,
+            }));
+        } catch (error) {
+            console.error("Error updating profile privacy:", error);
+            setError("Failed to update profile privacy");
+        }
     };
 
     const handleSave = async () => {
@@ -455,6 +484,29 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                         placeholder="https://instagram.com/your_handle"
                                         className="w-full md:w-80"
                                     />
+                                </div>
+
+                                <div className="mb-4">
+                                    <div className="flex items-center space-x-3">
+                                        <Checkbox
+                                            id="profile-private"
+                                            checked={formData.profile_private}
+                                            onCheckedChange={handleProfilePrivacyToggle}
+                                            className="border-[#5C5537] data-[state=checked]:bg-[#5C5537] data-[state=checked]:border-[#5C5537]"
+                                        />
+                                        <div className="flex items-center space-x-2">
+                                            <Lock className="w-4 h-4 text-[#5C5537]" />
+                                            <label
+                                                htmlFor="profile-private"
+                                                className="text-sm font-medium text-[#0C3B2E] cursor-pointer"
+                                            >
+                                                Make profile private
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-gray-600 mt-1 ml-7">
+                                        Only you will be able to see your profile when enabled
+                                    </p>
                                 </div>
                             </div>
 

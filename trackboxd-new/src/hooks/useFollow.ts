@@ -5,12 +5,12 @@ import { useState, useCallback } from "react";
 
 interface UseFollowProps {
   userId: string;
-  initialIsFollowing: boolean;
+  initialFollowStatus: 'following' | 'requested' | 'not_following';
   initialFollowerCount: number;
 }
 
 interface UseFollowReturn {
-  isFollowing: boolean;
+  followStatus: 'following' | 'requested' | 'not_following';
   followerCount: number;
   isLoading: boolean;
   toggleFollow: () => Promise<void>;
@@ -18,10 +18,10 @@ interface UseFollowReturn {
 
 export const useFollow = ({
   userId,
-  initialIsFollowing,
+  initialFollowStatus,
   initialFollowerCount,
 }: UseFollowProps): UseFollowReturn => {
-  const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
+  const [followStatus, setFollowStatus] = useState<'following' | 'requested' | 'not_following'>(initialFollowStatus);
   const [followerCount, setFollowerCount] = useState(initialFollowerCount);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,47 +30,64 @@ export const useFollow = ({
     
     setIsLoading(true);
     
-    // Optimistic update - update UI immediately
-    const newFollowingState = !isFollowing;
-    setIsFollowing(newFollowingState);
-    setFollowerCount(prev => newFollowingState ? prev + 1 : prev - 1);
-    
     try {
-      const url = '/api/follow';
-      const method = newFollowingState ? 'POST' : 'DELETE';
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          followingId: userId,
-        }),
-      });
+      if (followStatus === 'not_following') {
+        // Following/requesting
+        const response = await fetch('/api/follow', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            followingId: userId,
+          }),
+        });
 
-      if (!response.ok) {
-        // Revert optimistic update on error
-        setIsFollowing(!newFollowingState);
-        setFollowerCount(prev => newFollowingState ? prev - 1 : prev + 1);
-        
-        const errorData = await response.json();
-        console.error('Follow/unfollow failed:', errorData.error);
-        // You could show a toast notification here
+        if (response.ok) {
+          const data = await response.json();
+          if (data.isRequest) {
+            setFollowStatus('requested');
+            // Don't increment follower count for requests
+          } else {
+            setFollowStatus('following');
+            setFollowerCount(prev => prev + 1);
+          }
+        } else {
+          const errorData = await response.json();
+          console.error('Follow failed:', errorData.error);
+        }
+      } else {
+        // Unfollowing or canceling request
+        const response = await fetch('/api/follow', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            followingId: userId,
+          }),
+        });
+
+        if (response.ok) {
+          const wasFollowing = followStatus === 'following';
+          setFollowStatus('not_following');
+          if (wasFollowing) {
+            setFollowerCount(prev => prev - 1);
+          }
+        } else {
+          const errorData = await response.json();
+          console.error('Unfollow failed:', errorData.error);
+        }
       }
     } catch (error) {
-      // Revert optimistic update on error
-      setIsFollowing(!newFollowingState);
-      setFollowerCount(prev => newFollowingState ? prev - 1 : prev + 1);
       console.error('Follow/unfollow error:', error);
-      // You could show a toast notification here
     } finally {
       setIsLoading(false);
     }
-  }, [userId, isFollowing, isLoading]);
+  }, [userId, followStatus, isLoading]);
 
   return {
-    isFollowing,
+    followStatus,
     followerCount,
     isLoading,
     toggleFollow,

@@ -6,8 +6,6 @@ import { Search, X, Music, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useUser from "@/hooks/useUser";
-import { Lock } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface InitialAnnotation {
   id: string;
@@ -52,7 +50,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
   const [isLoadingTrending, setIsLoadingTrending] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [visibility, setVisibility] = useState<'public' | 'private'>('public');
+  // Removed visibility state: annotations are public by default
 
   // Fetch trending tracks on mount
   useEffect(() => {
@@ -100,7 +98,6 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
       setTimestamp(`${minutes}:${seconds.toString().padStart(2, '0')}`);
       
       setAnnotationText(initialAnnotation.text);
-      setVisibility(initialAnnotation.isPublic ? 'public' : 'private');
     }
   }, [initialAnnotation]);
 
@@ -185,11 +182,10 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          // For edit mode, we don't send trackId
-          ...(initialAnnotation ? {} : { trackId: selectedTrack.id }),
+          // For edit mode, we don't send trackId; preserve existing privacy
+          ...(initialAnnotation ? { isPublic: initialAnnotation.isPublic } : { trackId: selectedTrack.id, isPublic: true }),
           timestamp: timestampInSeconds,
           text: annotationText,
-          isPublic: visibility === 'public',
           userId: user?.id
         })
       });
@@ -213,7 +209,8 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
           ...initialAnnotation,
           text: annotationText,
           timestamp: timestampInSeconds,
-          isPublic: visibility === 'public'
+          // Preserve existing privacy on edit
+          isPublic: initialAnnotation.isPublic
         });
       }
       
@@ -423,28 +420,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
               />
             </div>
 
-            {/* Visibility Toggle */}
-            <div className="pt-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="private-toggle" 
-                  checked={visibility === 'private'}
-                  onCheckedChange={(checked) => {
-                    setVisibility(checked ? 'private' : 'public');
-                  }}
-                  className="border-[#5C5537]/50 data-[state=checked]:bg-[#5C5537] data-[state=checked]:border-[#5C5537]"
-                />
-                <div className="flex items-center gap-1.5">
-                  <Lock className="h-4 w-4 text-[#5C5537]" />
-                  <label 
-                    htmlFor="private-toggle" 
-                    className="text-sm font-medium leading-none text-[#5C5537] cursor-pointer"
-                  >
-                    Make this annotation private
-                  </label>
-                </div>
-              </div>
-            </div>
+            {/* Private visibility option removed: annotations are always public */}
           </div>
 
           <div className="flex flex-col gap-3 pt-4">

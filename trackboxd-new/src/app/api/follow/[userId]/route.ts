@@ -29,12 +29,13 @@ export async function GET(
 
     const supabase = createClient(cookies());
 
-    // Check if current user is following the target user
+    // Check if current user is following the target user (only accepted follows)
     const { data: follow, error } = await supabase
       .from("follows")
-      .select("follower_id, following_id")
+      .select("follower_id, following_id, accepted")
       .eq("follower_id", session.user.id)
       .eq("following_id", userId)
+      .eq("accepted", true)
       .single();
 
     if (error && error.code !== 'PGRST116') {

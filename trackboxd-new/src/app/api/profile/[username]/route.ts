@@ -43,7 +43,7 @@ interface ProfileData {
     spotify_url?: string; // Ensure this is included
     instagram_url?: string;
     created_at: string;
-    likes_private: boolean;
+    profile_private?: boolean;
   };
   stats: {
     followers: number;
@@ -64,6 +64,8 @@ interface ProfileData {
     };
   }>;
   following: FollowingUser[];
+  isFollowing?: boolean;
+  followStatus?: 'following' | 'requested' | 'not_following';
 }
 
 export async function GET(
@@ -73,6 +75,10 @@ export async function GET(
   try {
     const supabase = createClient(cookies());
     const { username } = params;
+
+    // Get current user session
+    const { data: { session } } = await supabase.auth.getSession();
+    const currentUserId = session?.user?.id;
 
     // Get user by name (since we're using name as the identifier now)
     const { data: user, error: userError } = await supabase
@@ -88,7 +94,29 @@ export async function GET(
       );
     }
 
-    // Get user stats
+    // Check follow status if user is logged in
+    let followStatus: 'following' | 'requested' | 'not_following' = 'not_following';
+    let isFollowing = false;
+    
+    if (currentUserId && currentUserId !== user.id) {
+      const { data: followData } = await supabase
+        .from("follows")
+        .select("accepted")
+        .eq("follower_id", currentUserId)
+        .eq("following_id", user.id)
+        .single();
+
+      if (followData) {
+        if (followData.accepted) {
+          followStatus = 'following';
+          isFollowing = true;
+        } else {
+          followStatus = 'requested';
+        }
+      }
+    }
+
+    // Get user stats (only count accepted follows)
     const [
       { count: followersCount },
       { count: followingCount },
@@ -98,11 +126,13 @@ export async function GET(
       supabase
         .from("follows")
         .select("*", { count: "exact", head: true })
-        .eq("following_id", user.id),
+        .eq("following_id", user.id)
+        .eq("accepted", true),
       supabase
         .from("follows")
         .select("*", { count: "exact", head: true })
-        .eq("follower_id", user.id),
+        .eq("follower_id", user.id)
+        .eq("accepted", true),
       supabase
         .from("reviews")
         .select("*", { count: "exact", head: true })
@@ -348,7 +378,7 @@ export async function GET(
         spotify_url: user.spotify_url || undefined, // Include user's spotify_url
         instagram_url: (user as any).instagram_url || undefined,
         created_at: user.created_at,
-        likes_private: user.likes_private || false,
+        profile_private: user.profile_private || false,
       },
       stats: {
         followers: followersCount || 0,
@@ -381,6 +411,9 @@ export async function GET(
           instagram_url: u.instagram_url || undefined
         } as FollowingUser;
       }).filter(Boolean) as FollowingUser[] || [],
+      
+      isFollowing,
+      followStatus,
     };
 
     // console.log('Profile data fetched:', profileData);

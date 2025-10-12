@@ -1,13 +1,14 @@
 // ProfileHeader.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { UserPlus, Users, MapPin } from "lucide-react";
+import { UserPlus, Users, MapPin, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFollow } from "@/hooks/useFollow";
 import FollowersModal from "./FollowersModal";
 import FollowingModal from "./FollowingModal";
+import FollowRequestsModal from "./FollowRequestsModal";
 
 interface ProfileHeaderProps {
   user: {
@@ -28,6 +29,8 @@ interface ProfileHeaderProps {
   isOwnProfile: boolean;
   username: string;
   initialIsFollowing?: boolean;
+  followStatus?: 'following' | 'requested' | 'not_following';
+  isPrivateProfile?: boolean;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
@@ -36,16 +39,39 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isOwnProfile = false,
   username,
   initialIsFollowing = false,
+  followStatus = 'not_following',
+  isPrivateProfile = false,
 }) => {
   const router = useRouter();
   const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
   const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
+  const [isFollowRequestsModalOpen, setIsFollowRequestsModalOpen] = useState(false);
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   
-  const { isFollowing, followerCount, isLoading, toggleFollow } = useFollow({
+  const { followStatus: currentFollowStatus, followerCount, isLoading, toggleFollow } = useFollow({
     userId: user.id,
-    initialIsFollowing,
+    initialFollowStatus: followStatus,
     initialFollowerCount: stats.followers,
   });
+
+  // Fetch pending requests count for notification badge
+  useEffect(() => {
+    if (isOwnProfile && isPrivateProfile) {
+      const fetchPendingRequestsCount = async () => {
+        try {
+          const response = await fetch('/api/follow-requests');
+          if (response.ok) {
+            const data = await response.json();
+            setPendingRequestsCount(data.requests?.length || 0);
+          }
+        } catch (error) {
+          console.error('Error fetching pending requests count:', error);
+        }
+      };
+      
+      fetchPendingRequestsCount();
+    }
+  }, [isOwnProfile, isPrivateProfile]);
   
   const handleEditClick = () => {
     router.push(`/profile/${username}/edit`);
@@ -164,19 +190,38 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             {/* Action Button */}
             <div className="flex gap-2">
               {isOwnProfile ? (
-                <Button 
-                  onClick={handleEditClick}
-                  className="bg-[#5C5537]/90 hover:bg-[#5C5537] text-white px-4 py-1.5 text-sm"
-                >
-                  Edit Profile
-                </Button>
+                <>
+                  <Button 
+                    onClick={handleEditClick}
+                    className="bg-[#5C5537]/90 hover:bg-[#5C5537] text-white px-4 py-1.5 text-sm"
+                  >
+                    Edit Profile
+                  </Button>
+                  {isPrivateProfile && (
+                    <Button 
+                      onClick={() => setIsFollowRequestsModalOpen(true)}
+                      variant="outline"
+                      className="relative text-[#5C5537] border-[#5C5537]/30 hover:bg-[#5C5537]/10 px-4 py-1.5 text-sm"
+                    >
+                      {/* <UserCheck className="w-3 h-3 mr-1" /> */}
+                      Follow Requests
+                      {pendingRequestsCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-[#5C5537] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px]">
+                          {pendingRequestsCount}
+                        </span>
+                      )}
+                    </Button>
+                  )}
+                </>
               ) : (
                 <Button 
                   onClick={toggleFollow}
                   disabled={isLoading}
                   className={`flex items-center gap-1 px-4 py-1.5 text-sm ${
-                    isFollowing 
+                    currentFollowStatus === 'following'
                       ? "bg-[#5C5537]/90 hover:bg-[#5C5537] text-white" 
+                      : currentFollowStatus === 'requested'
+                      ? "bg-[#5C5537]/50 hover:bg-[#5C5537]/60 text-white cursor-not-allowed"
                       : "bg-[#5C5537]/90 hover:bg-[#5C5537] text-white"
                   }`}
                 >
@@ -184,8 +229,22 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
                   ) : (
                     <>
-                      {isFollowing ? <Users className="w-3 h-3" /> : <UserPlus className="w-3 h-3" />}
-                      {isFollowing ? "Following" : "Follow"}
+                      {currentFollowStatus === 'following' ? (
+                        <>
+                          <Users className="w-3 h-3" />
+                          Following
+                        </>
+                      ) : currentFollowStatus === 'requested' ? (
+                        <>
+                          <UserPlus className="w-3 h-3" />
+                          Requested
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-3 h-3" />
+                          {isPrivateProfile ? 'Request' : 'Follow'}
+                        </>
+                      )}
                     </>
                   )}
                 </Button>
@@ -209,6 +268,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         onClose={() => setIsFollowingModalOpen(false)}
         userId={user.id}
         isOwnProfile={isOwnProfile}
+      />
+
+      {/* Follow Requests Modal */}
+      <FollowRequestsModal
+        isOpen={isFollowRequestsModalOpen}
+        onClose={() => setIsFollowRequestsModalOpen(false)}
       />
     </>
   );

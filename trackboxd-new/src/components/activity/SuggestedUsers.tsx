@@ -34,15 +34,17 @@ export default function SuggestedUsers({ users, onFollowSuccess }: SuggestedUser
       <div className="space-y-3">
         {users.map((user) => {
           // Use the useFollow hook for each user
-          const { isFollowing, isLoading, toggleFollow } = useFollow({
+          const { followStatus, isLoading, toggleFollow } = useFollow({
             userId: user.id,
-            initialIsFollowing: followedUsers[user.id] || false,
+            initialFollowStatus: followedUsers[user.id] ? 'following' : 'not_following',
             initialFollowerCount: 0 // Not displaying follower count in this component
           });
           
           const handleUserFollow = async () => {
             await toggleFollow();
-            setFollowedUsers(prev => ({ ...prev, [user.id]: true }));
+            if (followStatus === 'not_following') {
+              setFollowedUsers(prev => ({ ...prev, [user.id]: true }));
+            }
             if (onFollowSuccess) onFollowSuccess();
           };
           
@@ -74,7 +76,7 @@ export default function SuggestedUsers({ users, onFollowSuccess }: SuggestedUser
                 variant="outline"
                 size="sm"
                 className={`text-[#5C5537] border-[#5C5537]/30 hover:bg-[#5C5537]/10 ${
-                  isFollowing ? "bg-[#5C5537]/20" : ""
+                  followStatus === 'following' ? "bg-[#5C5537]/20" : ""
                 }`}
                 onClick={handleUserFollow}
                 disabled={isLoading}
@@ -82,13 +84,13 @@ export default function SuggestedUsers({ users, onFollowSuccess }: SuggestedUser
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-1" />
                 ) : (
-                  isFollowing ? (
+                  followStatus === 'following' ? (
                     <Users className="h-4 w-4 mr-1" />
                   ) : (
                     <UserPlus className="h-4 w-4 mr-1" />
                   )
                 )}
-                {isFollowing ? "Following" : "Follow"}
+                {followStatus === 'following' ? "Following" : "Follow"}
               </Button>
             </div>
           );
