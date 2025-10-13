@@ -158,7 +158,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
               return (
                 <div key={p.id} className="border border-[#5C5537]/20 rounded-lg p-4 flex flex-col justify-between">
                   {/* <div className="text-sm text-[#5C5537]/60 mb-1">{p.key}</div> */}
-                  <div className="text-[#5C5537] mb-1">{p.question}</div>
+                  <div className="text-[#5C5537] mb-3">{p.question}</div>
                   {existing ? (
                     <div className="flex items-center justify-between mt-auto pt-4">
                       <div className="text-[#5C5537]/80 truncate">
