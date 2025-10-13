@@ -125,16 +125,22 @@ export async function getTrackDetails(trackId: string) {
   return resp.json();
 }
 
-export async function searchPlaylists(query: string) {
+export async function searchPlaylists(
+  query: string,
+  options: { limit?: number; market?: string } = {}
+) {
   if (!query || !query.trim()) {
     throw new Error("Spotify search query cannot be empty");
   }
 
   await getAccessToken(); // Ensure token is available
 
+  const { limit, market } = options;
   const url = new URL("https://api.spotify.com/v1/search");
   url.searchParams.set("q", query);
   url.searchParams.set("type", "playlist");
+  if (typeof limit === 'number') url.searchParams.set("limit", String(limit));
+  if (market) url.searchParams.set("market", market);
 
   const resp = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${cachedToken}` },
@@ -143,7 +149,7 @@ export async function searchPlaylists(query: string) {
   if (resp.status === 401) {
     // Token expired unexpectedly → refresh + retry
     await fetchNewAccessToken();
-    return searchPlaylists(query);
+    return searchPlaylists(query, options);
   }
 
   if (!resp.ok) {

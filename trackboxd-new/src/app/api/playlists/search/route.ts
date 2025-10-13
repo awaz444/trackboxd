@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { searchTracksAlbumsAndPlaylists } from '@/lib/spotify';
+import { searchPlaylists } from '@/lib/spotify';
 
 export async function GET(request: Request) {
   try {
@@ -15,16 +15,11 @@ export async function GET(request: Request) {
       );
     }
 
-    const playlistLimit = limitParam ? Number(limitParam) : 10;
-    const results = await searchTracksAlbumsAndPlaylists(query, {
-      trackLimit: 0,
-      albumLimit: 0,
-      playlistLimit,
-      market,
-    });
-
-    // Return playlists array directly for simplicity
-    return NextResponse.json(results.playlists || []);
+    const limit = limitParam ? Number(limitParam) : 10;
+    const results = await searchPlaylists(query, { limit, market });
+    // Normalize to items array similar to tracks/albums search
+    const items = results.playlists?.items || results.items || [];
+    return NextResponse.json(items);
   } catch (error) {
     console.error('Spotify playlist search error:', error);
     return NextResponse.json(
