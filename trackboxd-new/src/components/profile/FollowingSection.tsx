@@ -30,15 +30,15 @@ const FollowingSection: React.FC<FollowingSectionProps> = ({
         )}
       </div>
       
-      <div className="flex space-x-6 overflow-x-auto pb-4 -mx-4 px-4">
+      <div className="flex flex-nowrap space-x-6 overflow-x-auto overflow-y-hidden scroll-smooth pb-4 -mx-4 px-4">
         {following.map((user) => (
           <Link key={user.id} href={`/profile/${user.name}`}>
             <div className="flex-shrink-0 flex flex-col items-center cursor-pointer">
-              <div className="relative">
+              <div className="relative w-16 h-16">
                 <img
                   src={user.image_url || "/default-avatar.jpg"}
                   alt={user.username}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-[#FFFBEb]"
+                  className="w-16 h-16 min-w-[64px] min-h-[64px] rounded-full object-cover border-2 border-[#FFFBEb]"
                 />
               </div>
                 <div className="mt-2 text-sm font-medium text-[#5C5537] truncate max-w-[80px]">

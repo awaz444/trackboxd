@@ -89,8 +89,8 @@ const ProfilePrompts: React.FC<ProfilePromptsProps> = ({ username, isOwnProfile 
             const href = internalHref || r.item?.spotify_url;
             return (
               <div key={p.id}>
-                <h2 className="text-2xl font-bold text-[#5C5537]">{p.question}...</h2>
-                <div className="mt-3 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg">
+                <h2 className="text-xl font-bold text-[#5C5537]">{p.question}...</h2>
+                <div className="mt-6 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg">
                   {r.type === 'text' ? (
                     <div className="text-[#5C5537]">{r.text}</div>
                   ) : r.item ? (
