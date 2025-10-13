@@ -373,6 +373,7 @@ export async function GET(
         )
       `)
       .eq("follower_id", user.id)
+      .eq("accepted", true)
       .order("created_at", { ascending: false })
       .limit(12);
 

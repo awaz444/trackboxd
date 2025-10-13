@@ -141,9 +141,13 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-[#5C5537]">Edit Profile Prompts</h2>
-            <Button variant="outline" onClick={onClose} className="border-[#5C5537]/20 text-[#5C5537] hover:bg-[#5C5537]/10">
-              <X className="w-4 h-4 mr-2" />
-              Close
+            <Button
+              variant="ghost"
+              onClick={onClose}
+              aria-label="Close editor"
+              className="text-[#5C5537] hover:bg-[#5C5537]/10"
+            >
+              <X className="w-5 h-5" />
             </Button>
           </div>
 
@@ -152,27 +156,38 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
             {prompts.map((p) => {
               const existing = responses.find(r => r.promptKey === p.key);
               return (
-                <div key={p.id} className="border border-[#5C5537]/20 rounded-lg p-4">
+                <div key={p.id} className="border border-[#5C5537]/20 rounded-lg p-4 flex flex-col justify-between">
                   {/* <div className="text-sm text-[#5C5537]/60 mb-1">{p.key}</div> */}
-                  <div className="text-[#5C5537] mb-3">{p.question}</div>
+                  <div className="text-[#5C5537] mb-1">{p.question}</div>
                   {existing ? (
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-auto pt-4">
                       <div className="text-[#5C5537]/80 truncate">
                         {existing.type === 'text' ? existing.text : existing.item?.name}
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" className="border-[#5C5537]/20 text-[#5C5537] hover:bg-[#5C5537]/10" onClick={() => setActivePromptKey(p.key)}>Edit</Button>
-                        <Button variant="destructive" disabled={deletingKey === p.key} onClick={() => deleteResponse(p.key)}>
+                        <Button
+                          variant="outline"
+                          className="border-[#5C5537]/20 text-[#5C5537] hover:bg-[#5C5537]/10"
+                          onClick={() => setActivePromptKey(p.key)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="border-[#5C5537]/20 text-[#5C5537] hover:bg-[#5C5537]/10"
+                          disabled={deletingKey === p.key}
+                          onClick={() => deleteResponse(p.key)}
+                        >
                           {deletingKey === p.key ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
                         </Button>
                       </div>
-                    </div>
-                  ) : (
-                    <Button className="bg-[#5C5537] hover:bg-[#3E3725] text-white" onClick={() => setActivePromptKey(p.key)}>Answer</Button>
-                  )}
-                </div>
-              );
-            })}
+                  </div>
+                ) : (
+                    <Button className="bg-[#5C5537] hover:bg-[#3E3725] text-white mt-auto" onClick={() => setActivePromptKey(p.key)}>Answer</Button>
+                )}
+              </div>
+            );
+          })}
             {prompts.length === 0 && (
               <div className="text-[#5C5537]/50">No prompts available.</div>
             )}

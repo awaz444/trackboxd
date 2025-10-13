@@ -144,7 +144,7 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
                         {request.follower.name}
                       </div>
                       <div className="text-sm text-[#5C5537]/70">
-                        @{request.follower.name}
+                        {/* @{request.follower.name} */}
                       </div>
                     </div>
                   </Link>
@@ -166,7 +166,7 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-[#5C5537]/70 border-[#5C5537]/30 hover:bg-red-50 hover:text-red-500 hover:border-red-300"
+                      className="text-[#5C5537]/70"
                       onClick={() => handleReject(request.follower_id)}
                       disabled={!!loadingActions[request.follower_id]}
                     >

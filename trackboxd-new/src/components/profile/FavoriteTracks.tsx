@@ -42,7 +42,7 @@ const FavoriteTracks: React.FC<FavoriteTracksProps> = ({
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-[#5C5537]">Favorite Songs</h2>
+        <h2 className="text-2xl font-bold text-[#5C5537]">my top 4 tracks are...</h2>
         {isOwnProfile && (
           <Button 
             variant="outline" 
@@ -63,7 +63,7 @@ const FavoriteTracks: React.FC<FavoriteTracksProps> = ({
                 <img
                   src={track.cover_url || "/default-avatar.jpg"}
                   alt={`${track.name} cover`}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-300 "
                 />
               </div>
               <div className="p-2 bg-[#FFFBEb]">

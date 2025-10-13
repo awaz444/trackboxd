@@ -261,7 +261,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         {/* Reviews & Annotations */}
                         <div className="mb-8">
                             <h2 className="text-2xl font-bold text-[#5C5537] mb-6">
-                                Reviews & Annotations
+                                my recent reviews & annotations...
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Reviews Column */}
@@ -376,7 +376,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         <div className="mb-8">
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-2xl font-bold text-[#5C5537]">
-                                    Recent Likes
+                                    my recent likes...
                                 </h2>
                             </div>
                             <div className="space-y-3">

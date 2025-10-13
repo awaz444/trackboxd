@@ -67,6 +67,7 @@ export async function GET(request: Request) {
       const expectedType = r.profile_prompts?.expected_type as 'track'|'album'|'playlist'|undefined;
       return {
         id: r.id,
+        prompt_id: r.profile_prompts?.id || null,
         promptKey: keyFrom(promptText),
         type: expectedType || (item?.type as 'track'|'album'|'playlist') || 'track',
         item: item ? { id: item.id, type: item.type, name: item.name, artist: item.artist, cover_url: item.cover_url } : null,
