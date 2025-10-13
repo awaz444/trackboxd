@@ -9,6 +9,7 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 import FavoriteTracks from "@/components/profile/FavoriteTracks";
 import FollowingSection from "@/components/profile/FollowingSection";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
     Select,
@@ -17,7 +18,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Save, X, Upload, HelpCircle, Lock } from "lucide-react";
+import { Save, X, Upload, HelpCircle, Lock, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { COUNTRIES } from "./countries";
@@ -80,6 +81,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [showSpotifyHelp, setShowSpotifyHelp] = useState(false);
+    const [imageUploading, setImageUploading] = useState(false);
 
     // Form state - removed username field
     const [formData, setFormData] = useState({
@@ -229,6 +231,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
         if (!file) return;
 
         try {
+            setImageUploading(true);
             const supabase = createSupabaseClient();
 
             // Generate unique filename
@@ -281,6 +284,8 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
             setError(
                 err instanceof Error ? err.message : "Failed to upload image"
             );
+        } finally {
+            setImageUploading(false);
         }
     };
 
@@ -331,12 +336,17 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
     return (
         <div className="min-h-screen bg-[#FFFBEb]">
             <div className="max-w-5xl mx-auto px-4 py-8">
-                {/* Success/Error Messages */}
-                {success && (
-                    <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                        {success}
-                    </div>
-                )}
+                {/* Success Modal - brand colors, floating, no green */}
+                <Dialog open={!!success} onOpenChange={(open) => !open && setSuccess(null)}>
+                    <DialogContent className="bg-[#FFFBEb] border-[#5C5537]/20 text-[#5C5537] shadow-lg rounded-lg px-5 w-[calc(100%-2rem)] sm:w-auto">
+                        <DialogHeader>
+                            <DialogTitle className="text-[#5C5537]">Profile Updated</DialogTitle>
+                            <DialogDescription className="text-[#5C5537]/70">
+                                {success}
+                            </DialogDescription>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
                 {error && (
                     <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
                         {error}
@@ -355,13 +365,20 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                 alt={formData.name}
                                 className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-[#FFFFF5] shadow-lg"
                             />
-                            <label className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                <Upload className="w-8 h-8 text-white" />
+                            <label
+                                className={`absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center transition-opacity cursor-pointer ${imageUploading ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                            >
+                                {imageUploading ? (
+                                    <Loader2 className="w-8 h-8 text-white animate-spin" />
+                                ) : (
+                                    <Upload className="w-8 h-8 text-white" />
+                                )}
                                 <input
                                     type="file"
                                     accept="image/*"
                                     className="hidden"
                                     onChange={handleImageUpload}
+                                    disabled={imageUploading}
                                 />
                             </label>
                         </div>

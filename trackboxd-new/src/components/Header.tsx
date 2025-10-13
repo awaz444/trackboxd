@@ -358,7 +358,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                     className="h-full w-auto"
                                 />
                             </div>
-                            <h1 className="text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
+                            <h1 className="hidden md:block text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
                                 Trackboxd
                             </h1>
                         </div>
