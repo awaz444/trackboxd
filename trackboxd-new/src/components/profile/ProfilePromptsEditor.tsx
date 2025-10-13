@@ -69,6 +69,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
       if (activePrompt.type === 'playlist') url = `/api/playlists/search?q=${encodeURIComponent(q)}`;
 
       const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to search');
       const data = await res.json();
       let items: any[] = [];
       if (activePrompt.type === 'track') {
@@ -76,8 +77,10 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
       } else if (activePrompt.type === 'album') {
         items = (Array.isArray(data) ? data : data || []).map((a: any) => ({ id: a.id, name: a.name, artist: a.artists?.map((x: any) => x.name).join(', '), cover: a.images?.[0]?.url }));
       } else if (activePrompt.type === 'playlist') {
-        const itemsRaw = Array.isArray(data) ? data : data || [];
-        items = itemsRaw.map((p: any) => ({ id: p.id, name: p.name, artist: p.owner?.display_name ?? '', cover: p.images?.[0]?.url }));
+        const itemsRaw = Array.isArray(data)
+          ? data
+          : (data?.playlists?.items || data?.items || []);
+        items = (itemsRaw as any[]).filter(Boolean).map((p: any) => ({ id: p.id, name: p.name, artist: p.owner?.display_name ?? '', cover: p.images?.[0]?.url }));
       }
       setSearchResults(items);
     } catch (e) {
