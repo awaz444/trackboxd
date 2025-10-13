@@ -66,6 +66,14 @@ interface ProfileData {
   following: FollowingUser[];
   isFollowing?: boolean;
   followStatus?: 'following' | 'requested' | 'not_following';
+  promptResponses?: Array<{
+    id: string;
+    promptKey: string;
+    type: 'text' | 'track' | 'album' | 'playlist';
+    item?: { id: string; type: string; name: string; artist?: string; cover_url?: string } | null;
+    text?: string | null;
+    created_at: string;
+  }>;
 }
 
 export async function GET(
@@ -368,6 +376,43 @@ export async function GET(
       .order("created_at", { ascending: false })
       .limit(12);
 
+    // Fetch prompt responses for this user
+    let promptResponses: Array<{ id: string; promptKey: string; type: 'text'|'track'|'album'|'playlist'; item?: { id: string; type: string; name: string; artist?: string; cover_url?: string } | null; text?: string | null; created_at: string; }> = [];
+    try {
+      const { data: responses } = await supabase
+        .from('user_profile_responses')
+        .select(`
+          id,
+          prompt_key,
+          target_type,
+          target_id,
+          text_response,
+          created_at,
+          spotify_items:target_id (
+            id,
+            type,
+            name,
+            artist,
+            cover_url
+          )
+        `)
+        .eq('user_id', user.id);
+
+      promptResponses = (responses || []).map((r: any) => {
+        const item = Array.isArray(r.spotify_items) ? r.spotify_items[0] : r.spotify_items;
+        return {
+          id: r.id,
+          promptKey: r.prompt_key,
+          type: r.target_type,
+          item: item ? { id: item.id, type: item.type, name: item.name, artist: item.artist, cover_url: item.cover_url } : null,
+          text: r.text_response || null,
+          created_at: r.created_at,
+        };
+      });
+    } catch (e) {
+      console.warn('Failed to fetch prompt responses:', e);
+    }
+
     // Format the response with proper typing
     const profileData: ProfileData = {
       user: {
@@ -414,6 +459,7 @@ export async function GET(
       
       isFollowing,
       followStatus,
+      promptResponses,
     };
 
     // console.log('Profile data fetched:', profileData);

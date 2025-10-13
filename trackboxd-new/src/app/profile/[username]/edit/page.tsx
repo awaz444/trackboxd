@@ -505,7 +505,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                         </div>
                                     </div>
                                     <p className="text-xs text-gray-600 mt-1 ml-7">
-                                        Only you will be able to see your profile when enabled
+                                        Only people you allow will be able to see your activity when enabled
                                     </p>
                                 </div>
                             </div>

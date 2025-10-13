@@ -10,6 +10,7 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 import ActivityCard from "@/components/profile/ActivityCard";
 import FavoriteTracks from "@/components/profile/FavoriteTracks";
 import FollowingSection from "@/components/profile/FollowingSection";
+import ProfilePrompts from "@/components/profile/ProfilePrompts";
 import { Heart, Star, MessageCircle } from "lucide-react";
 import Link from "next/link";
 
@@ -73,6 +74,14 @@ interface ProfileData {
     }>;
     isFollowing?: boolean;
     followStatus?: 'following' | 'requested' | 'not_following';
+    promptResponses?: Array<{
+        id: string;
+        promptKey: string;
+        type: 'text' | 'track' | 'album' | 'playlist';
+        item?: { id: string; type: string; name: string; artist?: string; cover_url?: string } | null;
+        text?: string | null;
+        created_at: string;
+    }>;
 }
 
 async function getProfileData(username: string): Promise<ProfileData | null> {
@@ -240,6 +249,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         <FavoriteTracks
                             tracks={favoriteTracks}
                             isOwnProfile={isOwnProfile}
+                        />
+
+                        {/* Profile Prompts */}
+                        <ProfilePrompts
+                            username={params.username}
+                            isOwnProfile={isOwnProfile}
+                            initialResponses={profileData.promptResponses || []}
                         />
 
                         {/* Reviews & Annotations */}
