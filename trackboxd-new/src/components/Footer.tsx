@@ -20,13 +20,17 @@ const Footer = ({ variant = "dark" }: FooterProps) => {
             © 2025 Trackboxd. Made with love 🤎
           </div>
           <div className="flex gap-6 text-sm">
-            {["About", "Privacy", "Contact"].map((item, index) => (
+            {[
+              { name: "About", href: "/about" },
+              { name: "Privacy", href: "/privacy" },
+              { name: "Contact", href: "/contact" }
+            ].map((item, index) => (
               <a
                 key={index}
-                href={`#${item.toLowerCase()}`}
+                href={item.href}
                 className={`${textColor} ${hoverColor} transition-colors duration-200`}
               >
-                {item}
+                {item.name}
               </a>
             ))}
           </div>

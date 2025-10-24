@@ -19,7 +19,10 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     '/',
     '/auth',
     '/login',
-    '/register'
+    '/register',
+    '/about',
+    '/contact',
+    '/privacy',
   ];
 
   // Check if current route is public
