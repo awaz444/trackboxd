@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${lora.className} bg-[#FFFFF0] text-[#1F2C24]`}>
+      <body className={`${lora.className} bg-[#FFFBEb] text-[#1F2C24]`}>
         <SessionProvider>
           <ClientShell>
             {children}

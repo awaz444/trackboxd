@@ -316,7 +316,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
 
     if (!profileData) {
         return (
-            <div className="min-h-screen bg-[#FFFFF0]">
+            <div className="min-h-screen bg-[#FFFBEb]">
                 <div className="max-w-5xl mx-auto px-4 py-8 text-center">
                     <h1 className="text-2xl font-bold text-[#0C3B2E] mb-4">
                         Profile Not Found
