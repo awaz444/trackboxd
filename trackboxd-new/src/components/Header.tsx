@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import LogModal from "./log/LogModal";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 
 interface HeaderProps {
@@ -58,6 +59,7 @@ interface SearchResults {
 
 const Header: React.FC<HeaderProps> = ({}) => {
     const router = useRouter();
+    const { data: session, status } = useSession();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -182,11 +184,17 @@ const Header: React.FC<HeaderProps> = ({}) => {
                 setSpotifyUser(data);
             } catch (error) {
                 console.error("Error fetching Spotify user:", error);
+                setSpotifyUser(null);
             }
         };
 
-        fetchSpotifyUser();
-    }, []);
+        // Only fetch user data if we have a session
+        if (session) {
+            fetchSpotifyUser();
+        } else {
+            setSpotifyUser(null);
+        }
+    }, [session]); // Re-run when session changes
 
     const getInitials = (name: string) => {
         return name
@@ -243,15 +251,31 @@ const Header: React.FC<HeaderProps> = ({}) => {
     // Added logout handler
     const handleLogout = async () => {
         try {
+            // Clear any localStorage data
+            if (typeof window !== 'undefined') {
+                localStorage.clear();
+                sessionStorage.clear();
+            }
+
+            // Sign out from NextAuth (this clears NextAuth session)
+            await signOut({ redirect: false });
+
+            // Call our custom logout API to clear Supabase session and cookies
             const response = await fetch("/api/auth/logout");
             if (response.ok) {
-                router.push("/");
-                router.refresh();
+                // Force a hard refresh to clear any remaining state
+                window.location.href = "/";
             } else {
                 console.error("Logout failed");
+                // Fallback: still redirect even if API call fails
+                router.push("/");
+                router.refresh();
             }
         } catch (error) {
             console.error("Logout error:", error);
+            // Fallback: redirect even on error
+            router.push("/");
+            router.refresh();
         }
     };
 

@@ -3,6 +3,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
+import AuthGuard from '@/components/AuthGuard';
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -14,10 +15,10 @@ export default function ClientShell({ children }: { children: React.ReactNode })
   }, [pathname]);
 
   return (
-    <>
+    <AuthGuard>
       {!hideHeader && <Header />}
       {children}
-    </>
+    </AuthGuard>
   );
 }
 

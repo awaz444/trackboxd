@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { createClient } from "@/lib/supabase/client";
 import { findUserByNameOrEmail } from "@/lib/auth-utils";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const router = useRouter();
+  const { update: updateSession } = useSession();
   
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -162,6 +163,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
         });
 
         if (signInResult?.ok) {
+          // Update the session to trigger re-renders
+          await updateSession();
+          
           onClose();
           // Reset form
           setFormData({
@@ -172,6 +176,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
           });
           // Redirect to activity page
           router.push('/activity');
+          router.refresh(); // Force a refresh to update all components
         } else {
           setErrors({ general: 'Account created successfully! Please sign in.' });
           setMode('login');
@@ -214,6 +219,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       if (result?.error) {
         setErrors({ general: 'Invalid username/email or password' });
       } else if (result?.ok) {
+        // Update the session to trigger re-renders
+        await updateSession();
+        
         onClose();
         // Reset form
           setFormData({
@@ -224,6 +232,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
         });
         // Redirect to activity page
         router.push('/activity');
+        router.refresh(); // Force a refresh to update all components
       }
     } catch (error) {
       console.error('Login error:', error);

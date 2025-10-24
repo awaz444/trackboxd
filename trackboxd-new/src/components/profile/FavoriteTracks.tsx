@@ -39,6 +39,12 @@ const FavoriteTracks: React.FC<FavoriteTracksProps> = ({
   const handleCloseEditor = () => {
     setIsEditing(false);
   };
+
+  // Don't render the section if there are no tracks and it's not the user's own profile
+  if (currentTracks.length === 0 && !isOwnProfile) {
+    return null;
+  }
+
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-6">
