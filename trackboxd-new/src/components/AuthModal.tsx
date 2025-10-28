@@ -34,6 +34,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
   const { update: updateSession } = useSession();
   
@@ -88,9 +89,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
+    // Clear error and success when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+    if (success) {
+      setSuccess(null);
     }
   };
 
@@ -108,6 +112,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       // Normalize inputs
       const email = formData.email.trim().toLowerCase();
       const name = formData.name.trim();
+
+      // Check for username uniqueness before proceeding
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('name')
+        .eq('name', name)
+        .single();
+
+      if (existingUser) {
+        setErrors({ name: 'This username is already taken. Please choose another one.' });
+        return;
+      }
 
       // Sign up with Supabase Auth
       const { data, error } = await supabase.auth.signUp({
@@ -178,8 +194,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
           router.push('/activity');
           router.refresh(); // Force a refresh to update all components
         } else {
-          setErrors({ general: 'Account created successfully! Please sign in.' });
+          setSuccess('Account created successfully! Please check your email to verify your account, then sign in.');
           setMode('login');
+          // Clear form data
+          setFormData({
+            email: '',
+            password: '',
+            confirmPassword: '',
+            name: '',
+          });
         }
       }
     } catch (error) {
@@ -206,7 +229,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       const email = await findUserByNameOrEmail(formData.email);
       
       if (!email) {
-        setErrors({ general: 'Invalid username/email or password' });
+        setErrors({ general: 'No account found with this username or email. Please check your credentials or sign up for a new account.' });
         return;
       }
 
@@ -217,7 +240,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       });
 
       if (result?.error) {
-        setErrors({ general: 'Invalid username/email or password' });
+        if (result.error === 'CredentialsSignin') {
+          setErrors({ general: 'Incorrect username OR password. Please check your credentials and try again.' });
+        } else {
+          setErrors({ general: 'Login failed. Please try again.' });
+        }
       } else if (result?.ok) {
         // Update the session to trigger re-renders
         await updateSession();
@@ -283,10 +310,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
           </p>
         </div>
 
+        {/* Success Message */}
+        {success && (
+          <div className="mb-4 p-4 bg-[#5C5537]/10 border border-[#5C5537]/20 text-[#5C5537] rounded-lg">
+            <p className="text-sm">{success}</p>
+          </div>
+        )}
+
         {/* General Error */}
         {errors.general && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-red-600 text-sm">{errors.general}</p>
+          <div className="mb-4 p-4 bg-[#5C5537]/10 border border-[#5C5537]/20 text-[#5C5537] rounded-lg">
+            <p className="text-sm">{errors.general}</p>
           </div>
         )}
         
@@ -313,7 +347,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                 required
               />
             </div>
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+            {errors.email && <p className="text-[#5C5537] text-xs mt-1">{errors.email}</p>}
           </div>
 
           {/* Password Field (login only) */}
@@ -373,7 +407,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                     required
                   />
                 </div>
-                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                {errors.name && <p className="text-[#5C5537] text-xs mt-1">{errors.name}</p>}
               </div>
               {/* Move Password + Confirm Password to bottom */}
               <div>
@@ -403,7 +437,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                {errors.password && <p className="text-[#5C5537] text-xs mt-1">{errors.password}</p>}
               </div>
 
               <div>
@@ -433,7 +467,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                     {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-[#5C5537] text-xs mt-1">{errors.confirmPassword}</p>}
               </div>
             </>
           )}
