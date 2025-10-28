@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Music } from 'lucide-react';
 import Footer from '@/components/Footer';
 import AuthModal from '@/components/AuthModal';
@@ -8,7 +9,16 @@ import Image from "next/image";
 
 const LandingPage = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'forgot-password' | 'update-password'>('login');
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const authParam = searchParams.get('auth');
+    if (authParam && ['login', 'signup', 'forgot-password', 'update-password'].includes(authParam)) {
+      setAuthMode(authParam as 'login' | 'signup' | 'forgot-password' | 'update-password');
+      setShowAuthModal(true);
+    }
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen max-h-screen bg-[#FFFBEb] flex flex-col relative overflow-hidden">

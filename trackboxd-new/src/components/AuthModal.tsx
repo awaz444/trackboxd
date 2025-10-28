@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
 import { signIn, useSession } from "next-auth/react";
 import { createClient } from "@/lib/supabase/client";
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultMode?: 'login' | 'signup';
+  defaultMode?: 'login' | 'signup' | 'forgot-password' | 'update-password';
 }
 
 interface FormData {
@@ -29,12 +29,13 @@ interface FormErrors {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'login' }) => {
-  const [mode, setMode] = useState<'login' | 'signup'>(defaultMode);
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot-password' | 'update-password'>(defaultMode);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [success, setSuccess] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const { update: updateSession } = useSession();
   
@@ -47,31 +48,38 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
   const supabase = createClient();
 
+  // Check authentication for update-password mode
+  useEffect(() => {
+    if (mode === 'update-password') {
+      const checkAuth = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setIsAuthenticated(true);
+        } else {
+          // Switch to forgot-password mode if not authenticated
+          setMode('forgot-password');
+        }
+      };
+      checkAuth();
+    }
+  }, [mode, supabase.auth]);
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // Email validation
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-
-    if (mode === 'signup') {
-      // Name validation (used as username)
-      if (!formData.name) {
-        newErrors.name = 'Username is required';
-      } else if (formData.name.length < 3) {
-        newErrors.name = 'Username must be at least 3 characters';
-      } else if (!/^[a-zA-Z0-9_]+$/.test(formData.name)) {
-        newErrors.name = 'Username can only contain letters, numbers, and underscores';
+    if (mode === 'forgot-password') {
+      // Only email validation for forgot password
+      if (!formData.email) {
+        newErrors.email = 'Email is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = 'Please enter a valid email address';
+      }
+    } else if (mode === 'update-password') {
+      // Password validation for update password
+      if (!formData.password) {
+        newErrors.password = 'Password is required';
+      } else if (formData.password.length < 6) {
+        newErrors.password = 'Password must be at least 6 characters';
       }
 
       // Confirm password validation
@@ -80,7 +88,39 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       }
+    } else {
+      // Original validation for login/signup
+      // Email validation
+      if (!formData.email) {
+        newErrors.email = 'Email is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = 'Please enter a valid email address';
+      }
 
+      // Password validation
+      if (!formData.password) {
+        newErrors.password = 'Password is required';
+      } else if (formData.password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters';
+      }
+
+      if (mode === 'signup') {
+        // Name validation (used as username)
+        if (!formData.name) {
+          newErrors.name = 'Username is required';
+        } else if (formData.name.length < 3) {
+          newErrors.name = 'Username must be at least 3 characters';
+        } else if (!/^[a-zA-Z0-9_]+$/.test(formData.name)) {
+          newErrors.name = 'Username can only contain letters, numbers, and underscores';
+        }
+
+        // Confirm password validation
+        if (!formData.confirmPassword) {
+          newErrors.confirmPassword = 'Please confirm your password';
+        } else if (formData.password !== formData.confirmPassword) {
+          newErrors.confirmPassword = 'Passwords do not match';
+        }
+      }
     }
 
     setErrors(newErrors);
@@ -269,8 +309,91 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.email) {
+      setErrors({ email: 'Please enter your email address.' });
+      return;
+    }
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
+    setSuccess(null);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+        redirectTo: `${window.location.origin}/api/auth/confirm?type=recovery&next=/update-password`,
+      });
+
+      if (error) {
+        setErrors({ general: 'Failed to send reset email. Please check your email address and try again.' });
+      } else {
+        setSuccess('Password reset email sent! Please check your inbox and follow the instructions to reset your password.');
+        setFormData(prev => ({ ...prev, email: '' }));
+      }
+    } catch (error) {
+      console.error('Password reset error:', error);
+      setErrors({ general: 'An unexpected error occurred. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
+    setSuccess(null);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: formData.password
+      });
+
+      if (error) {
+        setErrors({ general: 'Failed to update password. Please try again.' });
+      } else {
+        setSuccess('Password updated successfully! You can now sign in with your new password.');
+        setFormData({
+          email: '',
+          password: '',
+          confirmPassword: '',
+          name: '',
+        });
+        
+        // Close modal and redirect after a delay
+        setTimeout(() => {
+          onClose();
+          router.push('/');
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Password update error:', error);
+      setErrors({ general: 'An unexpected error occurred. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const switchMode = () => {
-    setMode(mode === 'login' ? 'signup' : 'login');
+    if (mode === 'forgot-password') {
+      setMode('login');
+    } else if (mode === 'update-password') {
+      // Can't switch from update-password mode
+      return;
+    } else {
+      setMode(mode === 'login' ? 'signup' : 'login');
+    }
     setErrors({});
     setFormData({
       email: '',
@@ -303,10 +426,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
         {/* Modal Header */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-[#5C5537]">
-            {mode === 'login' ? 'Welcome Back' : 'Create Account'}
+            {mode === 'login' && 'Welcome Back'}
+            {mode === 'signup' && 'Create Account'}
+            {mode === 'forgot-password' && 'Forgot Password'}
+            {mode === 'update-password' && 'Update Password'}
           </h2>
           <p className="text-[#5C5537]/70 mt-2">
-            {mode === 'login' ? 'Sign in to your account' : 'Join the Trackboxd community'}
+            {mode === 'login' && 'Sign in to your account'}
+            {mode === 'signup' && 'Join the Trackboxd community'}
+            {mode === 'forgot-password' && "Enter your email address and we'll send you a link to reset your password."}
+            {mode === 'update-password' && 'Enter your new password below.'}
           </p>
         </div>
 
@@ -325,30 +454,41 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
         )}
         
         {/* Form */}
-        <form onSubmit={mode === 'login' ? handleLogin : handleSignup} className="space-y-4">
-          {/* Email/Username Field */}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-[#5C5537] mb-2">
-              {mode === 'login' ? 'Email or Username *' : 'Email Address *'}
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
-              <input
-                type={mode === 'login' ? 'text' : 'email'}
-                id="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                  errors.email 
-                    ? 'border-red-300 focus:ring-red-500' 
-                    : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                }`}
-                placeholder={mode === 'login' ? 'Enter your email or username' : 'Enter your email'}
-                required
-              />
+        <form onSubmit={
+          mode === 'login' ? handleLogin : 
+          mode === 'signup' ? handleSignup :
+          mode === 'forgot-password' ? handleForgotPassword :
+          handleUpdatePassword
+        } className="space-y-4">
+          {/* Email Field - shown for login, signup, and forgot-password */}
+          {(mode === 'login' || mode === 'signup' || mode === 'forgot-password') && (
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-[#5C5537] mb-2">
+                {mode === 'login' ? 'Email or Username *' : 'Email Address *'}
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
+                <input
+                  type={mode === 'login' ? 'text' : 'email'}
+                  id="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
+                    errors.email 
+                      ? 'border-red-300 focus:ring-red-500' 
+                      : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                  }`}
+                  placeholder={
+                    mode === 'login' ? 'Enter your email or username' : 
+                    mode === 'forgot-password' ? 'Enter your email address' :
+                    'Enter your email'
+                  }
+                  required
+                />
+              </div>
+              {errors.email && <p className="text-[#5C5537] text-xs mt-1">{errors.email}</p>}
             </div>
-            {errors.email && <p className="text-[#5C5537] text-xs mt-1">{errors.email}</p>}
-          </div>
+          )}
 
           {/* Password Field (login only) */}
           {mode === 'login' && (
@@ -379,8 +519,84 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-[#5C5537] text-xs mt-1">{errors.password}</p>}
+              
+              {/* Forgot Password Link */}
+              <div className="text-right mt-2">
+                <button
+                  type="button"
+                  onClick={() => setMode('forgot-password')}
+                  className="text-sm text-[#5C5537]/70 hover:text-[#5C5537] hover:underline"
+                >
+                  Forgot your password?
+                </button>
+              </div>
             </div>
+          )}
+
+          {/* Password Fields for update-password mode */}
+          {mode === 'update-password' && (
+            <>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-[#5C5537] mb-2">
+                  New Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    className={`w-full pl-10 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
+                      errors.password 
+                        ? 'border-red-300 focus:ring-red-500' 
+                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                    }`}
+                    placeholder="Enter your new password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-[#5C5537] text-xs mt-1">{errors.password}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#5C5537] mb-2">
+                  Confirm New Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    className={`w-full pl-10 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
+                      errors.confirmPassword 
+                        ? 'border-red-300 focus:ring-red-500' 
+                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                    }`}
+                    placeholder="Confirm your new password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                {errors.confirmPassword && <p className="text-[#5C5537] text-xs mt-1">{errors.confirmPassword}</p>}
+              </div>
+            </>
           )}
 
           {/* Signup-only fields */}
@@ -478,22 +694,44 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
             disabled={isLoading}
             className="w-full bg-[#5C5537] text-white py-2 px-4 rounded-md hover:bg-[#3E3725] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Please wait...' : (mode === 'login' ? 'Sign In' : 'Create Account')}
+            {isLoading ? 'Please wait...' : 
+              mode === 'login' ? 'Sign In' :
+              mode === 'signup' ? 'Create Account' :
+              mode === 'forgot-password' ? 'Send Reset Email' :
+              'Update Password'
+            }
           </button>
         </form>
         
-        {/* Mode Switch */}
-        <div className="text-center mt-6 pt-6 border-t border-[#5C5537]/10">
-          <p className="text-[#5C5537]/70">
-            {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
-            <button
-              onClick={switchMode}
-              className="text-[#5C5537] hover:underline font-medium"
-            >
-              {mode === 'login' ? 'Create one' : 'Sign in'}
-            </button>
-          </p>
-        </div>
+        {/* Mode Switch - Only show for login/signup modes */}
+        {(mode === 'login' || mode === 'signup') && (
+          <div className="text-center mt-6 pt-6 border-t border-[#5C5537]/10">
+            <p className="text-[#5C5537]/70">
+              {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
+              <button
+                onClick={switchMode}
+                className="text-[#5C5537] hover:underline font-medium"
+              >
+                {mode === 'login' ? 'Create one' : 'Sign in'}
+              </button>
+            </p>
+          </div>
+        )}
+        
+        {/* Back to Login - Show for forgot-password mode */}
+        {mode === 'forgot-password' && (
+          <div className="text-center mt-6 pt-6 border-t border-[#5C5537]/10">
+            <p className="text-[#5C5537]/70">
+              Remember your password?{' '}
+              <button
+                onClick={() => setMode('login')}
+                className="text-[#5C5537] hover:underline font-medium"
+              >
+                Back to Sign In
+              </button>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
