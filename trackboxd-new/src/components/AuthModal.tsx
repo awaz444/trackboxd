@@ -48,15 +48,27 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
   const supabase = createClient();
 
+  // Update mode when defaultMode prop changes
+  useEffect(() => {
+    setMode(defaultMode);
+  }, [defaultMode]);
+
   // Check authentication for update-password mode
   useEffect(() => {
     if (mode === 'update-password') {
       const checkAuth = async () => {
+        // Add a small delay to ensure the session is properly set after redirect
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const { data: { user } } = await supabase.auth.getUser();
+        console.log('Auth check for update-password mode:', { user: !!user, userId: user?.id });
+        
         if (user) {
           setIsAuthenticated(true);
+          console.log('User authenticated, staying in update-password mode');
         } else {
           // Switch to forgot-password mode if not authenticated
+          console.log('No user found, switching to forgot-password mode');
           setMode('forgot-password');
         }
       };
@@ -327,7 +339,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-        redirectTo: `${window.location.origin}/api/auth/confirm?type=recovery&next=/update-password`,
+        redirectTo: `${window.location.origin}/api/auth/confirm`,
       });
 
       if (error) {
