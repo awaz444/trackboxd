@@ -127,14 +127,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <div className="flex items-center gap-1 text-sm text-[#5C5537]/80 mt-3">
                 <button 
                   onClick={() => setIsFollowersModalOpen(true)}
-                  className="text-center flex flex-row gap-1 hover:bg-[#5C5537]/5 px-1 py-1 rounded-md transition-colors"
+                  className="text-center flex flex-row gap-1 hover:bg-[#5C5537]/5 px-2 py-1 rounded-md transition-colors"
                 >
                   <div className="font-semibold text-[#5C5537]">{followerCount}</div>
                   <div className="text-xs text-[#5C5537]/60 mt-[3px]">Followers</div>
                 </button>
                 <button 
                   onClick={() => setIsFollowingModalOpen(true)}
-                  className="text-center flex flex-row gap-1 hover:bg-[#5C5537]/5 px-1 py-1 rounded-md transition-colors"
+                  className="text-center flex flex-row gap-1 hover:bg-[#5C5537]/5 px-2 py-1 rounded-md transition-colors"
                 >
                   <div className="font-semibold text-[#5C5537]">{stats.following}</div>
                   <div className="text-xs text-[#5C5537]/60 mt-[3px]">Following</div>

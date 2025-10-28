@@ -369,104 +369,134 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                          )}
 
                         {/* Likes */}
-                        {(likesActivity && likesActivity.length > 0) && (
-                            <div className="mb-8">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-2xl font-bold text-[#5C5537]">
-                                        my recent likes...
-                                    </h2>
-                                </div>
-                                <div className="space-y-3">
-                                    {(likesActivity || []).map((l) => {
-                                        const renderSentenceWithEmbeddedLinks = () => {
-                                            const sentence = l.sentence;
-                                            const links = l.links;
+                        <div className="mb-8">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-2xl font-bold text-[#5C5537]">
+                                    my recent likes...
+                                </h2>
+                            </div>
+                            <div className="space-y-3">
+                                {(likesActivity || []).map((l) => {
+                                    const renderSentenceWithEmbeddedLinks = () => {
+                                        const sentence = l.sentence;
+                                        const links = l.links;
 
-                                            const parts = sentence.split(" ");
-                                            const subject = parts[0]; // Always the profile owner
-                                            const verb = parts[1]; // Always "liked"
+                                        const parts = sentence.split(" ");
+                                        const subject = parts[0]; // Always the profile owner
+                                        const verb = parts[1]; // Always "liked"
 
-                                            let remainingParts = parts.slice(2);
-                                            let result = [];
+                                        let remainingParts = parts.slice(2);
+                                        let result = [];
 
-                                            // Just render the subject as plain text, but keep it semibold
+                                        // Just render the subject as plain text, but keep it semibold
+                                        result.push(
+                                            <span
+                                                key="subject"
+                                                className="font-semibold text-[#5C5537]">
+                                                {subject}
+                                            </span>
+                                        );
+                                        result.push(" ");
+                                        result.push(
+                                            <span className="font-medium text-[#5C5537]/70">
+                                                {verb}
+                                            </span>
+                                        );
+                                        result.push(" ");
+
+                                        // Check if there's a target user (contains apostrophe s)
+                                        const targetIndex = remainingParts.findIndex(
+                                            (part) => part.includes("'s")
+                                        );
+                                        if (targetIndex !== -1 && links.targetProfile) {
+                                            const targetName = remainingParts[
+                                                targetIndex
+                                            ].replace("'s", "");
+
+                                            // Add target user link with semibold
                                             result.push(
-                                                <span
-                                                    key="subject"
-                                                    className="font-semibold text-[#5C5537]">
-                                                    {subject}
-                                                </span>
+                                                <Link
+                                                    key="target"
+                                                    href={links.targetProfile}
+                                                    className="font-semibold text-[#5C5537] hover:underline">
+                                                    {targetName}
+                                                </Link>
                                             );
-                                            result.push(" ");
+                                            result.push("'s ");
+
+                                            remainingParts = [
+                                                ...remainingParts.slice(0, targetIndex),
+                                                ...remainingParts.slice(
+                                                    targetIndex + 1
+                                                ),
+                                            ];
+                                        }
+
+                                        // Add the type (playlist, album, annotation, review, etc.) with medium weight
+                                        if (remainingParts.length > 0) {
                                             result.push(
                                                 <span className="font-medium text-[#5C5537]/70">
-                                                    {verb}
+                                                    {remainingParts[0]}
                                                 </span>
                                             );
                                             result.push(" ");
+                                            remainingParts = remainingParts.slice(1);
+                                        }
 
-                                            // Check if there's a target user (contains apostrophe s)
-                                            const targetIndex = remainingParts.findIndex(
-                                                (part) => part.includes("'s")
+                                        // Handle "on" or "of" prepositions with medium weight
+                                        if (
+                                            remainingParts.length > 0 &&
+                                            (remainingParts[0] === "on" ||
+                                                remainingParts[0] === "of")
+                                        ) {
+                                            result.push(
+                                                <span className="font-medium text-[#5C5537]/70">
+                                                    {remainingParts[0]}
+                                                </span>
                                             );
+                                            result.push(" ");
+                                            remainingParts = remainingParts.slice(1);
+                                        }
 
-                                            if (targetIndex !== -1) {
-                                                // There's a target user
-                                                const beforeTarget = remainingParts.slice(0, targetIndex);
-                                                const targetPart = remainingParts[targetIndex];
-                                                const afterTarget = remainingParts.slice(targetIndex + 1);
+                                        // The remaining parts are the item name - link them with semibold
+                                        if (
+                                            remainingParts.length > 0 &&
+                                            links.itemHref
+                                        ) {
+                                            const itemText = remainingParts.join(" ");
+                                            result.push(
+                                                <Link
+                                                    key="item"
+                                                    href={links.itemHref}
+                                                    className="font-semibold text-[#5C5537] hover:underline">
+                                                    {itemText}
+                                                </Link>
+                                            );
+                                        } else if (remainingParts.length > 0) {
+                                            // If no item link, just add the text with medium weight
+                                            result.push(
+                                                <span className="font-medium text-[#5C5537]/70">
+                                                    {remainingParts.join(" ")}
+                                                </span>
+                                            );
+                                        }
 
-                                                // Add parts before target
-                                                if (beforeTarget.length > 0) {
-                                                    result.push(
-                                                        <span key="before-target">
-                                                            {beforeTarget.join(" ")}
-                                                        </span>
-                                                    );
-                                                    result.push(" ");
-                                                }
+                                        return result;
+                                    };
 
-                                                // Add target user as link
-                                                const targetUsername = targetPart.replace("'s", "");
-                                                result.push(
-                                                    <Link
-                                                        key="target-user"
-                                                        href={links.targetProfile || "#"}
-                                                        className="font-semibold text-[#5C5537] hover:underline">
-                                                        {targetUsername}
-                                                    </Link>
-                                                );
-                                                result.push("'s ");
-
-                                                // Add remaining parts
-                                                if (afterTarget.length > 0) {
-                                                    result.push(
-                                                        <span key="after-target">
-                                                            {afterTarget.join(" ")}
-                                                        </span>
-                                                    );
-                                                }
-                                            } else {
-                                                // No target user, just add remaining parts
-                                                result.push(
-                                                    <span key="remaining">
-                                                        {remainingParts.join(" ")}
-                                                    </span>
-                                                );
-                                            }
-
-                                            return result;
-                                        };
-
-                                        return (
-                                            <div key={l.id} className="text-sm text-[#5C5537]">
-                                                {renderSentenceWithEmbeddedLinks()}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                    return (
+                                        <div className="text-sm text-[#5C5537]">
+                                            {renderSentenceWithEmbeddedLinks()}
+                                        </div>
+                                    );
+                                })}
+                                {(!likesActivity || likesActivity.length === 0) && (
+                                    <div className="text-center text-[#5C5537]/70 py-8">
+                                        No recent likes
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
 
                         {/* Following Section */}
                         <FollowingSection
