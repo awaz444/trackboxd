@@ -58,12 +58,12 @@ const TrackCard: React.FC<TrackCardProps> = ({
                     }`}>
                     <div
                         className={`${
-                            viewMode === "list" ? "w-16 h-16" : "w-full h-48"
+                            viewMode === "list" ? "w-16 h-16" : "w-full aspect-square"
                         } relative overflow-hidden rounded-lg bg-[#5C5537]/10`}>
                         <img
                             src={track.coverArt}
                             alt={`${track.title} cover`}
-                            className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-200"
+                            className="w-full h-full object-cover cursor-pointer transition-transform duration-200"
                         />
                     </div>
 
@@ -120,24 +120,26 @@ const TrackCard: React.FC<TrackCardProps> = ({
                     <div
                         className={`${
                             viewMode === "list" ? "mt-2" : "mt-3"
-                        } flex flex-wrap gap-2`}>
+                        } flex items-center gap-4`}>
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
                                 onLikeClick(track.id);
                             }}
                             disabled={isLoading}
-                            className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors ${
-                                isLiked
-                                    ? "bg-[#5C5537] text-[#FFFBEb]"
-                                    : "bg-[#5C5537]/20 text-[#5C5537] hover:bg-[#5C5537]/30"
+                            className={`group flex items-center gap-1 text-xs focus:outline-none ${
+                                isLoading
+                                    ? 'cursor-not-allowed text-[#5C5537]/40'
+                                    : 'cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]'
                             }`}>
                             {isLoading ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
+                                <div className="w-4 h-4 flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#5C5537]"></div>
+                                </div>
                             ) : (
                                 <>
-                                    <Heart className="w-3 h-3" />
-                                    <span>{isLiked ? "Liked" : "Like"}</span>
+                                    <Heart className={`w-4 h-4 ${isLiked ? 'text-[#5C5537] fill-[#5C5537]' : ''}`} />
+                                    <span className={`${isLiked ? 'text-[#5C5537] font-medium' : ''}`}>{track.stats?.like_count || 0}</span>
                                 </>
                             )}
                         </button>
@@ -146,7 +148,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
                                 e.preventDefault();
                                 onReviewClick(track);
                             }}
-                            className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/20 hover:bg-[#5C5537]/10 transition-colors">
+                            className="flex items-center gap-1 text-xs text-[#5C5537]/70 hover:text-[#5C5537]">
                             <Star className="w-3 h-3" />
                             <span>Review</span>
                         </button>
@@ -155,7 +157,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
                                 e.preventDefault();
                                 onAnnotationClick(track);
                             }}
-                            className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/20 hover:bg-[#5C5537]/10 transition-colors">
+                            className="flex items-center gap-1 text-xs text-[#5C5537]/70 hover:text-[#5C5537]">
                             <MessageCircle className="w-3 h-3" />
                             <span>Annotate</span>
                         </button>

@@ -31,7 +31,7 @@ const SpotifyTrackCard: React.FC<SpotifyTrackCardProps> = ({
                                 "/default-album.png"
                             }
                             alt={`${track.name} cover`}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                            className="w-full h-full object-cover transition-transform duration-200"
                             onError={(e) => {
                                 e.currentTarget.src = "/default-album.png";
                             }}
