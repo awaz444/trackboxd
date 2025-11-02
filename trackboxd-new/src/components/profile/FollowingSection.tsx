@@ -28,11 +28,11 @@ const FollowingSection: React.FC<FollowingSectionProps> = ({
     <div className="mb-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-[#5C5537]">people i follow...</h2>
-        {/* {isOwnProfile && (
+        {isOwnProfile && (
           <Button variant="link" className="text-[#5C5537] hover:text-[#3E3725] p-0">
             View All
           </Button>
-        )} */}
+        )}
       </div>
       
       {/* Horizontal scrollable container with proper spacing */}

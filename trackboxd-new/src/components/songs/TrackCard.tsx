@@ -120,26 +120,24 @@ const TrackCard: React.FC<TrackCardProps> = ({
                     <div
                         className={`${
                             viewMode === "list" ? "mt-2" : "mt-3"
-                        } flex items-center gap-4`}>
+                        } flex flex-wrap gap-2`}>
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
                                 onLikeClick(track.id);
                             }}
                             disabled={isLoading}
-                            className={`group flex items-center gap-1 text-xs focus:outline-none ${
-                                isLoading
-                                    ? 'cursor-not-allowed text-[#5C5537]/40'
-                                    : 'cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]'
+                            className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors ${
+                                isLiked
+                                    ? "bg-[#5C5537] text-[#FFFBEb]"
+                                    : "bg-[#5C5537]/20 text-[#5C5537] hover:bg-[#5C5537]/30"
                             }`}>
                             {isLoading ? (
-                                <div className="w-4 h-4 flex items-center justify-center">
-                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#5C5537]"></div>
-                                </div>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
                             ) : (
                                 <>
-                                    <Heart className={`w-4 h-4 ${isLiked ? 'text-[#5C5537] fill-[#5C5537]' : ''}`} />
-                                    <span className={`${isLiked ? 'text-[#5C5537] font-medium' : ''}`}>{track.stats?.like_count || 0}</span>
+                                    <Heart className="w-3 h-3" />
+                                    <span>{isLiked ? "Liked" : "Like"}</span>
                                 </>
                             )}
                         </button>
@@ -148,7 +146,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
                                 e.preventDefault();
                                 onReviewClick(track);
                             }}
-                            className="flex items-center gap-1 text-xs text-[#5C5537]/70 hover:text-[#5C5537]">
+                            className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/20 hover:bg-[#5C5537]/10 transition-colors">
                             <Star className="w-3 h-3" />
                             <span>Review</span>
                         </button>
@@ -157,7 +155,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
                                 e.preventDefault();
                                 onAnnotationClick(track);
                             }}
-                            className="flex items-center gap-1 text-xs text-[#5C5537]/70 hover:text-[#5C5537]">
+                            className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/20 hover:bg-[#5C5537]/10 transition-colors">
                             <MessageCircle className="w-3 h-3" />
                             <span>Annotate</span>
                         </button>
