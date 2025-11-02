@@ -103,6 +103,13 @@ export const authOptions: NextAuthOptions = {
             return session;
         },
     },
+    session: {
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
+    },
+    jwt: {
+        maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
+    },
     cookies: {
         sessionToken: {
             name: `${
@@ -113,6 +120,7 @@ export const authOptions: NextAuthOptions = {
                 sameSite: "lax",
                 path: "/",
                 secure: process.env.NODE_ENV === "production",
+                maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
             },
         },
     },
