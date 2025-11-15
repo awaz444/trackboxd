@@ -368,6 +368,11 @@ const Header: React.FC<HeaderProps> = ({}) => {
 
     return (
         <header className="bg-[#FFFBEb] border-b border-[#5C5537]/20 sticky top-0 z-50">
+            {/* Safe-area filler to cover iOS PWA status bar space on mobile */}
+            <div
+                className="md:hidden bg-[#FFFBEb]"
+                style={{ height: "env(safe-area-inset-top)" }}
+            />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Left - Logo and Title */}
