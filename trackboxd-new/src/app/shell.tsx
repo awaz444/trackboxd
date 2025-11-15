@@ -7,6 +7,18 @@ import AuthGuard from '@/components/AuthGuard';
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  React.useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((reg) => {
+          console.log('Service worker registered:', reg.scope);
+        })
+        .catch((err) => {
+          console.warn('Service worker registration failed:', err);
+        });
+    }
+  }, []);
 
   const hideHeader = React.useMemo(() => {
     if (!pathname) return false;

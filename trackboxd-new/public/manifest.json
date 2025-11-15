@@ -1,0 +1,29 @@
+{
+  "name": "Trackboxd",
+  "short_name": "Trackboxd",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFBEb",
+  "theme_color": "#1F2C24",
+  "description": "Your music, your words.",
+  "icons": [
+    {
+      "src": "/trackboxd-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/trackboxd-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/trackboxd-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
