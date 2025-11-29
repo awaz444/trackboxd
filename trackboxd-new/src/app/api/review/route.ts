@@ -225,12 +225,6 @@ async function createReview(body: any, supabase: any, userId: string) {
             });
         if (activityError) throw activityError;
 
-        // Increment review count
-        const { error: incrementError } = await supabase.rpc("increment_review_count", { 
-            item_id: itemId 
-        });
-        if (incrementError) throw incrementError;
-
         // Then update the average rating (is_delete=false for creation)
         const { error: ratingError } = await supabase.rpc("update_avg_rating", {
             item_id: itemId,
@@ -238,6 +232,12 @@ async function createReview(body: any, supabase: any, userId: string) {
             is_delete: false
         });
         if (ratingError) throw ratingError;
+
+        // Increment review count
+        const { error: incrementError } = await supabase.rpc("increment_review_count", { 
+            item_id: itemId 
+        });
+        if (incrementError) throw incrementError;
 
         // Commit the transaction
         await supabase.rpc('commit');
@@ -370,16 +370,16 @@ async function deleteReview(body: any, supabase: any, userId: string) {
         .eq("id", reviewId);
     if (deleteError) throw deleteError;
 
-    // RPC to decrement review count
-    await supabase.rpc("decrement_review_count", {
-        item_id: existingReview.item_id,
-    });
-
     // Then update the average by removing this review's rating
     await supabase.rpc("update_avg_rating", {
         item_id: existingReview.item_id,
         rating_to_adjust: existingReview.rating,
         is_delete: true
+    });
+
+    // RPC to decrement review count
+    await supabase.rpc("decrement_review_count", {
+        item_id: existingReview.item_id,
     });
 
     return NextResponse.json({ success: true });
