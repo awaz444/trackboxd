@@ -13,6 +13,8 @@ import FollowingSection from "@/components/profile/FollowingSection";
 import ProfilePrompts from "@/components/profile/ProfilePrompts";
 import { Heart, Star, MessageCircle } from "lucide-react";
 import Link from "next/link";
+import ProfileReviewCard from "@/components/profile/ProfileReviewCard";
+import ProfileAnnotationCard from "@/components/profile/ProfileAnnotationCard";
 
 interface ProfilePageProps {
     params: {
@@ -276,44 +278,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                             </div>
                                             <div className="space-y-3">
                                                 {reviews.map((a) => (
-                                                    <div
-                                                        key={a.id}
-                                                        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4">
-                                                        <div className="flex items-center justify-between mb-2">
-                                                            <div className="text-sm text-[#5C5537]/70">
-                                                                {a.timestamp}
-                                                            </div>
-                                                        </div>
-                                                        <div className="mb-1 text-sm text-[#5C5537] flex items-center   ">
-                                                            <div>
-                                                                <span className="font-semibold">
-                                                                    {a.track.title}
-                                                                </span>
-                                                                <span className="text-[#5C5537]/70">
-                                                                    {" "}
-                                                                    by {a.track.artist}
-                                                                </span>
-                                                            </div>
-                                                            {a.rating !== undefined && (
-                                                                <div className="flex items-center text-[#FFBA00] text-sm ml-2">
-                                                                    <Star className="h-4 w-4 mr-1" />
-                                                                    <span>{a.rating}</span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        {a.text && (
-                                                            <div className="text-sm text-[#5C5537]/90 line-clamp-3">
-                                                                {a.text}
-                                                            </div>
-                                                        )}
-                                                        <div className="mt-2 text-xs">
-                                                            <Link
-                                                                href={`/songs/${a.track.id}`}
-                                                                className="text-[#5C5537]/70 hover:text-[#5C5537]">
-                                                                View track
-                                                            </Link>
-                                                        </div>
-                                                    </div>
+                                                    <ProfileReviewCard 
+                                                        key={a.id} 
+                                                        review={a as any} 
+                                                    />
                                                 ))}
                                             </div>
                                         </div>
@@ -330,43 +298,17 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                             </div>
                                             <div className="space-y-3">
                                                 {annotations.map((a) => (
-                                                    <div
-                                                        key={a.id}
-                                                        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4">
-                                                        <div className="flex items-center justify-between mb-2">
-                                                            <div className="text-sm text-[#5C5537]/70">
-                                                                {a.timestamp}
-                                                            </div>
-                                                        </div>
-                                                        <div className="mb-1 text-sm text-[#5C5537]">
-                                                            <span className="font-semibold">
-                                                                {a.track.title}
-                                                            </span>
-                                                            <span className="text-[#5C5537]/70">
-                                                                {" "}
-                                                                by {a.track.artist}
-                                                            </span>
-                                                        </div>
-                                                         {a.text && (
-                                                             <div className="text-sm text-[#5C5537]/90 line-clamp-3">
-                                                                 {a.text}
-                                                             </div>
-                                                         )}
-                                                         <div className="mt-2 text-xs">
-                                                             <Link
-                                                                 href={`/songs/${a.track.id}`}
-                                                                 className="text-[#5C5537]/70 hover:text-[#5C5537]">
-                                                                 View track
-                                                             </Link>
-                                                         </div>
-                                                     </div>
-                                                 ))}
-                                             </div>
-                                         </div>
-                                     )}
-                                 </div>
-                             </div>
-                         )}
+                                                    <ProfileAnnotationCard 
+                                                        key={a.id} 
+                                                        annotation={a as any} 
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Likes */}
                         <div className="mb-8">

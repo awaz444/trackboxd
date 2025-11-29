@@ -35,7 +35,7 @@ async function handleLogout() {
     { 
       status: 200,
       headers: new Headers(
-        clearCookieHeaders.map(cookie => ['Set-Cookie', cookie])
+        clearCookieHeaders.map(cookie => ['Set-Cookie', cookie] as [string, string])
       )
     }
   );
