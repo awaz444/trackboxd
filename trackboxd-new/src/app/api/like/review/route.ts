@@ -92,6 +92,25 @@ async function handleReviewLikeRequest(req: NextRequest, method: 'POST' | 'DELET
       });
       if (countError) throw countError;
 
+      // Fetch review owner to send notification
+      const { data: reviewData, error: reviewError } = await supabase
+        .from('reviews')
+        .select('user_id')
+        .eq('id', reviewId)
+        .single();
+
+      if (!reviewError && reviewData && reviewData.user_id !== userId) {
+        await supabase
+          .from('notifications')
+          .insert({
+            user_id: reviewData.user_id,
+            type: 'like',
+            source_id: userId,
+            target_id: reviewId,
+            is_read: false
+          });
+      }
+
       await supabase.rpc('commit');
       return NextResponse.json({ success: true });
     } 

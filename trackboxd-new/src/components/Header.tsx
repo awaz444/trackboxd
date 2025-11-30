@@ -18,6 +18,7 @@ import {
     Plus,
     Disc,
     Disc3,
+    Bell,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -76,6 +77,30 @@ const Header: React.FC<HeaderProps> = ({}) => {
     const [showResults, setShowResults] = useState(false);
     const searchContainerRef = useRef<HTMLDivElement>(null);
     const mobileSearchContainerRef = useRef<HTMLDivElement>(null);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (session?.user) {
+            const fetchNotifications = async () => {
+                try {
+                    const res = await fetch("/api/notifications");
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data)) {
+                            setUnreadCount(data.filter((n: any) => !n.is_read).length);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error fetching notifications:", error);
+                }
+            };
+            fetchNotifications();
+            
+            // Poll every minute for new notifications
+            const interval = setInterval(fetchNotifications, 60000);
+            return () => clearInterval(interval);
+        }
+    }, [session]);
 
     // Search handler with debounce
     useEffect(() => {
@@ -588,8 +613,20 @@ const Header: React.FC<HeaderProps> = ({}) => {
                         </div>
                     </nav>
 
+
                     {/* Right - Actions Section (desktop) */}
                     <div className="flex items-center gap-4">
+                        {/* Notifications */}
+                        <Link 
+                            href="/notifications" 
+                            className="hidden md:flex relative p-2 text-[#5C5537] hover:bg-[#5C5537]/10 rounded-lg transition-colors"
+                        >
+                            <Bell className="w-5 h-5" />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-1.5 right-2 w-2.5 h-2.5 bg-[#5C5537] rounded-full border-2 border-[#FFFBEb]"></span>
+                            )}
+                        </Link>
+
                         <button
                             onClick={() => setIsLogModalOpen(true)}
                             className="hidden md:flex items-center gap-1.5 bg-[#5C5537] text-[#FFFBEb] py-2 px-4 rounded-lg transition-all duration-200 ease-in-out transform hover:bg-[#5C5537]/90 shadow-sm">
@@ -873,6 +910,17 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                 />
                             )}
                         </div>
+
+                        {/* Notifications - Mobile */}
+                        <Link 
+                            href="/notifications" 
+                            className="relative p-2 text-[#5C5537] hover:bg-[#5C5537]/10 rounded-lg transition-colors"
+                        >
+                            <Bell className="w-5 h-5" />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-1.5 right-2 w-2.5 h-2.5 bg-[#5C5537] rounded-full border-2 border-[#FFFBEb]"></span>
+                            )}
+                        </Link>
 
                         <button
                             onClick={toggleMobileMenu}

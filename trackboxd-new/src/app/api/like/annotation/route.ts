@@ -89,6 +89,25 @@ async function handleAnnotationLikeRequest(req: NextRequest, method: 'POST' | 'D
       });
       if (countError) throw countError;
 
+      // Fetch annotation owner to send notification
+      const { data: annotationData, error: annotationError } = await supabase
+        .from('annotations')
+        .select('user_id')
+        .eq('id', annotationId)
+        .single();
+
+      if (!annotationError && annotationData && annotationData.user_id !== userId) {
+        await supabase
+          .from('notifications')
+          .insert({
+            user_id: annotationData.user_id,
+            type: 'like',
+            source_id: userId,
+            target_id: annotationId,
+            is_read: false
+          });
+      }
+
       await supabase.rpc('commit');
       return NextResponse.json({ success: true });
     } 

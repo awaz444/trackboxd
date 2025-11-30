@@ -100,6 +100,21 @@ export async function POST(request: Request) {
       );
     }
 
+    // Create notification for the user being followed
+    const { error: notificationError } = await supabase
+      .from("notifications")
+      .insert({
+        user_id: followingId,
+        type: "follow",
+        source_id: session.user.id,
+        is_read: false
+      });
+      
+    if (notificationError) {
+      console.error('Failed to create notification:', notificationError);
+      // Don't fail the request if notification fails
+    }
+
     return NextResponse.json({
       success: true,
       follow: newFollow,
