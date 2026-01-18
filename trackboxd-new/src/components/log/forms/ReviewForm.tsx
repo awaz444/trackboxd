@@ -262,12 +262,12 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
           method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            // For edit mode, we don't send itemId/itemType or privacy changes
+            // For edit mode, we don't send itemId/itemType
             ...(initialReview ? {} : {
               itemId: selectedItem?.id,
               itemType: selectedItem?.type,
-              isPublic: true
             }),
+            isPublic: initialReview ? initialReview.isPublic : true,
             rating: rating,
             text: reviewText,
             userId: user?.id

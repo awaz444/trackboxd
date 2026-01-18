@@ -101,6 +101,7 @@ CREATE TABLE public.user_favorite_tracks (
   CONSTRAINT user_favorite_tracks_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
   CONSTRAINT user_favorite_tracks_track_id_fkey FOREIGN KEY (track_id) REFERENCES public.spotify_items(id)
 );
+
 CREATE TABLE public.user_profile_responses (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id text NOT NULL,
@@ -115,6 +116,7 @@ CREATE TABLE public.user_profile_responses (
   CONSTRAINT user_profile_responses_prompt_id_fkey FOREIGN KEY (prompt_id) REFERENCES public.profile_prompts(id),
   CONSTRAINT user_profile_responses_spotify_item_id_fkey FOREIGN KEY (spotify_item_id) REFERENCES public.spotify_items(id)
 );
+
 CREATE TABLE public.users (
   id text NOT NULL,
   email text NOT NULL UNIQUE,

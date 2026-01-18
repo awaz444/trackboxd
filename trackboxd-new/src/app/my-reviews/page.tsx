@@ -51,7 +51,7 @@ const MyReviewsPage = () => {
     try {
       setReviews(prev => prev.filter(review => review.id !== reviewId));
       
-      const response = await fetch(`/api/review/${reviewId}`, {
+      const response = await fetch(`/api/review/actions/${reviewId}`, {
         method: "DELETE"
       });
       
