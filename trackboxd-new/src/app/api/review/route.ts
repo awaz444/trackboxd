@@ -139,8 +139,8 @@ async function createReview(body: any, supabase: any, userId: string) {
         );
     }
 
-    // Start a transaction
-    const { data, error } = await supabase.rpc('begin');
+    // Start a transaction - Removed to use app-side logic
+    // const { data, error } = await supabase.rpc('begin');
 
     try {
         // Ensure the spotify item exists with metadata
@@ -206,7 +206,7 @@ async function createReview(body: any, supabase: any, userId: string) {
             .single();
         if (reviewError) {
             if (reviewError.code === "23505") {
-                await supabase.rpc('rollback');
+                // await supabase.rpc('rollback'); // Removed
                 return NextResponse.json(
                     { error: "You have already reviewed this item" },
                     { status: 400 }
@@ -225,26 +225,15 @@ async function createReview(body: any, supabase: any, userId: string) {
             });
         if (activityError) throw activityError;
 
-        // Then update the average rating (is_delete=false for creation)
-        const { error: ratingError } = await supabase.rpc("update_avg_rating", {
-            item_id: itemId,
-            rating_to_adjust: rating,
-            is_delete: false
-        });
-        if (ratingError) throw ratingError;
+        // Then update the average rating and review count
+        await updateItemStats(supabase, itemId);
 
-        // Increment review count
-        const { error: incrementError } = await supabase.rpc("increment_review_count", { 
-            item_id: itemId 
-        });
-        if (incrementError) throw incrementError;
-
-        // Commit the transaction
-        await supabase.rpc('commit');
+        // Commit the transaction - Removed
+        // await supabase.rpc('commit');
 
         return NextResponse.json(review, { status: 201 });
     } catch (error) {
-        await supabase.rpc('rollback');
+        // await supabase.rpc('rollback'); // Removed
         console.error("Review creation error:", error);
         return NextResponse.json(
             { error: "Internal server error" },
@@ -311,19 +300,8 @@ async function updateReview(body: any, supabase: any, userId: string) {
     }
 
     if (rating !== undefined) {
-        // First remove the old rating from the average (is_delete=true)
-        await supabase.rpc("update_avg_rating", {
-            item_id: existingReview.item_id,
-            rating_to_adjust: existingReview.rating,
-            is_delete: true
-        });
-
-        // Then add the new rating to the average (is_delete=false)
-        await supabase.rpc("update_avg_rating", {
-            item_id: existingReview.item_id,
-            rating_to_adjust: rating,
-            is_delete: false
-        });
+        // Update stats after changing rating
+        await updateItemStats(supabase, existingReview.item_id);
     }
 
     return NextResponse.json(updatedReview);
@@ -370,17 +348,38 @@ async function deleteReview(body: any, supabase: any, userId: string) {
         .eq("id", reviewId);
     if (deleteError) throw deleteError;
 
-    // Then update the average by removing this review's rating
-    await supabase.rpc("update_avg_rating", {
-        item_id: existingReview.item_id,
-        rating_to_adjust: existingReview.rating,
-        is_delete: true
-    });
-
-    // RPC to decrement review count
-    await supabase.rpc("decrement_review_count", {
-        item_id: existingReview.item_id,
-    });
+    // Update stats after deletion
+    await updateItemStats(supabase, existingReview.item_id);
 
     return NextResponse.json({ success: true });
+}
+
+async function updateItemStats(supabase: any, itemId: string) {
+    const { data: reviews, error } = await supabase
+        .from("reviews")
+        .select("rating")
+        .eq("item_id", itemId);
+
+    if (error) {
+        console.error("Error fetching reviews for stats:", error);
+        return;
+    }
+
+    const totalReviews = reviews.length;
+    const avgRating = totalReviews > 0
+        ? reviews.reduce((acc: number, r: any) => acc + Number(r.rating), 0) / totalReviews
+        : 0;
+
+    const { error: updateError } = await supabase
+        .from("spotify_items")
+        .update({
+            review_count: totalReviews,
+            avg_rating: avgRating,
+            last_updated: new Date().toISOString()
+        })
+        .eq("id", itemId);
+
+    if (updateError) {
+        console.error("Error updating item stats:", updateError);
+    }
 }
