@@ -109,13 +109,6 @@ const EditableAnnotationCard: React.FC<EditableAnnotationCardProps> = ({
           
           <div className="flex justify-between items-center text-xs">
             <div className="flex items-center gap-2 text-[#5C5537]/70">
-              <span className={`px-2 py-1 rounded-full ${
-                annotation.is_public 
-                  ? "bg-green-100 text-green-800" 
-                  : "bg-gray-100 text-gray-800"
-              }`}>
-                {annotation.is_public ? "Public" : "Private"}
-              </span>
               <span>{new Date(annotation.created_at).toLocaleDateString()}</span>
             </div>
             

@@ -51,8 +51,12 @@ const MyAnnotationsPage = () => {
     try {
       setAnnotations(prev => prev.filter(a => a.id !== annotationId));
       
-      const response = await fetch(`/api/annotate/${annotationId}`, {
-        method: "DELETE"
+      const response = await fetch(`/api/annotate`, {
+        method: "DELETE",
+        body: JSON.stringify({ 
+          annotationId,
+          userId: user.id 
+        })
       });
       
       if (!response.ok) {

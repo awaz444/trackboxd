@@ -150,8 +150,8 @@ async function createAnnotation(body: any, supabase: any, userId: string) {
     }
 
     try {
-        // Start transaction
-        await supabase.rpc('begin');
+        // Start transaction - Removed
+        // await supabase.rpc('begin');
 
         // Ensure the track exists in spotify_items with metadata
         const { data: existingItem, error: fetchError } = await supabase
@@ -206,15 +206,18 @@ async function createAnnotation(body: any, supabase: any, userId: string) {
             });
         if (activityError) throw activityError;
 
-        // Commit transaction
-        await supabase.rpc('commit');
+        // Commit transaction - Removed
+        // await supabase.rpc('commit');
 
-        // RPC to increment annotation count (outside transaction)
-        await supabase.rpc("increment_annotation_count", { item_id: trackId });
+        // Update annotation count using app logic
+        await updateAnnotationCount(supabase, trackId);
+
+        // RPC to increment annotation count (outside transaction) - Removed
+        // await supabase.rpc("increment_annotation_count", { item_id: trackId });
 
         return NextResponse.json(annotation, { status: 201 });
     } catch (error) {
-        await supabase.rpc('rollback');
+        // await supabase.rpc('rollback'); // Removed
         console.error("Annotation creation error:", error);
         return NextResponse.json(
             { error: "Internal server error" },
@@ -343,10 +346,37 @@ async function deleteAnnotation(body: any, supabase: any, userId: string) {
         .eq("id", annotationId);
     if (deleteError) throw deleteError;
 
-    // RPC to decrement annotation count
-    await supabase.rpc("decrement_annotation_count", {
-        item_id: existingAnnotation.track_id,
-    });
+    // Update annotation count using app logic
+    await updateAnnotationCount(supabase, existingAnnotation.track_id);
+    
+    // RPC to decrement annotation count - Removed
+    // await supabase.rpc("decrement_annotation_count", {
+    //    item_id: existingAnnotation.track_id,
+    // });
 
     return NextResponse.json({ success: true });
+}
+
+async function updateAnnotationCount(supabase: any, trackId: string) {
+    const { count, error } = await supabase
+        .from("annotations")
+        .select("*", { count: 'exact', head: true })
+        .eq("track_id", trackId);
+
+    if (error) {
+        console.error("Error fetching annotation count:", error);
+        return;
+    }
+
+    const { error: updateError } = await supabase
+        .from("spotify_items")
+        .update({
+            annotation_count: count,
+            last_updated: new Date().toISOString()
+        })
+        .eq("id", trackId);
+
+    if (updateError) {
+        console.error("Error updating annotation count:", updateError);
+    }
 }
