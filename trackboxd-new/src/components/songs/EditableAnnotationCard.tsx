@@ -56,7 +56,7 @@ const EditableAnnotationCard: React.FC<EditableAnnotationCardProps> = ({
   }
 
   return (
-    <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200 mb-4">
+    <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg overflow-hidden transition-shadow duration-200 mb-4">
       <div className="p-4 flex items-start gap-4">
         <div className="w-16 h-16 relative overflow-hidden rounded-lg bg-[#5C5537]/10 flex-shrink-0">
           <img

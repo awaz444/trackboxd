@@ -75,7 +75,7 @@ const LandingPage = () => {
           <button
             className="text-lg text-[#5C5537] hover:text-[#3E3725] transition-colors font-medium px-6 py-3 rounded-md hover:bg-[#5C5537]/5"
             onClick={() => {
-              setAuthMode('signup');
+              setAuthMode('login');
               setShowAuthModal(true);
             }}
           >
