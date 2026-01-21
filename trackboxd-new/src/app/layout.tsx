@@ -14,9 +14,9 @@ export const metadata: Metadata = {
   title: "Trackboxd",
   description: "Your music, your words.",
   icons: {
-    icon: '/logo.png',
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
   },
 };
 
