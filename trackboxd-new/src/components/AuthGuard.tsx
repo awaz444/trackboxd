@@ -29,7 +29,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   ];
 
   // Check if current route is public
-  const isPublicRoute = publicRoutes.some(route => pathname === route);
+  const isPublicRoute = publicRoutes.some(route => pathname === route) || pathname?.startsWith('/profile/');
 
   useEffect(() => {
     // If we're on a public route, don't show auth modal
