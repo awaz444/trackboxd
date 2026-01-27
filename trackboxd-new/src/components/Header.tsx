@@ -23,6 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import LogModal from "./log/LogModal";
+import AuthModal from "./AuthModal";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
@@ -58,7 +59,7 @@ interface SearchResults {
     playlists: SearchResult[];
 }
 
-const Header: React.FC<HeaderProps> = ({}) => {
+const Header: React.FC<HeaderProps> = ({ }) => {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -66,6 +67,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
     const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [spotifyUser, setSpotifyUser] = useState<SpotifyUser | null>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
@@ -95,7 +97,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                 }
             };
             fetchNotifications();
-            
+
             // Poll every minute for new notifications
             const interval = setInterval(fetchNotifications, 60000);
             return () => clearInterval(interval);
@@ -424,20 +426,18 @@ const Header: React.FC<HeaderProps> = ({}) => {
                             <a
                                 key={item.label}
                                 href={item.href}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                                    item.active
-                                        ? "bg-[#5C5537] text-[#FFFBEb]"
-                                        : "text-[#5C5537] hover:bg-[#5C5537]/10"
-                                }`}>
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${item.active
+                                    ? "bg-[#5C5537] text-[#FFFBEb]"
+                                    : "text-[#5C5537] hover:bg-[#5C5537]/10"
+                                    }`}>
                                 {item.label}
                             </a>
                         ))}
                         <div className="relative ml-2">
                             <div className="relative" ref={searchContainerRef}>
                                 <div
-                                    className={`flex items-center transition-all duration-300 ${
-                                        isSearchExpanded ? "w-48" : "w-10"
-                                    }`}>
+                                    className={`flex items-center transition-all duration-300 ${isSearchExpanded ? "w-48" : "w-10"
+                                        }`}>
                                     {isSearchExpanded ? (
                                         <div className="w-full">
                                             <Input
@@ -488,16 +488,16 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                     {searchResults.tracks?.filter(
                                                         Boolean
                                                     ).length > 0 && (
-                                                        <>
-                                                            <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
-                                                                Tracks
-                                                            </div>
-                                                            <div className="mb-2">
-                                                                {searchResults.tracks
-                                                                    .filter(
-                                                                        Boolean
-                                                                    )
-                                                                    .map((track: any) => (
+                                                            <>
+                                                                <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                    Tracks
+                                                                </div>
+                                                                <div className="mb-2">
+                                                                    {searchResults.tracks
+                                                                        .filter(
+                                                                            Boolean
+                                                                        )
+                                                                        .map((track: any) => (
                                                                             <SearchResultItem
                                                                                 key={`track-${track.id}`}
                                                                                 item={
@@ -505,9 +505,9 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                                 }
                                                                             />
                                                                         ))}
-                                                            </div>
-                                                        </>
-                                                    )}
+                                                                </div>
+                                                            </>
+                                                        )}
 
                                                     {searchResults.users?.filter(Boolean).length > 0 && (
                                                         <>
@@ -541,17 +541,17 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                     {searchResults.albums?.filter(
                                                         Boolean
                                                     ).length > 0 && (
-                                                        <>
-                                                            <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                            <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
-                                                                Albums
-                                                            </div>
-                                                            <div className="mb-2">
-                                                                {searchResults.albums
-                                                                    .filter(
-                                                                        Boolean
-                                                                    )
-                                                                    .map((album: any) => (
+                                                            <>
+                                                                <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
+                                                                <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                    Albums
+                                                                </div>
+                                                                <div className="mb-2">
+                                                                    {searchResults.albums
+                                                                        .filter(
+                                                                            Boolean
+                                                                        )
+                                                                        .map((album: any) => (
                                                                             <SearchResultItem
                                                                                 key={`album-${album.id}`}
                                                                                 item={
@@ -559,24 +559,24 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                                 }
                                                                             />
                                                                         ))}
-                                                            </div>
-                                                        </>
-                                                    )}
+                                                                </div>
+                                                            </>
+                                                        )}
 
                                                     {searchResults.playlists?.filter(
                                                         Boolean
                                                     ).length > 0 && (
-                                                        <>
-                                                            <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                            <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
-                                                                Playlists
-                                                            </div>
-                                                            <div className="mb-2">
-                                                                {searchResults.playlists
-                                                                    .filter(
-                                                                        Boolean
-                                                                    )
-                                                                    .map((playlist: any) => (
+                                                            <>
+                                                                <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
+                                                                <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                    Playlists
+                                                                </div>
+                                                                <div className="mb-2">
+                                                                    {searchResults.playlists
+                                                                        .filter(
+                                                                            Boolean
+                                                                        )
+                                                                        .map((playlist: any) => (
                                                                             <SearchResultItem
                                                                                 key={`playlist-${playlist.id}`}
                                                                                 item={
@@ -584,9 +584,9 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                                 }
                                                                             />
                                                                         ))}
-                                                            </div>
-                                                        </>
-                                                    )}
+                                                                </div>
+                                                            </>
+                                                        )}
 
                                                     {searchResults.tracks.filter(
                                                         Boolean
@@ -616,109 +616,118 @@ const Header: React.FC<HeaderProps> = ({}) => {
 
                     {/* Right - Actions Section (desktop) */}
                     <div className="flex items-center gap-4">
-                        {/* Notifications */}
-                        <Link 
-                            href="/notifications" 
-                            className="hidden md:flex relative p-2 text-[#5C5537] hover:bg-[#5C5537]/10 rounded-lg transition-colors"
-                        >
-                            <Bell className="w-5 h-5" />
-                            {unreadCount > 0 && (
-                                <span className="absolute top-1.5 right-2 w-2.5 h-2.5 bg-[#5C5537] rounded-full border-2 border-[#FFFBEb]"></span>
-                            )}
-                        </Link>
-
-                        <button
-                            onClick={() => setIsLogModalOpen(true)}
-                            className="hidden md:flex items-center gap-1.5 bg-[#5C5537] text-[#FFFBEb] py-2 px-4 rounded-lg transition-all duration-200 ease-in-out transform hover:bg-[#5C5537]/90 shadow-sm">
-                            <Plus className="w-4 h-4" />
-                            <span className="font-medium text-sm">Log</span>
-                        </button>
-
-                        {/* User Section */}
-                        <div className="hidden md:block relative">
+                        {!session ? (
                             <button
-                                onClick={toggleDropdown}
-                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#5C5537]/10 transition-colors duration-200">
-                                <div className="relative">
-                                    <div className="w-8 h-8 rounded-full bg-[#5C5537] flex items-center justify-center ring-2 ring-[#5C5537]">
-                                        {user.avatar ? (
-                                            <img
-                                                src={user.avatar}
-                                                alt={user.name}
-                                                className="w-full h-full rounded-full object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-[#FFFBEb] text-sm font-semibold">
-                                                {getInitials(
-                                                    spotifyUser?.name ||
-                                                        "Guest User"
-                                                )}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <span className="text-sm font-medium text-[#5C5537]">
-                                    {spotifyUser?.name || "Guest User"}
-                                </span>
-
-                                <ChevronDown
-                                    className={`w-4 h-4 text-[#5C5537]/70 transition-transform duration-200 ${
-                                        isDropdownOpen ? "rotate-180" : ""
-                                    }`}
-                                />
+                                onClick={() => setIsAuthModalOpen(true)}
+                                className="hidden md:flex items-center gap-1.5 bg-[#5C5537] text-[#FFFBEb] py-2 px-6 rounded-lg transition-all duration-200 ease-in-out transform hover:bg-[#5C5537]/90 shadow-sm font-medium"
+                            >
+                                Login
                             </button>
+                        ) : (
+                            <>
+                                {/* Notifications */}
+                                <Link
+                                    href="/notifications"
+                                    className="hidden md:flex relative p-2 text-[#5C5537] hover:bg-[#5C5537]/10 rounded-lg transition-colors"
+                                >
+                                    <Bell className="w-5 h-5" />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute top-1.5 right-2 w-2.5 h-2.5 bg-[#5C5537] rounded-full border-2 border-[#FFFBEb]"></span>
+                                    )}
+                                </Link>
 
-                            {isDropdownOpen && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-10 md:hidden"
-                                        onClick={() => setIsDropdownOpen(false)}
-                                    />
+                                <button
+                                    onClick={() => setIsLogModalOpen(true)}
+                                    className="hidden md:flex items-center gap-1.5 bg-[#5C5537] text-[#FFFBEb] py-2 px-4 rounded-lg transition-all duration-200 ease-in-out transform hover:bg-[#5C5537]/90 shadow-sm">
+                                    <Plus className="w-4 h-4" />
+                                    <span className="font-medium text-sm">Log</span>
+                                </button>
 
-                                    <div className="absolute left-1/2 transform -translate-x-1/2 translate-y-1/25 top-full mt-2 w-56 bg-[#FFFBEb] rounded-xl shadow-lg border border-[#5C5537]/20 py-2 z-20">
-                                        {dropdownItems.map((item, index) =>
-                                            item.type === "divider" ? (
-                                                <div
-                                                    key={index}
-                                                    className="h-px bg-[#5C5537]/20 my-2"
-                                                />
-                                            ) : item.link ? (
-                                                <Link
-                                                    key={item.label}
-                                                    href={item.href || "#"}
-                                                    className="flex items-center gap-3 w-full px-4 py-3 text-sm text-left text-[#5C5537] hover:bg-[#5C5537]/10 transition-colors duration-200"
-                                                    onClick={() =>
-                                                        setIsDropdownOpen(false)
-                                                    }>
-                                                    {item.icon && (
-                                                        <item.icon className="w-4 h-4 text-[#5C5537]/70" />
-                                                    )}
-                                                    {item.label}
-                                                </Link>
-                                            ) : (
-                                                <button
-                                                    key={item.label}
-                                                    onClick={
-                                                        item.onClick ||
-                                                        (() => {})
-                                                    }
-                                                    className={`flex items-center gap-3 w-full px-4 py-3 text-sm text-left text-[#5C5537] hover:bg-[#5C5537]/10 transition-colors duration-200 rounded-lg ${
-                                                        item.onClick
-                                                            ? "cursor-pointer"
-                                                            : ""
-                                                    }`}>
-                                                    {item.icon && (
-                                                        <item.icon className="w-4 h-4 text-[#5C5537]/70" />
-                                                    )}
-                                                    {item.label}
-                                                </button>
-                                            )
-                                        )}
-                                    </div>
-                                </>
-                            )}
-                        </div>
+                                {/* User Section */}
+                                <div className="hidden md:block relative">
+                                    <button
+                                        onClick={toggleDropdown}
+                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#5C5537]/10 transition-colors duration-200">
+                                        <div className="relative">
+                                            <div className="w-8 h-8 rounded-full bg-[#5C5537] flex items-center justify-center ring-2 ring-[#5C5537]">
+                                                {user.avatar ? (
+                                                    <img
+                                                        src={user.avatar}
+                                                        alt={user.name}
+                                                        className="w-full h-full rounded-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <span className="text-[#FFFBEb] text-sm font-semibold">
+                                                        {getInitials(
+                                                            spotifyUser?.name ||
+                                                            "Guest User"
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <span className="text-sm font-medium text-[#5C5537]">
+                                            {spotifyUser?.name || "Guest User"}
+                                        </span>
+
+                                        <ChevronDown
+                                            className={`w-4 h-4 text-[#5C5537]/70 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
+                                                }`}
+                                        />
+                                    </button>
+
+                                    {isDropdownOpen && (
+                                        <>
+                                            <div
+                                                className="fixed inset-0 z-10 md:hidden"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                            />
+
+                                            <div className="absolute left-1/2 transform -translate-x-1/2 translate-y-1/25 top-full mt-2 w-56 bg-[#FFFBEb] rounded-xl shadow-lg border border-[#5C5537]/20 py-2 z-20">
+                                                {dropdownItems.map((item, index) =>
+                                                    item.type === "divider" ? (
+                                                        <div
+                                                            key={index}
+                                                            className="h-px bg-[#5C5537]/20 my-2"
+                                                        />
+                                                    ) : item.link ? (
+                                                        <Link
+                                                            key={item.label}
+                                                            href={item.href || "#"}
+                                                            className="flex items-center gap-3 w-full px-4 py-3 text-sm text-left text-[#5C5537] hover:bg-[#5C5537]/10 transition-colors duration-200"
+                                                            onClick={() =>
+                                                                setIsDropdownOpen(false)
+                                                            }>
+                                                            {item.icon && (
+                                                                <item.icon className="w-4 h-4 text-[#5C5537]/70" />
+                                                            )}
+                                                            {item.label}
+                                                        </Link>
+                                                    ) : (
+                                                        <button
+                                                            key={item.label}
+                                                            onClick={
+                                                                item.onClick ||
+                                                                (() => { })
+                                                            }
+                                                            className={`flex items-center gap-3 w-full px-4 py-3 text-sm text-left text-[#5C5537] hover:bg-[#5C5537]/10 transition-colors duration-200 rounded-lg ${item.onClick
+                                                                ? "cursor-pointer"
+                                                                : ""
+                                                                }`}>
+                                                            {item.icon && (
+                                                                <item.icon className="w-4 h-4 text-[#5C5537]/70" />
+                                                            )}
+                                                            {item.label}
+                                                        </button>
+                                                    )
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Mobile menu button */}
@@ -732,9 +741,8 @@ const Header: React.FC<HeaderProps> = ({}) => {
 
                         <div className="relative">
                             <div
-                                className={`flex items-center transition-all duration-300 ${
-                                    isMobileSearchExpanded ? "w-40" : "w-10"
-                                }`}
+                                className={`flex items-center transition-all duration-300 ${isMobileSearchExpanded ? "w-40" : "w-10"
+                                    }`}
                                 ref={mobileSearchContainerRef}
                             >
                                 {isMobileSearchExpanded ? (
@@ -765,16 +773,16 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                             {searchResults.tracks?.filter(
                                                                 Boolean
                                                             ).length > 0 && (
-                                                                <>
-                                                                    <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
-                                                                        Tracks
-                                                                    </div>
-                                                                    <div className="mb-2">
-                                                                        {searchResults.tracks
-                                                                            .filter(
-                                                                                Boolean
-                                                                            )
-                                                                            .map((track: any) => (
+                                                                    <>
+                                                                        <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                            Tracks
+                                                                        </div>
+                                                                        <div className="mb-2">
+                                                                            {searchResults.tracks
+                                                                                .filter(
+                                                                                    Boolean
+                                                                                )
+                                                                                .map((track: any) => (
                                                                                     <SearchResultItem
                                                                                         key={`track-${track.id}`}
                                                                                         item={
@@ -782,9 +790,9 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                                         }
                                                                                     />
                                                                                 ))}
-                                                                    </div>
-                                                                </>
-                                                            )}
+                                                                        </div>
+                                                                    </>
+                                                                )}
 
                                                             {searchResults.users?.filter(Boolean).length > 0 && (
                                                                 <>
@@ -818,17 +826,17 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                             {searchResults.albums?.filter(
                                                                 Boolean
                                                             ).length > 0 && (
-                                                                <>
-                                                                    <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                                    <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
-                                                                        Albums
-                                                                    </div>
-                                                                    <div className="mb-2">
-                                                                        {searchResults.albums
-                                                                            .filter(
-                                                                                Boolean
-                                                                            )
-                                                                            .map((album: any) => (
+                                                                    <>
+                                                                        <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
+                                                                        <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                            Albums
+                                                                        </div>
+                                                                        <div className="mb-2">
+                                                                            {searchResults.albums
+                                                                                .filter(
+                                                                                    Boolean
+                                                                                )
+                                                                                .map((album: any) => (
                                                                                     <SearchResultItem
                                                                                         key={`album-${album.id}`}
                                                                                         item={
@@ -836,24 +844,24 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                                         }
                                                                                     />
                                                                                 ))}
-                                                                    </div>
-                                                                </>
-                                                            )}
+                                                                        </div>
+                                                                    </>
+                                                                )}
 
                                                             {searchResults.playlists?.filter(
                                                                 Boolean
                                                             ).length > 0 && (
-                                                                <>
-                                                                    <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                                    <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
-                                                                        Playlists
-                                                                    </div>
-                                                                    <div className="mb-2">
-                                                                        {searchResults.playlists
-                                                                            .filter(
-                                                                                Boolean
-                                                                            )
-                                                                            .map((playlist: any) => (
+                                                                    <>
+                                                                        <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
+                                                                        <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                            Playlists
+                                                                        </div>
+                                                                        <div className="mb-2">
+                                                                            {searchResults.playlists
+                                                                                .filter(
+                                                                                    Boolean
+                                                                                )
+                                                                                .map((playlist: any) => (
                                                                                     <SearchResultItem
                                                                                         key={`playlist-${playlist.id}`}
                                                                                         item={
@@ -861,9 +869,9 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                                         }
                                                                                     />
                                                                                 ))}
-                                                                    </div>
-                                                                </>
-                                                            )}
+                                                                        </div>
+                                                                    </>
+                                                                )}
 
                                                             {searchResults.tracks.filter(
                                                                 Boolean
@@ -871,11 +879,11 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                                                 searchResults.albums.filter(
                                                                     Boolean
                                                                 ).length ===
-                                                                    0 &&
+                                                                0 &&
                                                                 searchResults.playlists.filter(
                                                                     Boolean
                                                                 ).length ===
-                                                                    0 && (
+                                                                0 && (
                                                                     <div className="px-4 py-8 text-center text-[#5C5537]/70">
                                                                         No
                                                                         results
@@ -912,8 +920,8 @@ const Header: React.FC<HeaderProps> = ({}) => {
                         </div>
 
                         {/* Notifications - Mobile */}
-                        <Link 
-                            href="/notifications" 
+                        <Link
+                            href="/notifications"
                             className="relative p-2 text-[#5C5537] hover:bg-[#5C5537]/10 rounded-lg transition-colors"
                         >
                             <Bell className="w-5 h-5" />
@@ -945,11 +953,10 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                 <a
                                     key={item.label}
                                     href={item.href}
-                                    className={`px-3 py-3 rounded-lg text-base font-medium transition-colors duration-200 ${
-                                        item.active
-                                            ? "bg-[#5C5537] text-[#FFFBEb]"
-                                            : "text-[#5C5537] hover:bg-[#5C5537]/10"
-                                    }`}>
+                                    className={`px-3 py-3 rounded-lg text-base font-medium transition-colors duration-200 ${item.active
+                                        ? "bg-[#5C5537] text-[#FFFBEb]"
+                                        : "text-[#5C5537] hover:bg-[#5C5537]/10"
+                                        }`}>
                                     {item.label}
                                 </a>
                             ))}
@@ -971,7 +978,7 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                         <span className="text-[#FFFBEb] text-base font-semibold">
                                             {getInitials(
                                                 spotifyUser?.name ||
-                                                    "Guest User"
+                                                "Guest User"
                                             )}
                                         </span>
                                     )}
@@ -1011,10 +1018,9 @@ const Header: React.FC<HeaderProps> = ({}) => {
                                 ) : (
                                     <button
                                         key={item.label}
-                                        onClick={item.onClick || (() => {})}
-                                        className={`flex items-center gap-3 px-3 py-3 text-base text-left text-[#5C5537] hover:bg-[#5C5537]/10 transition-colors duration-200 rounded-lg ${
-                                            item.onClick ? "cursor-pointer" : ""
-                                        }`}>
+                                        onClick={item.onClick || (() => { })}
+                                        className={`flex items-center gap-3 px-3 py-3 text-base text-left text-[#5C5537] hover:bg-[#5C5537]/10 transition-colors duration-200 rounded-lg ${item.onClick ? "cursor-pointer" : ""
+                                            }`}>
                                         {item.icon && (
                                             <item.icon className="w-5 h-5 text-[#5C5537]/70" />
                                         )}
@@ -1029,6 +1035,11 @@ const Header: React.FC<HeaderProps> = ({}) => {
             <LogModal
                 isOpen={isLogModalOpen}
                 onClose={() => setIsLogModalOpen(false)}
+            />
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                defaultMode="login"
             />
         </header>
     );
