@@ -19,13 +19,14 @@ interface ProfileReviewCardProps {
     timestamp: string;
     rating?: number;
     text?: string;
+    like_count?: number;
   };
 }
 
 const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0); // We might need to fetch this if not provided
+  const [likeCount, setLikeCount] = useState(review.like_count || 0);
   const [isLoading, setIsLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const { data: session } = useSession();
@@ -45,7 +46,7 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
         const response = await fetch(
           `/api/like/review?userId=${user.id}&reviewId=${review.id}`
         );
-        
+
         if (response.ok) {
           const data = await response.json();
           setIsLiked(data.isLiked);
@@ -66,19 +67,19 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
 
   // We also need to fetch the actual like count since it's not in the profile data
   useEffect(() => {
-     const fetchReviewDetails = async () => {
-         try {
-             // This is a bit of a hack if we don't have a direct endpoint for just the count
-             // But let's see if we can get it.
-             // For now, let's just rely on the user's interaction if we can't get the global count easily without N+1
-             // Or maybe we just don't show the count on the profile page card if it's not provided?
-             // The design request says "Any user should be able to like...".
-             // Let's try to fetch the review details which usually has the count.
-             // Or we can just show the heart and toggle it.
-         } catch (e) {
-             console.error(e);
-         }
-     }
+    const fetchReviewDetails = async () => {
+      try {
+        // This is a bit of a hack if we don't have a direct endpoint for just the count
+        // But let's see if we can get it.
+        // For now, let's just rely on the user's interaction if we can't get the global count easily without N+1
+        // Or maybe we just don't show the count on the profile page card if it's not provided?
+        // The design request says "Any user should be able to like...".
+        // Let's try to fetch the review details which usually has the count.
+        // Or we can just show the heart and toggle it.
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }, []);
 
 
@@ -124,8 +125,8 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
             {review.timestamp}
           </div>
         </div>
-        <div className="mb-1 text-sm text-[#5C5537] flex items-center flex-wrap">
-          <div>
+        <div className="mb-1 text-sm text-[#5C5537] flex items-center min-w-0 gap-2">
+          <div className="flex-1 min-w-0 truncate">
             <span className="font-semibold">
               {review.track.title}
             </span>
@@ -135,7 +136,7 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
             </span>
           </div>
           {review.rating !== undefined && (
-            <div className="flex items-center text-[#FFBA00] text-sm ml-2">
+            <div className="flex-shrink-0 flex items-center text-[#FFBA00] text-sm">
               <Star className="h-4 w-4 mr-1 fill-current" />
               <span>{review.rating}</span>
             </div>
@@ -154,19 +155,18 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
           >
             View track
           </Link>
-          
+
           {/* Like Button on Card */}
           <button
             onClick={handleLikeClick}
             disabled={isLoading || !user}
-            className={`flex items-center gap-1 text-xs transition-colors ${
-              isLiked ? "text-[#5C5537]" : "text-[#5C5537]/40 hover:text-[#5C5537]/70"
-            }`}
+            className={`flex items-center gap-1 text-xs transition-colors ${isLiked ? "text-[#5C5537]" : "text-[#5C5537]/40 hover:text-[#5C5537]/70"
+              }`}
           >
             <Heart className={`w-4 h-4 ${isLiked ? "fill-[#5C5537]" : ""}`} />
-            {/* We might not have the count, so maybe hide it if 0 or unknown? 
-                For now, let's just show the icon if we don't have a reliable count from props.
-            */}
+            {likeCount > 0 && (
+              <span className={isLiked ? "font-medium" : ""}>{likeCount}</span>
+            )}
           </button>
         </div>
       </div>
@@ -194,16 +194,15 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
 
           <div className="pt-4 flex items-center justify-between border-t border-[#5C5537]/10">
             <div className="text-sm text-[#5C5537]/60">
-                Posted {review.timestamp}
+              Posted {review.timestamp}
             </div>
             <button
               onClick={handleLikeClick}
               disabled={isLoading || !user}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
-                isLiked 
-                  ? "bg-[#5C5537]/10 text-[#5C5537]" 
-                  : "hover:bg-[#5C5537]/5 text-[#5C5537]/70"
-              }`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${isLiked
+                ? "bg-[#5C5537]/10 text-[#5C5537]"
+                : "hover:bg-[#5C5537]/5 text-[#5C5537]/70"
+                }`}
             >
               <Heart className={`w-5 h-5 ${isLiked ? "fill-[#5C5537]" : ""}`} />
               <span className="font-medium">{isLiked ? "Liked" : "Like"}</span>

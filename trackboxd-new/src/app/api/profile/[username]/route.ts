@@ -17,6 +17,7 @@ interface RecentActivity {
   timestamp: string;
   rating?: number;
   text?: string;
+  like_count: number;
 }
 
 interface FavoriteTrack {
@@ -210,8 +211,32 @@ export async function GET(
             timestamp: new Date(review.created_at).toLocaleDateString(),
             rating: (review as any).rating ?? undefined,
             text: (review as any).text ?? undefined,
+            like_count: 0, // Will be updated
           };
           recentActivity.push(activity);
+        }
+      });
+    }
+
+    // Get like counts for reviews
+    const reviewIds = recentActivity.filter(a => a.type === "review").map(a => a.id);
+    let reviewLikeCounts: Record<string, number> = {};
+    
+    if (reviewIds.length > 0) {
+      const { data: likeData } = await supabase
+        .from("likes")
+        .select("target_id")
+        .eq("target_type", "review")
+        .in("target_id", reviewIds);
+      
+      likeData?.forEach(like => {
+        reviewLikeCounts[like.target_id] = (reviewLikeCounts[like.target_id] || 0) + 1;
+      });
+      
+      // Update counts in recentActivity
+      recentActivity.forEach(activity => {
+        if (activity.type === "review") {
+          activity.like_count = reviewLikeCounts[activity.id] || 0;
         }
       });
     }
@@ -252,8 +277,32 @@ export async function GET(
             },
             timestamp: new Date(annotation.created_at).toLocaleDateString(),
             text: (annotation as any).text ?? undefined,
+            like_count: 0, // Will be updated
           };
           recentActivity.push(activity);
+        }
+      });
+    }
+
+    // Get like counts for annotations
+    const annotationIds = recentActivity.filter(a => a.type === "annotation").map(a => a.id);
+    let annotationLikeCounts: Record<string, number> = {};
+
+    if (annotationIds.length > 0) {
+      const { data: likeData } = await supabase
+        .from("likes")
+        .select("target_id")
+        .eq("target_type", "annotation")
+        .in("target_id", annotationIds);
+
+      likeData?.forEach(like => {
+        annotationLikeCounts[like.target_id] = (annotationLikeCounts[like.target_id] || 0) + 1;
+      });
+
+      // Update counts in recentActivity
+      recentActivity.forEach(activity => {
+        if (activity.type === "annotation") {
+          activity.like_count = annotationLikeCounts[activity.id] || 0;
         }
       });
     }

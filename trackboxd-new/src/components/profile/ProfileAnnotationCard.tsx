@@ -17,6 +17,7 @@ interface ProfileAnnotationCardProps {
       cover_url?: string;
     };
     timestamp: string;
+    like_count?: number;
     text?: string;
   };
 }
@@ -24,6 +25,7 @@ interface ProfileAnnotationCardProps {
 const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotation }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(annotation.like_count || 0);
   const [isLoading, setIsLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const { data: session } = useSession();
@@ -40,7 +42,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
         const response = await fetch(
           `/api/like/annotation?userId=${user.id}&annotationId=${annotation.id}`
         );
-        
+
         if (response.ok) {
           const data = await response.json();
           setIsLiked(data.isLiked);
@@ -62,6 +64,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
     setIsLoading(true);
     const newLikedState = !isLiked;
     setIsLiked(newLikedState);
+    setLikeCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
 
     try {
       const response = await fetch("/api/like/annotation", {
@@ -79,6 +82,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
     } catch (error) {
       console.error("Like operation failed:", error);
       setIsLiked(!newLikedState);
+      setLikeCount(annotation.like_count || 0);
     } finally {
       setIsLoading(false);
     }
@@ -95,14 +99,16 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
             {annotation.timestamp}
           </div>
         </div>
-        <div className="mb-1 text-sm text-[#5C5537]">
-          <span className="font-semibold">
-            {annotation.track.title}
-          </span>
-          <span className="text-[#5C5537]/70">
-            {" "}
-            by {annotation.track.artist}
-          </span>
+        <div className="mb-1 text-sm text-[#5C5537] flex items-center min-w-0">
+          <div className="flex-1 min-w-0 truncate">
+            <span className="font-semibold">
+              {annotation.track.title}
+            </span>
+            <span className="text-[#5C5537]/70">
+              {" "}
+              by {annotation.track.artist}
+            </span>
+          </div>
         </div>
         {annotation.text && (
           <div className="text-sm text-[#5C5537]/90 line-clamp-3 group-hover:text-[#5C5537] transition-colors">
@@ -121,11 +127,13 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
           <button
             onClick={handleLikeClick}
             disabled={isLoading || !user}
-            className={`flex items-center gap-1 text-xs transition-colors ${
-              isLiked ? "text-[#5C5537]" : "text-[#5C5537]/40 hover:text-[#5C5537]/70"
-            }`}
+            className={`flex items-center gap-1 text-xs transition-colors ${isLiked ? "text-[#5C5537]" : "text-[#5C5537]/40 hover:text-[#5C5537]/70"
+              }`}
           >
             <Heart className={`w-4 h-4 ${isLiked ? "fill-[#5C5537]" : ""}`} />
+            {likeCount > 0 && (
+              <span className={isLiked ? "font-medium" : ""}>{likeCount}</span>
+            )}
           </button>
         </div>
       </div>
@@ -138,8 +146,8 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
         <div className="space-y-4">
           <div className="border-b border-[#5C5537]/10 pb-4">
             <div className="flex items-center gap-2 mb-1">
-                <MessageCircle className="w-5 h-5 text-[#5C5537]" />
-                <h3 className="text-xl font-bold text-[#5C5537]">{annotation.track.title}</h3>
+              <MessageCircle className="w-5 h-5 text-[#5C5537]" />
+              <h3 className="text-xl font-bold text-[#5C5537]">{annotation.track.title}</h3>
             </div>
             <p className="text-[#5C5537]/70">{annotation.track.artist}</p>
           </div>
@@ -150,16 +158,15 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
 
           <div className="pt-4 flex items-center justify-between border-t border-[#5C5537]/10">
             <div className="text-sm text-[#5C5537]/60">
-                Posted {annotation.timestamp}
+              Posted {annotation.timestamp}
             </div>
             <button
               onClick={handleLikeClick}
               disabled={isLoading || !user}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
-                isLiked 
-                  ? "bg-[#5C5537]/10 text-[#5C5537]" 
-                  : "hover:bg-[#5C5537]/5 text-[#5C5537]/70"
-              }`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${isLiked
+                ? "bg-[#5C5537]/10 text-[#5C5537]"
+                : "hover:bg-[#5C5537]/5 text-[#5C5537]/70"
+                }`}
             >
               <Heart className={`w-5 h-5 ${isLiked ? "fill-[#5C5537]" : ""}`} />
               <span className="font-medium">{isLiked ? "Liked" : "Like"}</span>
