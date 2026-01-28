@@ -12,13 +12,31 @@ const lora = Lora({
 
 // 1. Set your base URL so Next.js can resolve absolute paths for images
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"), 
   title: {
     default: "Trackboxd",
     template: "%s | Trackboxd", // Adds a nice suffix to inner pages (e.g. "Login | Trackboxd")
   },
-  description: "Your music, your words.",
-  
+  description: "Your music, your words. Share reviews, annotations, and connect with other music lovers on Trackboxd.",
+  keywords: ["music reviews", "trackboxd", "music annotations", "social music platform", "share music taste", "spotify integration", "music community"],
+  authors: [{ name: "Trackboxd Team" }, { name: "Aawaiz Ali" }],
+  creator: "Aawaiz Ali",
+  publisher: "Trackboxd",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"),
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+
   // 2. Explicitly define the favicon
   icons: {
     icon: "/favicon.png",
@@ -29,7 +47,7 @@ export const metadata: Metadata = {
   // 3. Define Open Graph (Facebook, Discord, iMessage, etc)
   openGraph: {
     title: "Trackboxd",
-    description: "Your music, your words.",
+    description: "Your music, your words. Share reviews, annotations, and connect with other music lovers.",
     url: "https://trackboxd.com",
     siteName: "Trackboxd",
     images: [
@@ -48,7 +66,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Trackboxd",
-    description: "Your music, your words.",
+    description: "Your music, your words. Share reviews, annotations, and connect with other music lovers.",
     images: ["/og-image.png"], // Must be in public folder
   },
 };
@@ -65,6 +83,26 @@ export default function RootLayout({
         <meta name="theme-color" content="#1F2C24" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Trackboxd",
+              url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
+              description: "Your music, your words. Share reviews, annotations, and connect with other music lovers on Trackboxd.",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"}/search?q={search_term_string}`
+                },
+                "query-input": "required name=search_term_string"
+              }
+            }),
+          }}
+        />
       </head>
       <body className={`${lora.className} bg-[#FFFBEb] text-[#1F2C24]`}>
         <SessionProvider>
