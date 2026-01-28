@@ -22,6 +22,7 @@ interface ProfileAnnotationCardProps {
   };
 }
 
+
 const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotation }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
