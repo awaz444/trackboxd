@@ -95,8 +95,8 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
         className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 cursor-pointer hover:shadow-md transition-all duration-200 group"
       >
         <div className="flex items-center justify-between mb-2">
-          <div className="text-sm text-[#5C5537]/70">
-            {annotation.timestamp}
+          <div className="text-sm font-medium text-[#5C5537]">
+            at {annotation.timestamp}
           </div>
         </div>
         <div className="mb-1 text-sm text-[#5C5537] flex items-center min-w-0">
@@ -158,7 +158,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
 
           <div className="pt-4 flex items-center justify-between border-t border-[#5C5537]/10">
             <div className="text-sm text-[#5C5537]/60">
-              Posted {annotation.timestamp}
+              At {annotation.timestamp} in the track
             </div>
             <button
               onClick={handleLikeClick}

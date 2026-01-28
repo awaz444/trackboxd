@@ -106,7 +106,7 @@ export async function GET(
     // Check follow status if user is logged in
     let followStatus: 'following' | 'requested' | 'not_following' = 'not_following';
     let isFollowing = false;
-    
+
     if (currentUserId && currentUserId !== user.id) {
       const { data: followData } = await supabase
         .from("follows")
@@ -221,18 +221,18 @@ export async function GET(
     // Get like counts for reviews
     const reviewIds = recentActivity.filter(a => a.type === "review").map(a => a.id);
     let reviewLikeCounts: Record<string, number> = {};
-    
+
     if (reviewIds.length > 0) {
       const { data: likeData } = await supabase
         .from("likes")
         .select("target_id")
         .eq("target_type", "review")
         .in("target_id", reviewIds);
-      
+
       likeData?.forEach(like => {
         reviewLikeCounts[like.target_id] = (reviewLikeCounts[like.target_id] || 0) + 1;
       });
-      
+
       // Update counts in recentActivity
       recentActivity.forEach(activity => {
         if (activity.type === "review") {
@@ -250,6 +250,7 @@ export async function GET(
         track_id,
         text,
         created_at,
+        timestamp,
         spotify_items!annotations_track_id_fkey (
           id,
           name,
@@ -266,6 +267,16 @@ export async function GET(
       annotationActivities.forEach(annotation => {
         const track = Array.isArray(annotation.spotify_items) ? annotation.spotify_items[0] : annotation.spotify_items;
         if (track) {
+          // Format track timestamp (position in song) as MM:SS
+          const trackTimestamp = (annotation as any).timestamp;
+          const formatTrackTimestamp = (seconds: number): string => {
+            const totalSeconds = Math.floor(seconds);
+            const minutes = Math.floor(totalSeconds / 60);
+            const remainingSeconds = totalSeconds % 60;
+            const paddedSeconds = remainingSeconds.toString().padStart(2, '0');
+            return `${minutes}:${paddedSeconds}`;
+          };
+
           const activity: RecentActivity = {
             id: annotation.id,
             type: "annotation",
@@ -275,7 +286,7 @@ export async function GET(
               artist: track.artist,
               cover_url: track.cover_url,
             },
-            timestamp: new Date(annotation.created_at).toLocaleDateString(),
+            timestamp: trackTimestamp !== undefined ? formatTrackTimestamp(trackTimestamp) : "0:00",
             text: (annotation as any).text ?? undefined,
             like_count: 0, // Will be updated
           };
@@ -318,7 +329,7 @@ export async function GET(
     const likesActivity: Array<{ id: string; timestamp: string; sentence: string; links: { subjectProfile: string; targetProfile?: string; itemHref?: string; } }> = [];
 
     if (!likesAllError && likesAll && likesAll.length > 0) {
-      const trackLikeIds = likesAll.filter(l => ["track","album","playlist"].includes(l.target_type)).map(l => l.target_id);
+      const trackLikeIds = likesAll.filter(l => ["track", "album", "playlist"].includes(l.target_type)).map(l => l.target_id);
       const reviewLikeIds = likesAll.filter(l => l.target_type === "review").map(l => l.target_id);
       const annotationLikeIds = likesAll.filter(l => l.target_type === "annotation").map(l => l.target_id);
 
@@ -337,7 +348,7 @@ export async function GET(
       if (reviewLikeIds.length > 0) {
         const { data: revs } = await supabase
           .from("reviews")
-          .select(`id, item_id, rating, users(name), spotify_items!reviews_item_id_fkey(id, name, artist)`) 
+          .select(`id, item_id, rating, users(name), spotify_items!reviews_item_id_fkey(id, name, artist)`)
           .in("id", reviewLikeIds);
         (revs || []).forEach(r => { reviewMap[r.id] = r; });
       }
@@ -347,14 +358,14 @@ export async function GET(
       if (annotationLikeIds.length > 0) {
         const { data: ann } = await supabase
           .from("annotations")
-          .select(`id, track_id, users(name), spotify_items!annotations_track_id_fkey(id, name, artist)`) 
+          .select(`id, track_id, users(name), spotify_items!annotations_track_id_fkey(id, name, artist)`)
           .in("id", annotationLikeIds);
         (ann || []).forEach(a => { annotationMap[a.id] = a; });
       }
 
       likesAll.slice(0, 10).forEach(like => {
         const ts = new Date(like.created_at).toLocaleDateString();
-        if (["track","album","playlist"].includes(like.target_type)) {
+        if (["track", "album", "playlist"].includes(like.target_type)) {
           const item = spotifyMap[like.target_id];
           if (item) {
             const sentence = `${user.name} liked ${item.type} ${item.name}${item.artist ? ' by ' + item.artist : ''}`;
@@ -427,7 +438,7 @@ export async function GET(
       .limit(12);
 
     // Fetch prompt responses for this user
-    let promptResponses: Array<{ id: string; promptKey: string; type: 'text'|'track'|'album'|'playlist'; item?: { id: string; type: string; name: string; artist?: string; cover_url?: string } | null; text?: string | null; created_at: string; }> = [];
+    let promptResponses: Array<{ id: string; promptKey: string; type: 'text' | 'track' | 'album' | 'playlist'; item?: { id: string; type: string; name: string; artist?: string; cover_url?: string } | null; text?: string | null; created_at: string; }> = [];
     try {
       const { data: responses } = await supabase
         .from('user_profile_responses')
@@ -491,10 +502,10 @@ export async function GET(
           cover_url: track.cover_url
         } as FavoriteTrack;
       }).filter(Boolean) as FavoriteTrack[] || [],
-      
+
       recentActivity: sortedRecentActivity,
       likesActivity,
-      
+
       following: following?.map(f => {
         const u = Array.isArray(f.users) ? f.users[0] : f.users;
         if (!u) return null;
@@ -506,7 +517,7 @@ export async function GET(
           instagram_url: u.instagram_url || undefined
         } as FollowingUser;
       }).filter(Boolean) as FollowingUser[] || [],
-      
+
       isFollowing,
       followStatus,
       promptResponses,
