@@ -143,7 +143,7 @@ export async function getTrackDetails(trackId: string) {
   }
 
   const url = `https://api.spotify.com/v1/tracks/${trackId}`;
-  return fetchSpotifyJson(url);
+  return fetchSpotifyJson<any>(url);
 }
 
 export async function searchPlaylists(
@@ -161,11 +161,11 @@ export async function searchPlaylists(
   if (typeof limit === 'number') url.searchParams.set("limit", String(limit));
   if (market) url.searchParams.set("market", market);
 
-  return fetchSpotifyJson(url.toString());
+  return fetchSpotifyJson<any>(url.toString());
 }
 
 export const getPlaylistDetails = async (playlistId: string) => {
-  return fetchSpotifyJson(`${PLAYLISTS_ENDPOINT}/${playlistId}`);
+  return fetchSpotifyJson<any>(`${PLAYLISTS_ENDPOINT}/${playlistId}`);
 };
 
 interface PlaylistItemsOptions {
@@ -186,12 +186,12 @@ export const getPlaylistItems = async (playlistId: string, options?: PlaylistIte
     if (options.fields) url.searchParams.append("fields", options.fields);
   }
 
-  return fetchSpotifyJson(url.toString());
+  return fetchSpotifyJson<any>(url.toString());
 };
 
 export const getAlbumDetails = async (albumId: string) => {
   if (!albumId) throw new Error("Album ID is required");
-  return fetchSpotifyJson(`${ALBUMS_ENDPOINT}/${albumId}`);
+  return fetchSpotifyJson<any>(`${ALBUMS_ENDPOINT}/${albumId}`);
 };
 
 interface AlbumTracksOptions {
@@ -212,7 +212,7 @@ export const getAlbumTracks = async (albumId: string, options?: AlbumTracksOptio
     if (options.offset) url.searchParams.append("offset", options.offset.toString());
   }
 
-  return fetchSpotifyJson(url.toString());
+  return fetchSpotifyJson<any>(url.toString());
 };
 
 export const searchAlbums = async (query: string, limit = 20, offset = 0, market = "US") => {
