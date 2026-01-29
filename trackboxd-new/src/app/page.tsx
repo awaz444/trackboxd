@@ -84,7 +84,7 @@ const LandingPage = () => {
         </div>
 
         {/* SEO Features Section */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto px-4 pb-12 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto px-4 pb-6 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
           <article className="text-center space-y-2">
             <h2 className="text-sm font-bold text-[#5C5537] uppercase tracking-wide">Track Reviews</h2>
             <p className="text-xs text-[#5C5537]/70 leading-relaxed">
