@@ -68,8 +68,11 @@ async function getAccessToken() {
 
 // ------------------ Helper for Requests ------------------
 
+// Add this helper at the top or bottom of the file
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function fetchSpotify(url: string, options: RequestInit = {}): Promise<Response> {
-  const MAX_RETRIES = 3;
+  const MAX_RETRIES = 5;
   let attempt = 0;
 
   while (attempt < MAX_RETRIES) {
@@ -78,6 +81,9 @@ async function fetchSpotify(url: string, options: RequestInit = {}): Promise<Res
       
       const res = await fetch(url, {
         ...options,
+        // FORCE 'no-store' to bypass Next.js memoization/caching. 
+        // This ensures retries actually hit the network.
+        cache: 'no-store', 
         headers: {
           ...options.headers,
           Authorization: `Bearer ${cachedToken}`,
@@ -87,6 +93,11 @@ async function fetchSpotify(url: string, options: RequestInit = {}): Promise<Res
       if (res.status === 401) {
         // Token expired unexpectedly → refresh + retry
         await fetchNewAccessToken();
+        
+        // Add a small delay. If your proxy (googleusercontent) has eventual consistency,
+        // this gives it time to recognize the new token.
+        await sleep(500); 
+        
         attempt++;
         continue;
       }
@@ -146,23 +157,26 @@ export async function getTrackDetails(trackId: string) {
   return fetchSpotifyJson<any>(url);
 }
 
-export async function searchPlaylists(
+export const searchPlaylists = async (
   query: string,
   options: { limit?: number; market?: string } = {}
-) {
+) => {
   if (!query || !query.trim()) {
     throw new Error("Spotify search query cannot be empty");
   }
 
-  const { limit, market } = options;
-  const url = new URL("https://api.spotify.com/v1/search");
-  url.searchParams.set("q", query);
-  url.searchParams.set("type", "playlist");
-  if (typeof limit === 'number') url.searchParams.set("limit", String(limit));
-  if (market) url.searchParams.set("market", market);
+  const { limit = 20, market = 'US' } = options;
 
-  return fetchSpotifyJson<any>(url.toString());
-}
+  // FIX: Manually build the string to ensure %20 encoding
+  // This matches the logic in 'searchTracksAlbumsAndPlaylists' which is known to work.
+  const queryString = `?q=${encodeURIComponent(query)}&type=playlist&limit=${limit}&market=${market}`;
+  
+  // Combine directly with the endpoint
+  const url = `${SEARCH_ENDPOINT}${queryString}`;
+
+  const data = await fetchSpotifyJson<{ playlists: { items: any[] } }>(url);
+  return data.playlists?.items || [];
+};
 
 export const getPlaylistDetails = async (playlistId: string) => {
   return fetchSpotifyJson<any>(`${PLAYLISTS_ENDPOINT}/${playlistId}`);

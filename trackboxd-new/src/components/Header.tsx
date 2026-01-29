@@ -118,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
 
             try {
                 const res = await fetch(
-                    `/api/search/all?q=${encodeURIComponent(searchQuery)}&trackLimit=2&albumLimit=1&playlistLimit=1&userLimit=2`
+                    `/api/search/all?q=${encodeURIComponent(searchQuery)}&trackLimit=2&albumLimit=1&userLimit=2`
                 );
 
                 if (!res.ok) throw new Error("Search failed");
@@ -309,7 +309,6 @@ const Header: React.FC<HeaderProps> = ({ }) => {
     const navItems = [
         { label: "Activity", href: "/activity", active: false },
         { label: "Songs", href: "/songs", active: false },
-        { label: "Playlists", href: "/playlists", active: false },
         { label: "Albums", href: "/albums", active: false },
     ];
 
@@ -563,38 +562,11 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                             </>
                                                         )}
 
-                                                    {searchResults.playlists?.filter(
-                                                        Boolean
-                                                    ).length > 0 && (
-                                                            <>
-                                                                <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                                <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
-                                                                    Playlists
-                                                                </div>
-                                                                <div className="mb-2">
-                                                                    {searchResults.playlists
-                                                                        .filter(
-                                                                            Boolean
-                                                                        )
-                                                                        .map((playlist: any) => (
-                                                                            <SearchResultItem
-                                                                                key={`playlist-${playlist.id}`}
-                                                                                item={
-                                                                                    playlist
-                                                                                }
-                                                                            />
-                                                                        ))}
-                                                                </div>
-                                                            </>
-                                                        )}
 
                                                     {searchResults.tracks.filter(
                                                         Boolean
                                                     ).length === 0 &&
                                                         searchResults.albums.filter(
-                                                            Boolean
-                                                        ).length === 0 &&
-                                                        searchResults.playlists.filter(
                                                             Boolean
                                                         ).length === 0 && (
                                                             <div className="px-4 py-8 text-center text-[#5C5537]/70">
