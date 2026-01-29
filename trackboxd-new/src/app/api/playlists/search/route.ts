@@ -16,9 +16,8 @@ export async function GET(request: Request) {
     }
 
     const limit = limitParam ? Number(limitParam) : 10;
-    const results = await searchPlaylists(query, { limit, market });
-    // Normalize to items array similar to tracks/albums search
-    const items = results.playlists?.items || results.items || [];
+    const items = await searchPlaylists(query, { limit, market });
+    // results is now directly the array of items
     return NextResponse.json(items);
   } catch (error) {
     console.error('Spotify playlist search error:', error);

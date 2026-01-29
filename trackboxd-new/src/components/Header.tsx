@@ -441,7 +441,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                         <div className="w-full">
                                             <Input
                                                 type="text"
-                                                placeholder="Search tracks, albums, playlists..."
+                                                placeholder="Search tracks, albums..."
                                                 value={searchQuery}
                                                 onChange={(e) =>
                                                     setSearchQuery(
@@ -721,7 +721,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                     <div className="w-full">
                                         <Input
                                             type="text"
-                                            placeholder="Search tracks, albums, playlists..."
+                                            placeholder="Search tracks, albums..."
                                             value={searchQuery}
                                             onChange={(e) =>
                                                 setSearchQuery(e.target.value)
@@ -820,39 +820,11 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                                     </>
                                                                 )}
 
-                                                            {searchResults.playlists?.filter(
-                                                                Boolean
-                                                            ).length > 0 && (
-                                                                    <>
-                                                                        <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                                        <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
-                                                                            Playlists
-                                                                        </div>
-                                                                        <div className="mb-2">
-                                                                            {searchResults.playlists
-                                                                                .filter(
-                                                                                    Boolean
-                                                                                )
-                                                                                .map((playlist: any) => (
-                                                                                    <SearchResultItem
-                                                                                        key={`playlist-${playlist.id}`}
-                                                                                        item={
-                                                                                            playlist
-                                                                                        }
-                                                                                    />
-                                                                                ))}
-                                                                        </div>
-                                                                    </>
-                                                                )}
 
                                                             {searchResults.tracks.filter(
                                                                 Boolean
                                                             ).length === 0 &&
                                                                 searchResults.albums.filter(
-                                                                    Boolean
-                                                                ).length ===
-                                                                0 &&
-                                                                searchResults.playlists.filter(
                                                                     Boolean
                                                                 ).length ===
                                                                 0 && (
