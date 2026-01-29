@@ -144,11 +144,11 @@ const AlbumsPage = () => {
                 prev.map((a) =>
                     a.id === albumId
                         ? {
-                              ...a,
-                              like_count: currentLikedStatus
-                                  ? a.like_count - 1
-                                  : a.like_count + 1,
-                          }
+                            ...a,
+                            like_count: currentLikedStatus
+                                ? a.like_count - 1
+                                : a.like_count + 1,
+                        }
                         : a
                 );
 
@@ -238,7 +238,8 @@ const AlbumsPage = () => {
                 `/api/albums/search?q=${encodeURIComponent(query)}`
             );
             if (!res.ok) {
-                throw new Error("Failed to search");
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.details || errorData.error || "Failed to search");
             }
             const data = await res.json();
 
@@ -257,7 +258,7 @@ const AlbumsPage = () => {
             setShowSearchResults(true);
         } catch (error) {
             console.error("Album search error:", error);
-            setSearchError("Failed to search. Please try again.");
+            setSearchError(error instanceof Error ? error.message : "Failed to search. Please try again.");
             setShowSearchResults(false);
         } finally {
             setIsSearching(false);
@@ -428,14 +429,14 @@ const AlbumsPage = () => {
                                                 }
                                                 isLoading={
                                                     isLoadingLikes[
-                                                        album.id
+                                                    album.id
                                                     ] || false
                                                 }
                                                 onLikeToggle={handleLikeClick}
                                                 isLastItem={
                                                     index ===
                                                     recentlyLikedAlbums.length -
-                                                        1
+                                                    1
                                                 }
                                             />
                                         )
@@ -472,14 +473,14 @@ const AlbumsPage = () => {
                                                 }
                                                 isLoading={
                                                     isLoadingLikes[
-                                                        album.id
+                                                    album.id
                                                     ] || false
                                                 }
                                                 onLikeToggle={handleLikeClick}
                                                 isLastItem={
                                                     index ===
                                                     recentlyReviewedAlbums.length -
-                                                        1
+                                                    1
                                                 }
                                             />
                                         )

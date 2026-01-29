@@ -22,7 +22,10 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Spotify search error:', error);
     return NextResponse.json(
-      { error: 'Failed to search Spotify' },
+      { 
+        error: 'Failed to search Spotify',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

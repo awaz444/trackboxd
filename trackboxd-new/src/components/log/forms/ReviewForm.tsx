@@ -84,39 +84,39 @@ interface SpotifyImage {
     url: string;
 }
 
-const ReviewForm: React.FC<ReviewFormProps> = ({ 
-  onClose, 
-  initialTrack, 
-  initialAlbum,
-  initialReview,
-  onSave
+const ReviewForm: React.FC<ReviewFormProps> = ({
+    onClose,
+    initialTrack,
+    initialAlbum,
+    initialReview,
+    onSave
 }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedItem, setSelectedItem] = useState<SpotifyItem | null>(
         initialTrack
             ? {
-                  id: initialTrack.id,
-                  name: initialTrack.name,
-                  artists: [{ name: initialTrack.artist }],
-                  album: {
-                      name: initialTrack.album,
-                      images: initialTrack.coverArt
-                          ? [{ url: initialTrack.coverArt }]
-                          : [],
-                  },
-                  type: "track",
-              }
+                id: initialTrack.id,
+                name: initialTrack.name,
+                artists: [{ name: initialTrack.artist }],
+                album: {
+                    name: initialTrack.album,
+                    images: initialTrack.coverArt
+                        ? [{ url: initialTrack.coverArt }]
+                        : [],
+                },
+                type: "track",
+            }
             : initialAlbum
-            ? {
-                  id: initialAlbum.id,
-                  name: initialAlbum.name,
-                  artists: [{ name: initialAlbum.artist }],
-                  images: initialAlbum.coverArt
-                      ? [{ url: initialAlbum.coverArt }]
-                      : [],
-                  type: "album",
-              }
-            : null
+                ? {
+                    id: initialAlbum.id,
+                    name: initialAlbum.name,
+                    artists: [{ name: initialAlbum.artist }],
+                    images: initialAlbum.coverArt
+                        ? [{ url: initialAlbum.coverArt }]
+                        : [],
+                    type: "album",
+                }
+                : null
     );
     const [rating, setRating] = useState<number>(0);
     const [reviewText, setReviewText] = useState("");
@@ -168,20 +168,20 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     }, [initialTrack]);
 
     useEffect(() => {
-      if (initialReview) {
-        setRating(initialReview.rating);
-        setReviewText(initialReview.text);
-        setSelectedItem({
-          id: initialReview.track?.id || '',
-          name: initialReview.track?.name || '',
-          artists: [{ name: initialReview.track?.artist || '' }],
-          album: {
-            name: initialReview.track?.album || '',
-            images: initialReview.track?.coverArt ? [{ url: initialReview.track.coverArt }] : []
-          },
-          type: 'track'
-        });
-      }
+        if (initialReview) {
+            setRating(initialReview.rating);
+            setReviewText(initialReview.text);
+            setSelectedItem({
+                id: initialReview.track?.id || '',
+                name: initialReview.track?.name || '',
+                artists: [{ name: initialReview.track?.artist || '' }],
+                album: {
+                    name: initialReview.track?.album || '',
+                    images: initialReview.track?.coverArt ? [{ url: initialReview.track.coverArt }] : []
+                },
+                type: 'track'
+            });
+        }
     }, [initialReview]);
 
     // Search when query changes (with debounce)
@@ -202,7 +202,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                 );
 
                 if (!response.ok) {
-                    throw new Error(`Search failed: ${response.statusText}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.details || errorData.error || `Search failed: ${response.statusText}`);
                 }
 
                 const data: SpotifyAPIResponse = await response.json();
@@ -236,7 +237,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                 setSearchResults(combinedResults);
             } catch (error) {
                 console.error("Search error:", error);
-                setSearchError("Failed to search. Please try again.");
+                setSearchError(error instanceof Error ? error.message : "Failed to search. Please try again.");
             } finally {
                 setIsSearching(false);
             }
@@ -247,58 +248,58 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     }, [searchQuery]);
 
     const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setIsSubmitting(true);
-      setSubmitError(null);
-      
-      try {
-        const url = initialReview 
-          ? `/api/review/actions/${initialReview.id}`
-          : '/api/review';
-        
-        const method = initialReview ? 'PUT' : 'POST';
-        
-        const response = await fetch(url, {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            // For edit mode, we don't send itemId/itemType
-            ...(initialReview ? {} : {
-              itemId: selectedItem?.id,
-              itemType: selectedItem?.type,
-            }),
-            isPublic: initialReview ? initialReview.isPublic : true,
-            rating: rating,
-            text: reviewText,
-            userId: user?.id
-          })
-        });
-  
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to submit review');
+        e.preventDefault();
+        setIsSubmitting(true);
+        setSubmitError(null);
+
+        try {
+            const url = initialReview
+                ? `/api/review/actions/${initialReview.id}`
+                : '/api/review';
+
+            const method = initialReview ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    // For edit mode, we don't send itemId/itemType
+                    ...(initialReview ? {} : {
+                        itemId: selectedItem?.id,
+                        itemType: selectedItem?.type,
+                    }),
+                    isPublic: initialReview ? initialReview.isPublic : true,
+                    rating: rating,
+                    text: reviewText,
+                    userId: user?.id
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to submit review');
+            }
+
+            const reviewData = await response.json();
+
+            if (initialReview && onSave) {
+                onSave({
+                    ...initialReview,
+                    rating,
+                    text: reviewText,
+                    // Preserve existing privacy on edit
+                    isPublic: initialReview.isPublic
+                });
+            }
+
+            console.log('Review saved:', reviewData);
+            onClose();
+        } catch (error) {
+            console.error('Review submission error:', error);
+            setSubmitError(error instanceof Error ? error.message : 'Failed to submit review');
+        } finally {
+            setIsSubmitting(false);
         }
-  
-        const reviewData = await response.json();
-        
-        if (initialReview && onSave) {
-          onSave({
-            ...initialReview,
-            rating,
-            text: reviewText,
-            // Preserve existing privacy on edit
-            isPublic: initialReview.isPublic
-          });
-        }
-        
-        console.log('Review saved:', reviewData);
-        onClose();
-      } catch (error) {
-        console.error('Review submission error:', error);
-        setSubmitError(error instanceof Error ? error.message : 'Failed to submit review');
-      } finally {
-        setIsSubmitting(false);
-      }
     };
 
     const getImageUrl = (item: SpotifyItem): string | undefined => {
@@ -435,10 +436,10 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                                             name: track.album,
                                                             images: track.coverArt
                                                                 ? [
-                                                                      {
-                                                                          url: track.coverArt,
-                                                                      },
-                                                                  ]
+                                                                    {
+                                                                        url: track.coverArt,
+                                                                    },
+                                                                ]
                                                                 : [],
                                                         },
                                                         type: "track",

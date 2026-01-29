@@ -1,4 +1,4 @@
-    "use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Search, Grid, List, Heart, Star, Plus, X } from "lucide-react";
@@ -170,11 +170,11 @@ const Playlists = () => {
                 prev.map((p) =>
                     p.id === playlistId
                         ? {
-                              ...p,
-                              likeCount: currentLikedStatus
-                                  ? p.like_count - 1
-                                  : p.like_count + 1,
-                          }
+                            ...p,
+                            likeCount: currentLikedStatus
+                                ? p.like_count - 1
+                                : p.like_count + 1,
+                        }
                         : p
                 );
 
@@ -258,7 +258,8 @@ const Playlists = () => {
                 `/api/playlists/search?q=${encodeURIComponent(query)}`
             );
             if (!res.ok) {
-                throw new Error("Failed to search");
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.details || errorData.error || "Failed to search");
             }
             const data = await res.json();
 
@@ -276,7 +277,7 @@ const Playlists = () => {
             setShowSearchResults(true);
         } catch (error) {
             console.error("Playlist search error:", error);
-            setSearchError("Failed to search. Please try again.");
+            setSearchError(error instanceof Error ? error.message : "Failed to search. Please try again.");
             setShowSearchResults(false);
         } finally {
             setIsSearching(false);
@@ -448,14 +449,14 @@ const Playlists = () => {
                                                 }
                                                 isLoading={
                                                     isLoadingLikes[
-                                                        playlist.id
+                                                    playlist.id
                                                     ] || false
                                                 }
                                                 onLikeToggle={handleLikeClick}
                                                 isLastItem={
                                                     index ===
                                                     recentlyLikedPlaylists.length -
-                                                        1
+                                                    1
                                                 }
                                             />
                                         )

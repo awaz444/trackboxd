@@ -30,9 +30,9 @@ interface AnnotationFormProps {
   onSave?: (annotation: InitialAnnotation) => void;
 }
 
-const AnnotationForm: React.FC<AnnotationFormProps> = ({ 
-  onClose, 
-  initialTrack, 
+const AnnotationForm: React.FC<AnnotationFormProps> = ({
+  onClose,
+  initialTrack,
   initialAnnotation,
   onSave
 }) => {
@@ -59,7 +59,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
         setIsLoadingTrending(true);
         const res = await fetch("/api/songs/global-top-4");
         if (!res.ok) throw new Error("Failed to fetch trending tracks");
-        
+
         const data = await res.json();
         const tracks = data.map((item: any) => ({
           id: item.track.id,
@@ -68,7 +68,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
           album: item.track.album.name,
           coverArt: item.track.album.images[0]?.url || "/default-album.png"
         }));
-        
+
         // Select 3 random trending tracks
         const shuffled = [...tracks].sort(() => 0.5 - Math.random());
         setTrendingTracks(shuffled.slice(0, 3));
@@ -91,12 +91,12 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
         album: initialAnnotation.track?.album || '',
         coverArt: initialAnnotation.track?.coverArt || ''
       });
-      
+
       // Convert seconds to mm:ss format
       const minutes = Math.floor(initialAnnotation.timestamp / 60);
       const seconds = Math.floor(initialAnnotation.timestamp % 60);
       setTimestamp(`${minutes}:${seconds.toString().padStart(2, '0')}`);
-      
+
       setAnnotationText(initialAnnotation.text);
     }
   }, [initialAnnotation]);
@@ -123,7 +123,8 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
     try {
       const res = await fetch(`/api/songs/search?q=${encodeURIComponent(query)}`);
       if (!res.ok) {
-        throw new Error("Failed to search");
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.details || errorData.error || "Failed to search");
       }
       const data = await res.json();
       const items = Array.isArray(data) ? data : data?.tracks?.items || [];
@@ -135,11 +136,11 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
         album: track.album.name,
         coverArt: track.album.images[0]?.url || "/default-album.png"
       })) || [];
-      
+
       setSearchResults(results);
     } catch (error) {
       console.error("Spotify search error:", error);
-      setSearchError("Failed to search. Please try again.");
+      setSearchError(error instanceof Error ? error.message : "Failed to search. Please try again.");
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -148,9 +149,9 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedTrack) return;
-    
+
     setIsSubmitting(true);
     setSubmitError(null);
 
@@ -172,12 +173,12 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
         throw new Error('Invalid timestamp value');
       }
 
-      const url = initialAnnotation 
+      const url = initialAnnotation
         ? `/api/annotate/actions/${initialAnnotation.id}`
         : '/api/annotate';
-      
+
       const method = initialAnnotation ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -203,7 +204,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
       }
 
       const annotationData = await response.json();
-      
+
       if (initialAnnotation && onSave) {
         onSave({
           ...initialAnnotation,
@@ -213,12 +214,12 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
           isPublic: initialAnnotation.isPublic
         });
       }
-      
+
       console.log('Annotation saved:', annotationData);
       onClose();
     } catch (error) {
       console.error('Annotation submission error:', error);
-      
+
       // Simplify error message for HTML responses
       let errorMessage = 'Failed to create annotation';
       if (error instanceof Error) {
@@ -236,7 +237,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-     {!initialAnnotation && !selectedTrack ? (
+      {!initialAnnotation && !selectedTrack ? (
         <div className="space-y-4">
           <h3 className="font-medium text-[#5C5537]">
             Search for a track to annotate
@@ -452,7 +453,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
             </div>
           </div>
         </div>
-      ) : null} 
+      ) : null}
     </form>
   );
 };

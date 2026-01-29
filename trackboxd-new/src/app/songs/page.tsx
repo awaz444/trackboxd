@@ -218,8 +218,8 @@ const Songs = () => {
     const trendingTracks =
         globalTopTracks.length > 0
             ? globalTopTracks.map((trackData: SpotifyTrack) =>
-                  spotifyToTrack(trackData)
-              )
+                spotifyToTrack(trackData)
+            )
             : [];
 
     const recentlyAnnotated =
@@ -285,9 +285,9 @@ const Songs = () => {
                 setIsLoadingTopTracks(false);
             }
         };
-    
+
         fetchGlobalTopTracks();
-    }, []); 
+    }, []);
 
     useEffect(() => {
         if (user && globalTopTracks.length > 0) {
@@ -333,7 +333,8 @@ const Songs = () => {
                 `/api/songs/search?q=${encodeURIComponent(query)}`
             );
             if (!res.ok) {
-                throw new Error("Failed to search");
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.details || errorData.error || "Failed to search");
             }
 
             const data = await res.json();
@@ -347,7 +348,7 @@ const Songs = () => {
             }
         } catch (error) {
             console.error("Spotify search error:", error);
-            setSearchError("Failed to search. Please try again.");
+            setSearchError(error instanceof Error ? error.message : "Failed to search. Please try again.");
             setShowSearchResults(false);
         } finally {
             setIsSearching(false);
