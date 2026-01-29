@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   description: "Your music, your words. Share reviews, annotations, and connect with other music lovers on Trackboxd.",
   keywords: ["music reviews", "trackboxd", "music annotations", "social music platform", "share music taste", "spotify integration", "music community"],
-  authors: [{ name: "Trackboxd Team" }, { name: "Aawaiz Ali" }],
+  authors: [{ name: "Trackboxd Team" }, { name: "Aawaiz Ali" }, { name: "Umer Noor" }],
   creator: "Aawaiz Ali",
   publisher: "Trackboxd",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"),
