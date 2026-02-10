@@ -38,7 +38,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const { update: updateSession } = useSession();
-  
+
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -50,6 +50,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
   // Update mode when defaultMode prop changes
   useEffect(() => {
+    console.log('AuthModal: defaultMode changed to', defaultMode);
     setMode(defaultMode);
   }, [defaultMode]);
 
@@ -59,10 +60,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       const checkAuth = async () => {
         // Add a small delay to ensure the session is properly set after redirect
         await new Promise(resolve => setTimeout(resolve, 100));
-        
+
         const { data: { user } } = await supabase.auth.getUser();
         console.log('Auth check for update-password mode:', { user: !!user, userId: user?.id });
-        
+
         if (user) {
           setIsAuthenticated(true);
           console.log('User authenticated, staying in update-password mode');
@@ -152,7 +153,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -233,7 +234,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
         if (signInResult?.ok) {
           // Update the session to trigger re-renders
           await updateSession();
-          
+
           onClose();
           // Reset form
           setFormData({
@@ -267,7 +268,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.email || !formData.password) {
       setErrors({ general: 'Please fill in all required fields' });
       return;
@@ -279,7 +280,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
     try {
       // Check if the input is a name or email and get the corresponding email
       const email = await findUserByNameOrEmail(formData.email);
-      
+
       if (!email) {
         setErrors({ general: 'No account found with this username or email. Please check your credentials or sign up for a new account.' });
         return;
@@ -300,10 +301,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       } else if (result?.ok) {
         // Update the session to trigger re-renders
         await updateSession();
-        
+
         onClose();
         // Reset form
-          setFormData({
+        setFormData({
           email: '',
           password: '',
           confirmPassword: '',
@@ -323,7 +324,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.email) {
       setErrors({ email: 'Please enter your email address.' });
       return;
@@ -339,11 +340,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-        redirectTo: `${window.location.origin}/api/auth/confirm`,
+        redirectTo: `${window.location.origin}/api/auth/confirm?next=/?auth=update-password`,
       });
 
       if (error) {
-        setErrors({ general: 'Failed to send reset email. Please check your email address and try again.' });
+        console.error('Reset password error:', error);
+        // Display the actual error message from Supabase (e.g. "Rate limit exceeded", "User not found")
+        setErrors({ general: error.message });
       } else {
         setSuccess('Password reset email sent! Please check your inbox and follow the instructions to reset your password.');
         setFormData(prev => ({ ...prev, email: '' }));
@@ -358,7 +361,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -382,7 +385,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
           confirmPassword: '',
           name: '',
         });
-        
+
         // Close modal and redirect after a delay
         setTimeout(() => {
           onClose();
@@ -420,11 +423,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-5">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-[#5C5537]/20 backdrop-blur-sm"
         onClick={onClose}
       ></div>
-      
+
       {/* Modal Content */}
       <div className="bg-[#FFFBEb] rounded-lg p-8 w-full max-w-md border border-[#5C5537]/20 shadow-lg relative z-10 max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
@@ -434,7 +437,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
         >
           <X size={20} />
         </button>
-        
+
         {/* Modal Header */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-[#5C5537]">
@@ -464,13 +467,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
             <p className="text-sm">{errors.general}</p>
           </div>
         )}
-        
+
         {/* Form */}
         <form onSubmit={
-          mode === 'login' ? handleLogin : 
-          mode === 'signup' ? handleSignup :
-          mode === 'forgot-password' ? handleForgotPassword :
-          handleUpdatePassword
+          mode === 'login' ? handleLogin :
+            mode === 'signup' ? handleSignup :
+              mode === 'forgot-password' ? handleForgotPassword :
+                handleUpdatePassword
         } className="space-y-4">
           {/* Email Field - shown for login, signup, and forgot-password */}
           {(mode === 'login' || mode === 'signup' || mode === 'forgot-password') && (
@@ -484,15 +487,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   id="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                    errors.email 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                  }`}
+                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${errors.email
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                    }`}
                   placeholder={
-                    mode === 'login' ? 'Enter your email or username' : 
-                    mode === 'forgot-password' ? 'Enter your email address' :
-                    'Enter your email'
+                    mode === 'login' ? 'Enter your email or username' :
+                      mode === 'forgot-password' ? 'Enter your email address' :
+                        'Enter your email'
                   }
                   required
                 />
@@ -513,11 +515,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   id="password"
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  className={`w-full px-4 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                    errors.password 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                  }`}
+                  className={`w-full px-4 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${errors.password
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                    }`}
                   placeholder="Enter your password"
                   required
                 />
@@ -530,7 +531,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                 </button>
               </div>
               {errors.password && <p className="text-[#5C5537] text-xs mt-1">{errors.password}</p>}
-              
+
               {/* Forgot Password Link */}
               <div className="text-right mt-2">
                 <button
@@ -557,11 +558,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                     id="password"
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
-                    className={`w-full px-4 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                      errors.password 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                    }`}
+                    className={`w-full px-4 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${errors.password
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                      }`}
                     placeholder="Enter your new password"
                     required
                   />
@@ -587,11 +587,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                     id="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    className={`w-full pl-10 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                      errors.confirmPassword 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                    }`}
+                    className={`w-full pl-10 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${errors.confirmPassword
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                      }`}
                     placeholder="Confirm your new password"
                     required
                   />
@@ -622,11 +621,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                      errors.name 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                    }`}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${errors.name
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                      }`}
                     placeholder="Choose a username"
                     required
                   />
@@ -644,11 +642,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                     id="password"
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
-                    className={`w-full px-4 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                      errors.password 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                    }`}
+                    className={`w-full px-4 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${errors.password
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                      }`}
                     placeholder="Enter your password"
                     required
                   />
@@ -673,11 +670,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                     id="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    className={`w-full px-4 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${
-                      errors.confirmPassword 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
-                    }`}
+                    className={`w-full px-4 pr-12 py-2 border rounded-md focus:outline-none focus:ring-1 bg-white ${errors.confirmPassword
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-[#5C5537]/20 focus:ring-[#5C5537]/50'
+                      }`}
                     placeholder="Confirm your password"
                     required
                   />
@@ -693,22 +689,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
               </div>
             </>
           )}
-          
+
           {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
             className="w-full bg-[#5C5537] text-white py-2 px-4 rounded-md hover:bg-[#3E3725] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Please wait...' : 
+            {isLoading ? 'Please wait...' :
               mode === 'login' ? 'Sign In' :
-              mode === 'signup' ? 'Create Account' :
-              mode === 'forgot-password' ? 'Send Reset Email' :
-              'Update Password'
+                mode === 'signup' ? 'Create Account' :
+                  mode === 'forgot-password' ? 'Send Reset Email' :
+                    'Update Password'
             }
           </button>
         </form>
-        
+
         {/* Mode Switch - Only show for login/signup modes */}
         {(mode === 'login' || mode === 'signup') && (
           <div className="text-center mt-6 pt-6 border-t border-[#5C5537]/10">
@@ -723,7 +719,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
             </p>
           </div>
         )}
-        
+
         {/* Back to Login - Show for forgot-password mode */}
         {mode === 'forgot-password' && (
           <div className="text-center mt-6 pt-6 border-t border-[#5C5537]/10">

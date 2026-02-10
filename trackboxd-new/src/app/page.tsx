@@ -14,7 +14,9 @@ const LandingPage = () => {
 
   useEffect(() => {
     const authParam = searchParams.get('auth');
+    console.log('LandingPage: auth param:', authParam);
     if (authParam && ['login', 'signup', 'forgot-password', 'update-password'].includes(authParam)) {
+      console.log('LandingPage: Setting auth mode to', authParam);
       setAuthMode(authParam as 'login' | 'signup' | 'forgot-password' | 'update-password');
       setShowAuthModal(true);
     }

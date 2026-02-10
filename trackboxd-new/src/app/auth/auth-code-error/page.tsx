@@ -1,16 +1,20 @@
 "use client";
 
 import React from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from "next/link";
 
 const AuthCodeErrorPage: React.FC = () => {
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
+
   return (
     <div className="min-h-screen bg-[#FFFBEb] flex items-center justify-center px-5">
       <div className="bg-white rounded-lg p-8 w-full max-w-md border border-[#5C5537]/20 shadow-lg text-center">
         {/* Back Button */}
         <div className="mb-6 text-left">
-          <Link 
+          <Link
             href="/"
             className="inline-flex items-center text-[#5C5537]/70 hover:text-[#5C5537] transition-colors"
           >
@@ -30,7 +34,7 @@ const AuthCodeErrorPage: React.FC = () => {
             Authentication Error
           </h1>
           <p className="text-[#5C5537]/70">
-            The authentication link you clicked is invalid or has expired.
+            {error ? `Error: ${decodeURIComponent(error)}` : 'The authentication link you clicked is invalid or has expired.'}
           </p>
         </div>
 
@@ -54,7 +58,7 @@ const AuthCodeErrorPage: React.FC = () => {
           >
             Request New Reset Link
           </Link>
-          
+
           <Link
             href="/"
             className="block w-full border border-[#5C5537]/20 text-[#5C5537] py-2 px-4 rounded-md hover:bg-[#5C5537]/5 transition-colors text-center"

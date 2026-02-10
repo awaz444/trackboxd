@@ -32,6 +32,16 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
+  // Exclude API routes, Next.js internals, and other non-cacheable paths
+  const url = new URL(request.url);
+  if (
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/_next/') ||
+    url.pathname.includes('/auth/')
+  ) {
+    return;
+  }
+
   event.respondWith(
     caches.match(request).then((cached) => {
       const fetchPromise = fetch(request)
