@@ -376,7 +376,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       });
 
       if (error) {
-        setErrors({ general: 'Failed to update password. Please try again.' });
+        console.error('Supabase updateUser error:', error);
+        setErrors({ general: error.message || 'Failed to update password. Please try again.' });
       } else {
         setSuccess('Password updated successfully! You can now sign in with your new password.');
         setFormData({
