@@ -16,6 +16,7 @@ Run the SQL migration in your Supabase SQL editor:
 -- Copy and paste the contents of supabase-migration.sql
 ```
 
+
 This migration will:
 - Enable Row Level Security (RLS) on the users table
 - Create policies for user data access
