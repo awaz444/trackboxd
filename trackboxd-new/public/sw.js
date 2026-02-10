@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trackboxd-cache-v1';
+const CACHE_NAME = 'trackboxd-cache-v2';
 const OFFLINE_URLS = [
   '/',
   '/manifest.json',
@@ -42,6 +42,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network First strategy for HTML navigation (to ensure latest version)
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Clone and cache the updated index.html
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return response;
+        })
+        .catch(() => {
+          // If offline, fall back to cached index.html
+          return caches.match(request);
+        })
+    );
+    return;
+  }
+
+  // Stale-While-Revalidate for other assets (images, styles, etc.)
   event.respondWith(
     caches.match(request).then((cached) => {
       const fetchPromise = fetch(request)

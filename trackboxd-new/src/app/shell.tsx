@@ -8,6 +8,7 @@ import AuthGuard from '@/components/AuthGuard';
 export default function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   React.useEffect(() => {
+    // Service Worker Registration
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/sw.js')
