@@ -146,6 +146,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                 mobileSearchContainerRef.current &&
                 !mobileSearchContainerRef.current.contains(e.target as Node);
 
+
             if (isSearchExpanded && clickedOutsideDesktop) {
                 setIsSearchExpanded(false);
                 setSearchQuery("");
