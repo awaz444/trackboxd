@@ -13,6 +13,8 @@ const Footer = ({ variant = "dark" }: FooterProps) => {
   const hoverColor = isDark ? "hover:text-[#FFFBEb]" : "hover:text-[#5C5537]";
   const borderColor = isDark ? "border-[#FFFBEb]/20" : "border-[#5C5537]/20";
 
+
+
   return (
     <footer className={`px-6 py-8 relative ${bgColor} z-10 border-t ${borderColor}`}>
       <div className="max-w-4xl mx-auto">
