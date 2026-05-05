@@ -1,14 +1,13 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getTrackDetails } from "@/lib/spotify";
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -32,7 +31,7 @@ export async function POST(request: Request) {
     const { count, error: countError } = await supabase
       .from("user_favorite_tracks")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", session.user.id);
+      .eq("user_id", user.id);
     if (countError) {
       console.error('Error counting favorites:', countError);
       return NextResponse.json({ error: "Failed to validate favorites" }, { status: 500 });
@@ -81,7 +80,7 @@ export async function POST(request: Request) {
     const { data: existingFavorite, error: checkError } = await supabase
       .from("user_favorite_tracks")
       .select("track_id")
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .eq("track_id", trackId)
       .single();
 
@@ -104,7 +103,7 @@ export async function POST(request: Request) {
     const { data: newFavorite, error: insertError } = await supabase
       .from("user_favorite_tracks")
       .insert({
-        user_id: session.user.id,
+        user_id: user.id,
         track_id: trackId,
       })
       .select()
@@ -132,9 +131,9 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -158,7 +157,7 @@ export async function DELETE(request: Request) {
     const { error: deleteError } = await supabase
       .from("user_favorite_tracks")
       .delete()
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .eq("track_id", trackId);
 
     if (deleteError) {

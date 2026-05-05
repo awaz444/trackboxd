@@ -1,9 +1,8 @@
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { getAlbumTracks } from "@/lib/spotify";
 import { getTrackDetails } from "@/lib/spotify";
 import { getAlbumDetails } from "@/lib/spotify";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
@@ -11,9 +10,9 @@ export async function GET(
     request: Request,
     { params }: { params: { album_id: string } }
 ) {
-    const session = await getServerSession(authOptions);
+    const user = await getServerUser();
 
-    if (!session?.user?.id) {
+    if (!user) {
         return NextResponse.json(
             { error: "Not authenticated" },
             { status: 401 }

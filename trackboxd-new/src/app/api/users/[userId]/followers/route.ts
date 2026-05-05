@@ -1,8 +1,7 @@
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
 
 export async function GET(
   request: Request,

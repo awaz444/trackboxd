@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, MessageCircle } from "lucide-react";
 import ContentModal from "./ContentModal";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProfileAnnotationCardProps {
   annotation: {
@@ -29,8 +29,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
   const [likeCount, setLikeCount] = useState(annotation.like_count || 0);
   const [isLoading, setIsLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchLikeStatus = async () => {
@@ -41,7 +40,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
 
       try {
         const response = await fetch(
-          `/api/like/annotation?userId=${user.id}&annotationId=${annotation.id}`
+          `/api/likes/annotation?userId=${user.id}&annotationId=${annotation.id}`
         );
 
         if (response.ok) {
@@ -68,7 +67,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
     setLikeCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
 
     try {
-      const response = await fetch("/api/like/annotation", {
+      const response = await fetch("/api/likes/annotation", {
         method: newLikedState ? "POST" : "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -73,7 +73,7 @@ interface ProfileData {
 }
 
 export default function EditProfilePage({ params }: ProfilePageProps) {
-    const { data: session, status } = useSession();
+    const { user: authUser, loading: authLoading } = useAuth();
     const router = useRouter();
     const [profileData, setProfileData] = useState<ProfileData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -95,9 +95,9 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
 
     // Check if user is authorized to edit this profile
     useEffect(() => {
-        if (status === "loading") return;
+        if (authLoading) return;
 
-        if (!session?.user?.id) {
+        if (!authUser?.id) {
             router.push("/");
             return;
         }
@@ -112,7 +112,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                 const data = await response.json();
 
                 // Check if the logged-in user matches the profile owner
-                if (data.user.id !== session.user.id) {
+                if (data.user.id !== authUser.id) {
                     router.push(`/profile/${params.username}`);
                     return;
                 }
@@ -135,7 +135,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
         };
 
         fetchProfileData();
-    }, [session, status, params.username, router]);
+    }, [authUser, authLoading, params.username, router]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -236,7 +236,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
 
             // Generate unique filename
             const fileExt = file.name.split(".").pop();
-            const fileName = `${session?.user?.id}-${Date.now()}.${fileExt}`;
+            const fileName = `${authUser?.id}-${Date.now()}.${fileExt}`;
 
             console.log("Attempting upload to avatars bucket...");
 

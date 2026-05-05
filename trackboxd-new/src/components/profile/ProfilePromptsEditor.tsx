@@ -64,7 +64,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
     setIsSearching(true);
     try {
       let url = '';
-      if (activePrompt.type === 'track') url = `/api/songs/search?q=${encodeURIComponent(q)}`;
+      if (activePrompt.type === 'track') url = `/api/tracks/search?q=${encodeURIComponent(q)}`;
       if (activePrompt.type === 'album') url = `/api/albums/search?q=${encodeURIComponent(q)}`;
       if (activePrompt.type === 'playlist') url = `/api/playlists/search?q=${encodeURIComponent(q)}`;
 

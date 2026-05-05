@@ -91,7 +91,7 @@ const Songs = () => {
         setRecentlyAnnotatedError(null);
 
         try {
-            const res = await fetch("/api/annotate/last-annotated-tracks");
+            const res = await fetch("/api/annotations/last-annotated-tracks");
             if (!res.ok) {
                 throw new Error("Failed to fetch recently annotated tracks");
             }
@@ -116,7 +116,7 @@ const Songs = () => {
         setPopularAnnotationsError(null);
 
         try {
-            const res = await fetch("/api/annotate/popular-this-week");
+            const res = await fetch("/api/annotations/popular-this-week");
             if (!res.ok) {
                 throw new Error("Failed to fetch popular annotations");
             }
@@ -141,7 +141,7 @@ const Songs = () => {
         setPopularReviewsError(null);
 
         try {
-            const res = await fetch("/api/review/popular-this-week");
+            const res = await fetch("/api/reviews/popular-this-week");
             if (!res.ok) {
                 throw new Error("Failed to fetch popular reviews");
             }
@@ -166,7 +166,7 @@ const Songs = () => {
         setRecentlyReviewedError(null);
 
         try {
-            const res = await fetch("/api/review/last-reviewed-tracks");
+            const res = await fetch("/api/reviews/last-reviewed-tracks");
             if (!res.ok) {
                 throw new Error("Failed to fetch recently reviewed tracks");
             }
@@ -195,7 +195,7 @@ const Songs = () => {
         try {
             const currentLikedStatus = likes[trackId] || false;
             const method = currentLikedStatus ? "DELETE" : "POST";
-            const endpoint = `/api/like/track`;
+            const endpoint = `/api/likes/track`;
 
             const response = await fetch(endpoint, {
                 method,
@@ -235,7 +235,7 @@ const Songs = () => {
                 const likeStatuses = await Promise.all(
                     trackIds.map((trackId) =>
                         fetch(
-                            `/api/like/track?userId=${user.id}&trackId=${trackId}`
+                            `/api/likes/track?userId=${user.id}&trackId=${trackId}`
                         )
                             .then((res) => res.json())
                             .then((data) => ({
@@ -264,7 +264,7 @@ const Songs = () => {
         const fetchGlobalTopTracks = async () => {
             try {
                 setIsLoadingTopTracks(true);
-                const res = await fetch("/api/songs/global-top-4");
+                const res = await fetch("/api/tracks/global-top-4");
                 if (!res.ok) {
                     throw new Error("Failed to fetch global top tracks");
                 }
@@ -330,7 +330,7 @@ const Songs = () => {
 
         try {
             const res = await fetch(
-                `/api/songs/search?q=${encodeURIComponent(query)}`
+                `/api/tracks/search?q=${encodeURIComponent(query)}`
             );
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));

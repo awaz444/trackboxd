@@ -1,7 +1,6 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import Header from "@/components/Header";
@@ -147,21 +146,21 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     console.log("Spotify URL:", profileData.user.spotify_url);
     console.log("Full response:", JSON.stringify(profileData, null, 2));
 
-    // Get current session to determine if this is the user's own profile
-    const session = await getServerSession(authOptions);
-    const isOwnProfile = session?.user?.id === profileData.user.id;
+    // Get current user to determine if this is their own profile
+    const currentUser = await getServerUser();
+    const isOwnProfile = currentUser?.id === profileData.user.id;
 
     // Check if current user is following this profile owner
     let initialIsFollowing = false;
     let followStatus: 'following' | 'requested' | 'not_following' = 'not_following';
-    
-    if (!isOwnProfile && session?.user?.id) {
+
+    if (!isOwnProfile && currentUser?.id) {
         try {
             const supabase = createClient(cookies());
             const { data: follow } = await supabase
                 .from("follows")
                 .select("follower_id, following_id, accepted")
-                .eq("follower_id", session.user.id)
+                .eq("follower_id", currentUser.id)
                 .eq("following_id", profileData.user.id)
                 .single();
 

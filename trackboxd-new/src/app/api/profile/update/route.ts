@@ -1,13 +1,12 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -42,7 +41,7 @@ export async function POST(request: Request) {
       .from("users")
       .select("id")
       .eq("name", name) // Changed from username to name
-      .neq("id", session.user.id)
+      .neq("id", user.id)
       .single();
 
     if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
@@ -71,7 +70,7 @@ export async function POST(request: Request) {
         instagram_url: instagram_url || null,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", session.user.id)
+      .eq("id", user.id)
       .select()
       .single();
 

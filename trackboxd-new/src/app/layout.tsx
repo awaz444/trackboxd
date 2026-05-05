@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Lora } from "next/font/google";
 import "./globals.css";
-import SessionProvider from "@/components/SessionProvider";
+import { AuthProvider } from "@/contexts/AuthContext";
 import React from "react";
 import ClientShell from "./shell";
 
@@ -105,9 +105,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${lora.className} bg-[#FFFBEb] text-[#1F2C24]`}>
-        <SessionProvider>
+        <AuthProvider>
           <ClientShell>{children}</ClientShell>
-        </SessionProvider>
+        </AuthProvider>
       </body>
     </html>
   );

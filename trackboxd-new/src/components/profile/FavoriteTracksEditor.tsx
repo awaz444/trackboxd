@@ -179,7 +179,7 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
                     }
                     setIsSearching(true);
                     try {
-                      const res = await fetch(`/api/songs/search?q=${encodeURIComponent(q)}`);
+                      const res = await fetch(`/api/tracks/search?q=${encodeURIComponent(q)}`);
                       const data = await res.json();
                       const items = Array.isArray(data) ? data : data?.tracks?.items || [];
                       const results = items.map((track: any) => ({

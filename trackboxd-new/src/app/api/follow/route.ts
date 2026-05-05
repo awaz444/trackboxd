@@ -1,13 +1,12 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -25,7 +24,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (followingId === session.user.id) {
+    if (followingId === user.id) {
       return NextResponse.json(
         { error: "Cannot follow yourself" },
         { status: 400 }
@@ -38,7 +37,7 @@ export async function POST(request: Request) {
     const { data: existingFollow, error: checkError } = await supabase
       .from("follows")
       .select("follower_id, following_id, accepted")
-      .eq("follower_id", session.user.id)
+      .eq("follower_id", user.id)
       .eq("following_id", followingId)
       .single();
 
@@ -85,7 +84,7 @@ export async function POST(request: Request) {
     const { data: newFollow, error: insertError } = await supabase
       .from("follows")
       .insert({
-        follower_id: session.user.id,
+        follower_id: user.id,
         following_id: followingId,
         accepted: accepted,
       })
@@ -106,7 +105,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: followingId,
         type: "follow",
-        source_id: session.user.id,
+        source_id: user.id,
         is_read: false
       });
       
@@ -130,9 +129,9 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -156,7 +155,7 @@ export async function DELETE(request: Request) {
     const { error: deleteError } = await supabase
       .from("follows")
       .delete()
-      .eq("follower_id", session.user.id)
+      .eq("follower_id", user.id)
       .eq("following_id", followingId);
 
     if (deleteError) {

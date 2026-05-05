@@ -25,7 +25,7 @@ import Image from "next/image";
 import LogModal from "./log/LogModal";
 import AuthModal from "./AuthModal";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
 interface HeaderProps {
@@ -61,7 +61,7 @@ interface SearchResults {
 
 const Header: React.FC<HeaderProps> = ({ }) => {
     const router = useRouter();
-    const { data: session, status } = useSession();
+    const { user: authUser, signOut } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -82,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
     const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
-        if (session?.user) {
+        if (authUser) {
             const fetchNotifications = async () => {
                 try {
                     const res = await fetch("/api/notifications");
@@ -102,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
             const interval = setInterval(fetchNotifications, 60000);
             return () => clearInterval(interval);
         }
-    }, [session]);
+    }, [authUser]);
 
     // Search handler with debounce
     useEffect(() => {
@@ -216,13 +216,12 @@ const Header: React.FC<HeaderProps> = ({ }) => {
             }
         };
 
-        // Only fetch user data if we have a session
-        if (session) {
+        if (authUser) {
             fetchSpotifyUser();
         } else {
             setSpotifyUser(null);
         }
-    }, [session]); // Re-run when session changes
+    }, [authUser]);
 
     const getInitials = (name: string) => {
         return name
@@ -276,32 +275,12 @@ const Header: React.FC<HeaderProps> = ({ }) => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
-    // Added logout handler
     const handleLogout = async () => {
         try {
-            // Clear any localStorage data
-            if (typeof window !== 'undefined') {
-                localStorage.clear();
-                sessionStorage.clear();
-            }
-
-            // Sign out from NextAuth (this clears NextAuth session)
-            await signOut({ redirect: false });
-
-            // Call our custom logout API to clear Supabase session and cookies
-            const response = await fetch("/api/auth/logout");
-            if (response.ok) {
-                // Force a hard refresh to clear any remaining state
-                window.location.href = "/";
-            } else {
-                console.error("Logout failed");
-                // Fallback: still redirect even if API call fails
-                router.push("/");
-                router.refresh();
-            }
+            await signOut();
+            window.location.href = "/";
         } catch (error) {
             console.error("Logout error:", error);
-            // Fallback: redirect even on error
             router.push("/");
             router.refresh();
         }
@@ -589,7 +568,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
 
                     {/* Right - Actions Section (desktop) */}
                     <div className="flex items-center gap-4">
-                        {!session ? (
+                        {!authUser ? (
                             <button
                                 onClick={() => setIsAuthModalOpen(true)}
                                 className="hidden md:flex items-center gap-1.5 bg-[#5C5537] text-[#FFFBEb] py-2 px-6 rounded-lg transition-all duration-200 ease-in-out transform hover:bg-[#5C5537]/90 shadow-sm font-medium"

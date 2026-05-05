@@ -1,13 +1,12 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -19,7 +18,7 @@ export async function GET(request: Request) {
 
     // Use raw SQL query to fetch notifications with source user details
     const { data: notifications, error } = await supabase.rpc('get_user_notifications', {
-      p_user_id: session.user.id
+      p_user_id: user.id
     });
 
     if (error) {
@@ -27,7 +26,7 @@ export async function GET(request: Request) {
       const { data: rawNotifications, error: fetchError } = await supabase
         .from("notifications")
         .select("*")
-        .eq("user_id", session.user.id)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (fetchError) throw fetchError;
@@ -110,9 +109,9 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -127,7 +126,7 @@ export async function PATCH(request: Request) {
     let query = supabase
       .from("notifications")
       .update({ is_read: true })
-      .eq("user_id", session.user.id);
+      .eq("user_id", user.id);
 
     if (!markAll) {
       if (!notificationIds || !Array.isArray(notificationIds)) {

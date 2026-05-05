@@ -88,7 +88,7 @@ const Playlists = () => {
                 const likeStatuses = await Promise.all(
                     playlistIds.map((id) =>
                         fetch(
-                            `/api/like/playlist?userId=${user.id}&playlistId=${id}`
+                            `/api/likes/playlist?userId=${user.id}&playlistId=${id}`
                         )
                             .then((res) => res.json())
                             .then((data) => ({ id, isLiked: data.isLiked }))
@@ -151,7 +151,7 @@ const Playlists = () => {
 
         try {
             const method = currentLikedStatus ? "DELETE" : "POST";
-            const response = await fetch("/api/like/playlist", {
+            const response = await fetch("/api/likes/playlist", {
                 method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: user.id, playlistId }),

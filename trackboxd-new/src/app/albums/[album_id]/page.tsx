@@ -110,7 +110,7 @@ const AlbumDetailsPage = () => {
                 setLoadingReviews(true);
                 setReviewsError(null);
 
-                const res = await fetch(`/api/review/${albumId}`);
+                const res = await fetch(`/api/reviews/${albumId}`);
                 if (!res.ok) {
                     throw new Error("Failed to fetch reviews");
                 }
@@ -134,7 +134,7 @@ const AlbumDetailsPage = () => {
     useEffect(() => {
         const fetchRatingDistribution = async () => {
             try {
-                const res = await fetch(`/api/review/distribution/${albumId}`);
+                const res = await fetch(`/api/reviews/distribution/${albumId}`);
                 if (res.ok) {
                     const data = await res.json();
                     setRatingDistribution([
@@ -162,7 +162,7 @@ const AlbumDetailsPage = () => {
 
             try {
                 const res = await fetch(
-                    `/api/like/album?userId=${user.id}&albumId=${album.id}`
+                    `/api/likes/album?userId=${user.id}&albumId=${album.id}`
                 );
                 if (res.ok) {
                     const data = await res.json();
@@ -190,7 +190,7 @@ const AlbumDetailsPage = () => {
 
         try {
             const method = newIsLiked ? "POST" : "DELETE";
-            const res = await fetch("/api/like/album", {
+            const res = await fetch("/api/likes/album", {
                 method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: user.id, albumId: album.id }),

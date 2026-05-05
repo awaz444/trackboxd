@@ -62,7 +62,7 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({ annotation }) => {
             
             try {
                 const response = await fetch(
-                    `/api/like/annotation?userId=${user.id}&annotationId=${annotation.id}`
+                    `/api/likes/annotation?userId=${user.id}&annotationId=${annotation.id}`
                 );
                 
                 if (!response.ok) throw new Error("Failed to fetch like status");
@@ -93,7 +93,7 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({ annotation }) => {
             setIsLiked(newLikedState);
             setLikeCount(newCount);
 
-            const response = await fetch("/api/like/annotation", {
+            const response = await fetch("/api/likes/annotation", {
                 method: newLikedState ? "POST" : "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

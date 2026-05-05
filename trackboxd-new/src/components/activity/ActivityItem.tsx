@@ -77,9 +77,9 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
       try {
         let url = "";
         if (activity.type === "review") {
-          url = `/api/like/review?userId=${user.id}&reviewId=${activity.target_id}`;
+          url = `/api/likes/review?userId=${user.id}&reviewId=${activity.target_id}`;
         } else if (activity.type === "annotation") {
-          url = `/api/like/annotation?userId=${user.id}&annotationId=${activity.target_id}`;
+          url = `/api/likes/annotation?userId=${user.id}&annotationId=${activity.target_id}`;
         }
         if (!url) return;
         const res = await fetch(url);
@@ -104,7 +104,7 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
     setIsLiked(next);
     setLikeCount(optimistic);
     try {
-      const endpoint = activity.type === "review" ? "/api/like/review" : "/api/like/annotation";
+      const endpoint = activity.type === "review" ? "/api/likes/review" : "/api/likes/annotation";
       const body = activity.type === "review" 
         ? { userId: user.id, reviewId: activity.target_id }
         : { userId: user.id, annotationId: activity.target_id };

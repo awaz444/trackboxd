@@ -57,7 +57,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
     const fetchTrendingTracks = async () => {
       try {
         setIsLoadingTrending(true);
-        const res = await fetch("/api/songs/global-top-4");
+        const res = await fetch("/api/tracks/global-top-4");
         if (!res.ok) throw new Error("Failed to fetch trending tracks");
 
         const data = await res.json();
@@ -121,7 +121,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
     setSearchError(null);
 
     try {
-      const res = await fetch(`/api/songs/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/tracks/search?q=${encodeURIComponent(query)}`);
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.details || errorData.error || "Failed to search");
@@ -174,8 +174,8 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
       }
 
       const url = initialAnnotation
-        ? `/api/annotate/actions/${initialAnnotation.id}`
-        : '/api/annotate';
+        ? `/api/annotations/actions/${initialAnnotation.id}`
+        : '/api/annotations';
 
       const method = initialAnnotation ? 'PUT' : 'POST';
 

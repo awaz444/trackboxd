@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
-import { signIn, useSession } from "next-auth/react";
 import { createClient } from "@/lib/supabase/client";
 import { findUserByNameOrEmail } from "@/lib/auth-utils";
 import { useRouter } from "next/navigation";
@@ -37,7 +36,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
   const [success, setSuccess] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
-  const { update: updateSession } = useSession();
 
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -224,38 +222,21 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
           // Don't fail the signup if the insert fails, the trigger might have already created it
         }
 
-        // Sign in the user
-        const signInResult = await signIn('credentials', {
-          email: formData.email,
+        // Sign in immediately after signup
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
           password: formData.password,
-          redirect: false,
         });
 
-        if (signInResult?.ok) {
-          // Update the session to trigger re-renders
-          await updateSession();
-
+        if (!signInError) {
           onClose();
-          // Reset form
-          setFormData({
-            email: '',
-            password: '',
-            confirmPassword: '',
-            name: '',
-          });
-          // Redirect to activity page
+          setFormData({ email: '', password: '', confirmPassword: '', name: '' });
           router.push('/activity');
-          router.refresh(); // Force a refresh to update all components
+          router.refresh();
         } else {
-          setSuccess('Account created successfully! Please check your email to verify your account, then sign in.');
+          setSuccess('Account created! Please sign in to continue.');
           setMode('login');
-          // Clear form data
-          setFormData({
-            email: '',
-            password: '',
-            confirmPassword: '',
-            name: '',
-          });
+          setFormData({ email: '', password: '', confirmPassword: '', name: '' });
         }
       }
     } catch (error) {
@@ -278,7 +259,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
     setErrors({});
 
     try {
-      // Check if the input is a name or email and get the corresponding email
+      // Support login with username or email
       const email = await findUserByNameOrEmail(formData.email);
 
       if (!email) {
@@ -286,33 +267,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
         return;
       }
 
-      const result = await signIn('credentials', {
-        email: email,
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
         password: formData.password,
-        redirect: false,
       });
 
-      if (result?.error) {
-        if (result.error === 'CredentialsSignin') {
-          setErrors({ general: 'Incorrect username OR password. Please check your credentials and try again.' });
+      if (error) {
+        if (error.message.toLowerCase().includes('invalid') || error.message.toLowerCase().includes('credentials')) {
+          setErrors({ general: 'Incorrect username or password. Please check your credentials and try again.' });
         } else {
-          setErrors({ general: 'Login failed. Please try again.' });
+          setErrors({ general: error.message || 'Login failed. Please try again.' });
         }
-      } else if (result?.ok) {
-        // Update the session to trigger re-renders
-        await updateSession();
-
+      } else {
         onClose();
-        // Reset form
-        setFormData({
-          email: '',
-          password: '',
-          confirmPassword: '',
-          name: '',
-        });
-        // Redirect to activity page
+        setFormData({ email: '', password: '', confirmPassword: '', name: '' });
         router.push('/activity');
-        router.refresh(); // Force a refresh to update all components
+        router.refresh();
       }
     } catch (error) {
       console.error('Login error:', error);

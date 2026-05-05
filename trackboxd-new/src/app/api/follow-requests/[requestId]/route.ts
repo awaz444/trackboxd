@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -9,9 +8,9 @@ export async function PUT(
   request: Request,
   { params }: { params: { requestId: string } }
 ) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -27,7 +26,7 @@ export async function PUT(
       .from("follows")
       .select("follower_id, following_id, accepted")
       .eq("follower_id", requestId)
-      .eq("following_id", session.user.id)
+      .eq("following_id", user.id)
       .eq("accepted", false)
       .single();
 
@@ -43,7 +42,7 @@ export async function PUT(
       .from("follows")
       .update({ accepted: true })
       .eq("follower_id", requestId)
-      .eq("following_id", session.user.id);
+      .eq("following_id", user.id);
 
     if (updateError) {
       console.error('Error accepting follow request:', updateError);
@@ -71,9 +70,9 @@ export async function DELETE(
   request: Request,
   { params }: { params: { requestId: string } }
 ) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -89,7 +88,7 @@ export async function DELETE(
       .from("follows")
       .select("follower_id, following_id, accepted")
       .eq("follower_id", requestId)
-      .eq("following_id", session.user.id)
+      .eq("following_id", user.id)
       .eq("accepted", false)
       .single();
 
@@ -105,7 +104,7 @@ export async function DELETE(
       .from("follows")
       .delete()
       .eq("follower_id", requestId)
-      .eq("following_id", session.user.id);
+      .eq("following_id", user.id);
 
     if (deleteError) {
       console.error('Error rejecting follow request:', deleteError);

@@ -1,10 +1,9 @@
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { getTrackDetails } from "@/lib/spotify";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
 
 // Workaround for Next.js 13 App Router limitation
 export const dynamic = 'force-dynamic';
@@ -14,9 +13,9 @@ export async function GET(
   { params }: { params: { song_id: string } }
 ) {
 
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
 
-  if (!session?.user?.id) {
+  if (!user) {
       return NextResponse.json(
           { error: "Not authenticated" },
           { status: 401 }

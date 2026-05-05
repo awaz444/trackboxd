@@ -1,9 +1,8 @@
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { getTrackDetails, getAlbumDetails, getPlaylistDetails } from '@/lib/spotify';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/authOptions';
 
 // GET: list responses for a given username or for current user if not provided
 export async function GET(request: Request) {
@@ -21,8 +20,8 @@ export async function GET(request: Request) {
         .single();
       userId = user?.id || null;
     } else {
-      const session = await getServerSession(authOptions);
-      userId = session?.user?.id || null;
+      const user = await getServerUser();
+      userId = user?.id || null;
     }
 
     if (!userId) {
@@ -86,8 +85,8 @@ export async function GET(request: Request) {
 // POST: upsert a response for current user
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const user = await getServerUser();
+    if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
@@ -185,11 +184,11 @@ export async function POST(request: Request) {
     await supabase
       .from('user_profile_responses')
       .delete()
-      .match({ user_id: session.user.id, prompt_id: targetPrompt.id });
+      .match({ user_id: user.id, prompt_id: targetPrompt.id });
 
     // Insert new response
     const insertPayload: any = {
-      user_id: session.user.id,
+      user_id: user.id,
       prompt_id: targetPrompt.id,
       spotify_item_id: id,
       custom_text: null,
@@ -216,8 +215,8 @@ export async function POST(request: Request) {
 // DELETE: remove a response for current user
 export async function DELETE(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const user = await getServerUser();
+    if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
@@ -239,7 +238,7 @@ export async function DELETE(request: Request) {
     const { error } = await supabase
       .from('user_profile_responses')
       .delete()
-      .match({ user_id: session.user.id, prompt_id: targetPrompt.id });
+      .match({ user_id: user.id, prompt_id: targetPrompt.id });
 
     if (error) {
       console.error('Delete prompt response error:', error);

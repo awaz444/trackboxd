@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
 import ContentModal from "./ContentModal";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProfileReviewCardProps {
   review: {
@@ -29,7 +29,8 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
   const [likeCount, setLikeCount] = useState(review.like_count || 0);
   const [isLoading, setIsLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
-  const { data: session } = useSession();
+  const { user: sessionData } = useAuth();
+  const session = sessionData ? { user: sessionData } : null;
   const user = session?.user;
 
   // Fetch like status and count
@@ -44,7 +45,7 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
         // We need an endpoint to get like status and count for a review
         // Assuming the existing endpoint supports this or we reuse the logic
         const response = await fetch(
-          `/api/like/review?userId=${user.id}&reviewId=${review.id}`
+          `/api/likes/review?userId=${user.id}&reviewId=${review.id}`
         );
 
         if (response.ok) {
@@ -93,7 +94,7 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
     setLikeCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
 
     try {
-      const response = await fetch("/api/like/review", {
+      const response = await fetch("/api/likes/review", {
         method: newLikedState ? "POST" : "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

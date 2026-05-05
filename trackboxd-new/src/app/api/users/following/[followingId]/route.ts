@@ -1,8 +1,7 @@
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
 
 export async function DELETE(
   request: Request,
@@ -10,15 +9,15 @@ export async function DELETE(
 ) {
   try {
     // Get the current user from the session
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    const user = await getServerUser();
+    if (!user) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 }
       );
     }
 
-    const currentUserId = session.user.id;
+    const currentUserId = user.id;
     const followingId = params.followingId;
     const supabase = createClient(cookies());
 

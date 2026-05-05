@@ -1,3 +1,4 @@
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -85,9 +86,9 @@ export async function GET(
     const supabase = createClient(cookies());
     const { username } = params;
 
-    // Get current user session
-    const { data: { session } } = await supabase.auth.getSession();
-    const currentUserId = session?.user?.id;
+    // Get current user (optional — used for follow status check)
+    const currentSupabaseUser = await getServerUser();
+    const currentUserId = currentSupabaseUser?.id ?? null;
 
     // Get user by name (since we're using name as the identifier now)
     const { data: user, error: userError } = await supabase

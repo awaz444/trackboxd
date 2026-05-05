@@ -1,3 +1,4 @@
+import { getServerUser } from "@/lib/supabase/get-server-user";
 // app/api/playlists/[playlist_id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -7,10 +8,6 @@ import {
 } from "@/lib/spotify";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
-
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-import { Session } from "next-auth";
 
 // Add interfaces for Spotify API responses
 interface SpotifyTrackItem {
@@ -45,10 +42,10 @@ export async function GET(
     req: NextRequest,
     { params }: { params: { playlist_id: string } }
 ) {
-    const session = await getServerSession(authOptions);
+    const user = await getServerUser();
 
     // Add type assertion and proper null check for accessToken
-    if (!session?.user?.id) {
+    if (!user) {
         return NextResponse.json(
             { error: "Valid access token required" },
             { status: 401 }

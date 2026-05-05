@@ -23,7 +23,7 @@ const MyReviewsPage = () => {
   const fetchUserReviews = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/review/my/${user.id}`);
+      const res = await fetch(`/api/reviews/my/${user.id}`);
       
       if (!res.ok) {
         throw new Error("Failed to fetch reviews");
@@ -51,7 +51,7 @@ const MyReviewsPage = () => {
     try {
       setReviews(prev => prev.filter(review => review.id !== reviewId));
       
-      const response = await fetch(`/api/review/actions/${reviewId}`, {
+      const response = await fetch(`/api/reviews/actions/${reviewId}`, {
         method: "DELETE"
       });
       

@@ -23,7 +23,7 @@ const MyAnnotationsPage = () => {
   const fetchUserAnnotations = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/annotate/my/${user.id}`);
+      const res = await fetch(`/api/annotations/my/${user.id}`);
       
       if (!res.ok) {
         throw new Error("Failed to fetch annotations");
@@ -51,7 +51,7 @@ const MyAnnotationsPage = () => {
     try {
       setAnnotations(prev => prev.filter(a => a.id !== annotationId));
       
-      const response = await fetch(`/api/annotate`, {
+      const response = await fetch(`/api/annotations`, {
         method: "DELETE",
         body: JSON.stringify({ 
           annotationId,

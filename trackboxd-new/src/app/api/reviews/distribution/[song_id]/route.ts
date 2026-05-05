@@ -1,4 +1,4 @@
-// app/api/review/distribution/[song_id]/route.ts
+// app/api/reviews/distribution/[song_id]/route.ts
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';

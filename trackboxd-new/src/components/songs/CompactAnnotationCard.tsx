@@ -54,7 +54,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({
                 return;
             }
             try {
-                const res = await fetch(`/api/like/annotation?userId=${user.id}&annotationId=${targetId}`);
+                const res = await fetch(`/api/likes/annotation?userId=${user.id}&annotationId=${targetId}`);
                 if (!res.ok) throw new Error("Failed to fetch like status");
                 const data = await res.json();
                 setIsLiked(!!data.isLiked);
@@ -76,7 +76,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({
         setIsLiked(next);
         setLikeCount(optimistic);
         try {
-            const res = await fetch(`/api/like/annotation`, {
+            const res = await fetch(`/api/likes/annotation`, {
                 method: next ? "POST" : "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: user.id, annotationId: targetId }),

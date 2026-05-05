@@ -10,7 +10,7 @@ import FollowersModal from "./FollowersModal";
 import FollowingModal from "./FollowingModal";
 import FollowRequestsModal from "./FollowRequestsModal";
 import AuthModal from "@/components/AuthModal";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProfileHeaderProps {
   user: {
@@ -50,7 +50,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [isFollowRequestsModalOpen, setIsFollowRequestsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
-  const { data: session } = useSession();
+  const { user: session } = useAuth();
 
   const { followStatus: currentFollowStatus, followerCount, isLoading, toggleFollow } = useFollow({
     userId: user.id,

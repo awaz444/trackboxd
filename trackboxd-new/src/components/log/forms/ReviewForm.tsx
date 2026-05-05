@@ -139,7 +139,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
         const fetchTrendingTracks = async () => {
             try {
                 setIsLoadingTrending(true);
-                const res = await fetch("/api/songs/global-top-4");
+                const res = await fetch("/api/tracks/global-top-4");
                 if (!res.ok) throw new Error("Failed to fetch trending tracks");
 
                 const data = await res.json();
@@ -196,7 +196,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
             setSearchError(null);
             try {
                 const response = await fetch(
-                    `/api/search/tracksAndAlbums?q=${encodeURIComponent(
+                    `/api/search/spotify?q=${encodeURIComponent(
                         searchQuery
                     )}&trackLimit=6&albumLimit=4`
                 );
@@ -254,8 +254,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
 
         try {
             const url = initialReview
-                ? `/api/review/actions/${initialReview.id}`
-                : '/api/review';
+                ? `/api/reviews/actions/${initialReview.id}`
+                : '/api/reviews';
 
             const method = initialReview ? 'PUT' : 'POST';
 

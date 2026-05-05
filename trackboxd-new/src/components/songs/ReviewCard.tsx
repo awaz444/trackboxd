@@ -26,7 +26,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
             
             try {
                 const response = await fetch(
-                    `/api/like/review?userId=${user.id}&reviewId=${review.id}`
+                    `/api/likes/review?userId=${user.id}&reviewId=${review.id}`
                 );
                 
                 if (!response.ok) {
@@ -72,7 +72,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
             setIsLiked(newLikedState);
             setLikeCount(newCount);
 
-            const response = await fetch("/api/like/review", {
+            const response = await fetch("/api/likes/review", {
                 method: newLikedState ? "POST" : "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

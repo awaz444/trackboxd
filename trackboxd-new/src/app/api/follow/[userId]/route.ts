@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getServerUser } from "@/lib/supabase/get-server-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -8,9 +7,9 @@ export async function GET(
   request: Request,
   { params }: { params: { userId: string } }
 ) {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
-  if (!session?.user?.id) {
+  if (!user) {
     return NextResponse.json(
       { error: "Not authenticated" },
       { status: 401 }
@@ -33,7 +32,7 @@ export async function GET(
     const { data: follow, error } = await supabase
       .from("follows")
       .select("follower_id, following_id, accepted")
-      .eq("follower_id", session.user.id)
+      .eq("follower_id", user.id)
       .eq("following_id", userId)
       .eq("accepted", true)
       .single();

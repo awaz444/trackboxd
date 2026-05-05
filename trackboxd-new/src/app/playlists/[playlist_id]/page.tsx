@@ -77,7 +77,7 @@ const PlaylistDetailsPage = () => {
 
             try {
                 const res = await fetch(
-                    `/api/like/playlist?userId=${user.id}&playlistId=${playlistDetails.playlist.id}`
+                    `/api/likes/playlist?userId=${user.id}&playlistId=${playlistDetails.playlist.id}`
                 );
 
                 if (res.ok) {
@@ -106,7 +106,7 @@ const PlaylistDetailsPage = () => {
 
         try {
             const method = newIsLiked ? "POST" : "DELETE";
-            const res = await fetch("/api/like/playlist", {
+            const res = await fetch("/api/likes/playlist", {
                 method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

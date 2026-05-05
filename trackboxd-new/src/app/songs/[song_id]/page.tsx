@@ -118,7 +118,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
             for (const review of reviews) {
                 try {
                     const res = await fetch(
-                        `/api/like/review?userId=${user.id}&reviewId=${review.id}`
+                        `/api/likes/review?userId=${user.id}&reviewId=${review.id}`
                     );
                     if (res.ok) {
                         const data = await res.json();
@@ -150,7 +150,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
             for (const annotation of annotations) {
                 try {
                     const res = await fetch(
-                        `/api/like/annotation?userId=${user.id}&annotationId=${annotation.id}`
+                        `/api/likes/annotation?userId=${user.id}&annotationId=${annotation.id}`
                     );
                     if (res.ok) {
                         const data = await res.json();
@@ -188,7 +188,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
         setReviewLikeCounts((prev) => ({ ...prev, [reviewId]: newCount }));
 
         try {
-            const response = await fetch("/api/like/review", {
+            const response = await fetch("/api/likes/review", {
                 method: newIsLiked ? "POST" : "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -231,7 +231,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
         }));
 
         try {
-            const response = await fetch("/api/like/annotation", {
+            const response = await fetch("/api/likes/annotation", {
                 method: newIsLiked ? "POST" : "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -269,7 +269,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
 
             try {
                 const res = await fetch(
-                    `/api/like/track?userId=${user.id}&trackId=${track.id}`
+                    `/api/likes/track?userId=${user.id}&trackId=${track.id}`
                 );
                 if (res.ok) {
                     const data = await res.json();
@@ -297,7 +297,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
 
         try {
             const method = newIsLiked ? "POST" : "DELETE";
-            const res = await fetch("/api/like/track", {
+            const res = await fetch("/api/likes/track", {
                 method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: user.id, trackId: track.id }),
@@ -345,7 +345,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
                 setLoadingReviews(true);
                 setReviewsError(null);
 
-                const res = await fetch(`/api/review/${params.song_id}`);
+                const res = await fetch(`/api/reviews/${params.song_id}`);
                 if (!res.ok) {
                     throw new Error("Failed to fetch reviews");
                 }
@@ -373,7 +373,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
                 setLoadingAnnotations(true);
                 setAnnotationsError(null);
 
-                const res = await fetch(`/api/annotate/${params.song_id}`);
+                const res = await fetch(`/api/annotations/${params.song_id}`);
                 if (!res.ok) {
                     throw new Error("Failed to fetch annotations");
                 }
@@ -398,7 +398,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
         const fetchRatingDistribution = async () => {
             try {
                 const res = await fetch(
-                    `/api/review/distribution/${params.song_id}`
+                    `/api/reviews/distribution/${params.song_id}`
                 );
                 if (res.ok) {
                     const data = await res.json();
@@ -432,7 +432,7 @@ const TrackDetailsPage = ({ params }: { params: { song_id: string } }) => {
         const fetchTrackDetails = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`/api/songs/${params.song_id}`);
+                const response = await fetch(`/api/tracks/${params.song_id}`);
 
                 if (!response.ok) {
                     throw new Error("Failed to fetch track details");
