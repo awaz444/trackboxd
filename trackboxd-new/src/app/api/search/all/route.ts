@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
-import { searchTracksAlbumsAndPlaylists } from "@/lib/spotify";
+import { searchAll } from "@/lib/search-service";
 
 export async function GET(request: Request) {
   try {
@@ -20,34 +18,15 @@ export async function GET(request: Request) {
       );
     }
 
-    // Spotify search
-    const [spotify] = await Promise.all([
-      searchTracksAlbumsAndPlaylists(query, {
-        trackLimit,
-        albumLimit,
-        playlistLimit,
-        market,
-      }),
-    ]);
-
-    // Users search (by name)
-    const supabase = createClient(cookies());
-    const { data: users, error: usersError } = await supabase
-      .from("users")
-      .select("id, name, image_url, country")
-      .ilike("name", `%${query}%`)
-      .limit(userLimit);
-
-    if (usersError) {
-      console.error("User search error:", usersError);
-    }
-
-    return NextResponse.json({
-      tracks: spotify.tracks || [],
-      albums: spotify.albums || [],
-      playlists: spotify.playlists || [],
-      users: users || [],
+    const results = await searchAll(query, {
+      trackLimit,
+      albumLimit,
+      playlistLimit,
+      userLimit,
+      market,
     });
+
+    return NextResponse.json(results);
   } catch (error) {
     console.error("Search-all API error:", error);
     return NextResponse.json(
@@ -59,21 +38,3 @@ export async function GET(request: Request) {
     );
   }
 }
-
-export async function POST() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-}
-
-export async function PUT() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-}
-
-export async function DELETE() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-}
-
-export async function PATCH() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-}
-
-

@@ -51,21 +51,7 @@ interface SearchResults {
   users: User[];
 }
 
-async function fetchAll(query: string): Promise<SearchResults> {
-  const params = new URLSearchParams({
-    q: query,
-    trackLimit: "10",
-    albumLimit: "4",
-    playlistLimit: "5",
-    userLimit: "10",
-  });
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/search/all?${params.toString()}`,
-    { cache: "no-store" }
-  );
-  if (!res.ok) return { tracks: [], albums: [], playlists: [], users: [] };
-  return res.json();
-}
+import { searchAll } from "@/lib/search-service";
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +61,12 @@ export default async function SearchPage({
   searchParams?: { q?: string } 
 }) {
   const q = searchParams?.q?.trim() || "";
-  const results = q ? await fetchAll(q) : { tracks: [], albums: [], playlists: [], users: [] };
+  const results = q ? await searchAll(q, {
+    trackLimit: 10,
+    albumLimit: 4,
+    playlistLimit: 5,
+    userLimit: 10,
+  }) : { tracks: [], albums: [], playlists: [], users: [] };
 
   return (
     <div className="min-h-screen bg-[#FFFBEb]">
