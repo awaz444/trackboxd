@@ -21,99 +21,13 @@ interface ProfilePageProps {
     };
 }
 
-interface ProfileData {
-    user: {
-        id: string;
-        name: string;
-        image_url?: string;
-        country?: string;
-        spotify_url?: string;
-        instagram_url?: string;
-        created_at: string;
-        profile_private?: boolean;
-    };
-    stats: {
-        followers: number;
-        following: number;
-        reviews: number;
-        annotations: number;
-    };
-    favoriteTracks: Array<{
-        id: string;
-        name: string;
-        artist: string;
-        cover_url?: string;
-    }>;
-    recentActivity: Array<{
-        id: string;
-        type: "like" | "review" | "annotation";
-        track: {
-            id: string;
-            title: string;
-            artist: string;
-            cover_url?: string;
-        };
-        timestamp: string;
-        rating?: number;
-        text?: string;
-    }>;
-    likesActivity: Array<{
-        id: string;
-        timestamp: string;
-        sentence: string;
-        links: {
-            subjectProfile: string;
-            targetProfile?: string;
-            itemHref?: string;
-        };
-    }>;
-    following: Array<{
-        id: string;
-        username: string;
-        name: string;
-        image_url?: string;
-    }>;
-    isFollowing?: boolean;
-    followStatus?: 'following' | 'requested' | 'not_following';
-    promptResponses?: Array<{
-        id: string;
-        promptKey: string;
-        type: 'text' | 'track' | 'album' | 'playlist';
-        item?: { id: string; type: string; name: string; artist?: string; cover_url?: string } | null;
-        text?: string | null;
-        created_at: string;
-    }>;
-}
-
-async function getProfileData(username: string): Promise<ProfileData | null> {
-    try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
-        const url = `${baseUrl}/api/profile/${encodeURIComponent(username)}`;
-        const response = await fetch(url, { cache: "no-store" });
-
-        if (!response.ok) {
-            return null;
-        }
-
-        if (process.env.NODE_ENV === "development") {
-            console.log(
-                "Raw response from profile API:",
-                await response.clone().text()
-            );
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error("Failed to fetch profile data:", error);
-        return null;
-    }
-}
+import { getProfileByUsername, type ProfileData } from "@/lib/profile-service";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: ProfilePageProps) {
-    const profileData = await getProfileData(params.username);
+    const profileData = await getProfileByUsername(params.username);
 
     if (!profileData) {
         return {
@@ -135,47 +49,16 @@ export async function generateMetadata({ params }: ProfilePageProps) {
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
-    const profileData = await getProfileData(params.username);
+    const currentUser = await getServerUser();
+    const profileData = await getProfileByUsername(params.username, currentUser?.id);
 
     if (!profileData) {
         notFound();
     }
 
-    // ADD THIS DEBUG LOG to see what's actually coming from the API
-    console.log("Fetched profile data - USER OBJECT:", profileData.user);
-    console.log("Spotify URL:", profileData.user.spotify_url);
-    console.log("Full response:", JSON.stringify(profileData, null, 2));
-
-    // Get current user to determine if this is their own profile
-    const currentUser = await getServerUser();
     const isOwnProfile = currentUser?.id === profileData.user.id;
-
-    // Check if current user is following this profile owner
-    let initialIsFollowing = false;
-    let followStatus: 'following' | 'requested' | 'not_following' = 'not_following';
-
-    if (!isOwnProfile && currentUser?.id) {
-        try {
-            const supabase = createClient(cookies());
-            const { data: follow } = await supabase
-                .from("follows")
-                .select("follower_id, following_id, accepted")
-                .eq("follower_id", currentUser.id)
-                .eq("following_id", profileData.user.id)
-                .single();
-
-            if (follow) {
-                if (follow.accepted) {
-                    initialIsFollowing = true;
-                    followStatus = 'following';
-                } else {
-                    followStatus = 'requested';
-                }
-            }
-        } catch (error) {
-            console.error("Failed to check follow status:", error);
-        }
-    }
+    const initialIsFollowing = profileData.isFollowing || false;
+    const followStatus = profileData.followStatus || 'not_following';
 
     const {
         user,
