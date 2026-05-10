@@ -101,10 +101,6 @@ export default function AboutPage() {
               other platform in this space supports inline lyric annotation at
               the song level.
             </p>
-            <p className="text-base text-[#5C5537]/80 leading-relaxed">
-              The dark-mode interface is built for late-night listening sessions.
-              Pages are server-rendered for fast load times and full indexability.
-            </p>
           </section>
 
           {/* Founders — minimal, below the fold */}
