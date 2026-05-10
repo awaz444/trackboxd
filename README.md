@@ -4,7 +4,6 @@
 
 You log in with your Spotify account, explore your music history, write timestamped thoughts on tracks (like SoundCloud comments), rate albums like Pitchfork, and create custom playlists that live on both trackboxd and Spotify.
 
-
 ---
 
 ## 📌 Core Idea
