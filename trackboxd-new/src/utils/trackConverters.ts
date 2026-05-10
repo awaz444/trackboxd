@@ -1,4 +1,4 @@
-import { Track, SpotifyTrack, Review, SpotifyPlaylistTrack } from "@/app/songs/types";
+import { Track, SpotifyTrack, Review, SpotifyPlaylistTrack } from "@/app/tracks/types";
 
 export const spotifyToTrack = (trackData: any): Track => {
   return {

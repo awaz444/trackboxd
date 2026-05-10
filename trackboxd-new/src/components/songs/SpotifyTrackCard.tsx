@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Heart, Star, MessageCircle } from "lucide-react";
-import { SpotifyTrack } from "@/app/songs/types";
+import { SpotifyTrack } from "@/app/tracks/types";
 
 interface SpotifyTrackCardProps {
     track: SpotifyTrack;

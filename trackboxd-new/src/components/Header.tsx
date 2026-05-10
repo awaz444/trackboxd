@@ -288,7 +288,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
 
     const navItems = [
         { label: "Activity", href: "/activity", active: false },
-        { label: "Songs", href: "/songs", active: false },
+        { label: "Tracks", href: "/tracks", active: false },
         { label: "Albums", href: "/albums", active: false },
     ];
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, Clock } from "lucide-react";
-import { Annotation } from "@/app/songs/types";
+import { Annotation } from "@/app/tracks/types";
 import useUser from "@/hooks/useUser";
 
 const formatTimeAgo = (dateString: string) => {

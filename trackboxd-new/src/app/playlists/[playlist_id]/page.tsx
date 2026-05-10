@@ -7,7 +7,7 @@ import { Grid, List, Heart } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
-import { SpotifyTrack } from "../../songs/types";
+import { SpotifyTrack } from "../../tracks/types";
 
 import Link from "next/link";
 

@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Track } from "@/app/songs/types";
+import { Track } from "@/app/tracks/types";
 
 interface CompactTrackCardProps {
   track: Track;

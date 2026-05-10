@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Annotation } from "@/app/songs/types";
+import { Annotation } from "@/app/tracks/types";
 import { Clock, Heart } from "lucide-react";
 import useUser from "@/hooks/useUser";
 

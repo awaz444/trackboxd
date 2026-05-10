@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
-import { Review } from "@/app/songs/types";
+import { Review } from "@/app/tracks/types";
 import useUser from "@/hooks/useUser";
 
 interface ReviewCardProps {

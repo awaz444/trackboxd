@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import EditableReviewCard from "@/components/songs/EditableReviewCard";
-import { Review } from "@/app/songs/types";
+import { Review } from "@/app/tracks/types";
 
 const MyReviewsPage = () => {
   const { user, loading: userLoading, error: userError } = useUser();

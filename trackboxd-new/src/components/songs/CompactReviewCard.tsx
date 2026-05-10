@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Review } from "@/app/songs/types";
+import { Review } from "@/app/tracks/types";
 import { Star, Heart } from "lucide-react";
 import useUser from "@/hooks/useUser";
 

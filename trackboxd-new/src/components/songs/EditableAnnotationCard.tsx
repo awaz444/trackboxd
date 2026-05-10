@@ -1,7 +1,7 @@
 // EditableAnnotationCard.tsx
 import React, { useState } from "react";
 import { Edit, Trash, Clock, Heart, MessageCircle } from "lucide-react";
-import { Annotation } from "@/app/songs/types";
+import { Annotation } from "@/app/tracks/types";
 import AnnotationForm from "@/components/log/forms/AnnotationForm";
 
 interface EditableAnnotationCardProps {

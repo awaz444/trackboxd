@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import EditableAnnotationCard from "@/components/songs/EditableAnnotationCard";
-import { Annotation } from "@/app/songs/types";
+import { Annotation } from "@/app/tracks/types";
 
 const MyAnnotationsPage = () => {
   const { user, loading: userLoading, error: userError } = useUser();

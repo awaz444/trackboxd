@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Heart, Star, MessageCircle } from "lucide-react";
 import RatingStars from "../RatingStars";
-import { Track } from "@/app/songs/types";
+import { Track } from "@/app/tracks/types";
 
 interface TrackCardProps {
     track: Track;

@@ -1,7 +1,7 @@
 // EditableReviewCard.tsx
 import React, { useState } from "react";
 import { Edit, Trash, Star, MessageCircle, Heart } from "lucide-react";
-import { Review } from "@/app/songs/types";
+import { Review } from "@/app/tracks/types";
 import ReviewForm from "@/components/log/forms/ReviewForm";
 
 interface EditableReviewCardProps {

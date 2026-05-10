@@ -2,7 +2,7 @@ import { getPlaylistItems } from '@/lib/spotify';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { SpotifyPlaylistTrack } from '@/app/songs/types';
+import { SpotifyPlaylistTrack } from '@/app/tracks/types';
 
 export async function GET() {
   const playlistId = '5FN6Ego7eLX6zHuCMovIR2';

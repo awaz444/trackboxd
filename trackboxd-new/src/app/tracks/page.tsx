@@ -26,7 +26,7 @@ import {
     SpotifyPlaylistTrack,
 } from "./types";
 
-const Songs = () => {
+const Tracks = () => {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [sortBy, setSortBy] = useState("Most Rated");
     const [searchTerm, setSearchTerm] = useState("");
@@ -655,4 +655,4 @@ const Songs = () => {
     );
 };
 
-export default Songs;
+export default Tracks;
