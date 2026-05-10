@@ -107,14 +107,6 @@ export default function AboutPage() {
             </p>
           </section>
 
-          <section className="mb-16">
-            <h2 className="text-xl font-bold text-[#5C5537] mb-2">Stack</h2>
-            <p className="text-sm text-[#5C5537]/60">
-              Next.js 15 · TypeScript · PostgreSQL (Supabase) · Tailwind CSS ·
-              Vercel · Spotify Web API
-            </p>
-          </section>
-
           {/* Founders — minimal, below the fold */}
           <section className="border-t border-[#5C5537]/10 pt-8">
             <p className="text-xs text-[#5C5537]/40 mb-3 uppercase tracking-widest">
