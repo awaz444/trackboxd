@@ -37,6 +37,8 @@ Sitemap — src/app/sitemap.ts only lists home and about. It needs to query your
 Structured data — Song pages should emit MusicRecording JSON-LD, album pages MusicAlbum, profile pages Person. This is what Google uses for rich results
 Canonical URLs — Each dynamic page needs a <link rel="canonical"> to prevent duplicate indexing
 OG images per page — Next.js has a built-in opengraph-image.tsx route that can generate dynamic OG images per song/album/profile using their data
+
+
 Task 5 — Instagram Story / Reel Share Card
 Difficulty: 4.5/5 (Hard)
 

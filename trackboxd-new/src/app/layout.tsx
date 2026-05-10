@@ -13,12 +13,29 @@ const lora = Lora({
 // 1. Set your base URL so Next.js can resolve absolute paths for images
 export const metadata: Metadata = {
   title: {
-    default: "Trackboxd",
-    template: "%s | Trackboxd", // Adds a nice suffix to inner pages (e.g. "Login | Trackboxd")
+    default: "Trackboxd — The Letterboxd for Tracks",
+    template: "%s | Trackboxd",
   },
-  description: "Your music, your words. Share reviews, annotations, and connect with other music lovers on Trackboxd.",
-  keywords: ["music reviews", "trackboxd", "music annotations", "social music platform", "share music taste", "spotify integration", "music community"],
-  authors: [{ name: "Trackboxd Team" }, { name: "Aawaiz Ali" }, { name: "Umer Noor" }],
+  description:
+    "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary. The music annotation platform built for people who actually care.",
+  keywords: [
+    "letterboxd for music",
+    "letterboxd for tracks",
+    "song annotation",
+    "music review platform",
+    "track diary",
+    "music rating app",
+    "song meaning",
+    "musicboard alternative",
+    "rate your music alternative",
+    "social music tracking app",
+    "music annotation platform",
+    "trackboxd",
+  ],
+  authors: [
+    { name: "Aawaiz Ali", url: "https://www.linkedin.com/in/aawaiz" },
+    { name: "Umer Noor", url: "https://www.linkedin.com/in/umer-noor" },
+  ],
   creator: "Aawaiz Ali",
   publisher: "Trackboxd",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"),
@@ -46,8 +63,9 @@ export const metadata: Metadata = {
 
   // 3. Define Open Graph (Facebook, Discord, iMessage, etc)
   openGraph: {
-    title: "Trackboxd",
-    description: "Your music, your words. Share reviews, annotations, and connect with other music lovers.",
+    title: "Trackboxd — The Letterboxd for Tracks",
+    description:
+      "Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary. The music annotation platform built for people who actually care.",
     url: "https://trackboxd.com",
     siteName: "Trackboxd",
     images: [
@@ -65,9 +83,11 @@ export const metadata: Metadata = {
   // 4. Define Twitter Card
   twitter: {
     card: "summary_large_image",
-    title: "Trackboxd",
-    description: "Your music, your words. Share reviews, annotations, and connect with other music lovers.",
-    images: ["/og-image.png"], // Must be in public folder
+    title: "Trackboxd — The Letterboxd for Tracks",
+    description:
+      "Rate songs, write reviews, annotate lyrics, and build your listening diary. The music annotation platform built for people who actually care.",
+    images: ["/og-image.png"],
+    site: "@trackboxd",
   },
 };
 
@@ -86,21 +106,55 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "Trackboxd",
-              url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
-              description: "Your music, your words. Share reviews, annotations, and connect with other music lovers on Trackboxd.",
-              potentialAction: {
-                "@type": "SearchAction",
-                target: {
-                  "@type": "EntryPoint",
-                  urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"}/search?q={search_term_string}`
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "Trackboxd",
+                alternateName: "The Letterboxd for Tracks",
+                url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
+                description:
+                  "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary.",
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: {
+                    "@type": "EntryPoint",
+                    urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"}/search?q={search_term_string}`,
+                  },
+                  "query-input": "required name=search_term_string",
                 },
-                "query-input": "required name=search_term_string"
-              }
-            }),
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                name: "Trackboxd",
+                url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
+                description:
+                  "Trackboxd is a track-first social platform for rating songs, writing reviews, and annotating lyrics.",
+                founder: [
+                  {
+                    "@type": "Person",
+                    name: "Aawaiz Ali",
+                    url: "https://www.linkedin.com/in/aawaiz",
+                    sameAs: [
+                      "https://www.linkedin.com/in/aawaiz",
+                      "https://www.instagram.com/aawaiz_",
+                      "https://github.com/awaz444",
+                    ],
+                  },
+                  {
+                    "@type": "Person",
+                    name: "Umer Noor",
+                    url: "https://www.linkedin.com/in/umer-noor",
+                    sameAs: [
+                      "https://www.linkedin.com/in/umer-noor",
+                      "https://www.instagram.com/umer1300",
+                      "https://github.com/UmerNoor-cmd",
+                    ],
+                  },
+                ],
+              },
+            ]),
           }}
         />
       </head>

@@ -59,13 +59,16 @@ const LandingPage = () => {
             />
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold text-[#5C5537] mb-4">
+          <h1 className="text-5xl md:text-6xl font-bold text-[#5C5537] mb-3">
             Trackboxd
           </h1>
 
           <div className="text-center">
-            <p className="text-xl text-[#5C5537]/70 mb-10 max-w-md">
-              Your music, your words.
+            <h2 className="text-lg md:text-xl font-medium text-[#5C5537] mb-1">
+              The Letterboxd for Tracks
+            </h2>
+            <p className="text-base text-[#5C5537]/60 mb-10 max-w-md">
+              Rate songs, annotate lyrics, build your listening diary.
             </p>
 
             <div className="h-px w-48 bg-[#5C5537]/20 mx-auto mb-10"></div>
