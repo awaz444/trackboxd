@@ -27,30 +27,45 @@ import { getProfileByUsername, type ProfileData } from "@/lib/profile-service";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: ProfilePageProps) {
-    const profileData = await getProfileByUsername(params.username);
+    const { username } = await params;
+    const profileData = await getProfileByUsername(username);
 
     if (!profileData) {
         return {
-            title: "User Not Found",
+            title: "User Not Found - Trackboxd",
+        };
+    }
+
+    const { user, stats } = profileData;
+
+    if (user.profile_private) {
+        return {
+            title: "Private Profile - Trackboxd",
+            description: "This user's profile is private.",
+            alternates: {
+                canonical: `https://trackboxd.com/profile/${params.username}`,
+            },
         };
     }
 
     return {
-        title: `${profileData.user.name} - Trackboxd`,
-        description: `View ${profileData.user.name}'s music profile on Trackboxd. See their reviews, annotations, and favorite tracks.`,
+        title: `${user.name} (@${user.name}) — Trackboxd`,
+        description: `${user.name} has written ${stats.reviews} reviews and ${stats.annotations} annotations on Trackboxd. View their music profile and favorite tracks.`,
+        alternates: {
+            canonical: `https://trackboxd.com/profile/${username}`,
+        },
         openGraph: {
-            title: `${profileData.user.name} - Trackboxd`,
-            description: `View ${profileData.user.name}'s music profile on Trackboxd.`,
-            images: profileData.user.image_url
-                ? [profileData.user.image_url]
-                : [],
+            title: `${user.name} (@${user.name}) — Trackboxd`,
+            description: `${user.name} has written ${stats.reviews} reviews on Trackboxd.`,
+            images: user.image_url ? [user.image_url] : [],
         },
     };
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
+    const { username } = await params;
     const currentUser = await getServerUser();
-    const profileData = await getProfileByUsername(params.username, currentUser?.id);
+    const profileData = await getProfileByUsername(username, currentUser?.id);
 
     if (!profileData) {
         notFound();
@@ -103,7 +118,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     }}
                     stats={stats}
                     isOwnProfile={isOwnProfile}
-                    username={params.username}
+                    username={username}
                     initialIsFollowing={initialIsFollowing}
                     followStatus={followStatus}
                     isPrivateProfile={isPrivateProfile}
@@ -137,7 +152,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
                         {/* Profile Prompts */}
                         <ProfilePrompts
-                            username={params.username}
+                            username={username}
                             isOwnProfile={isOwnProfile}
                             initialResponses={profileData.promptResponses || []}
                         />
