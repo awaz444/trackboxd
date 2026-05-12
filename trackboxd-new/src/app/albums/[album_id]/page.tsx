@@ -3,6 +3,7 @@ import { getAlbumDetails } from '@/lib/spotify';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import AlbumDetailClient from './AlbumDetailClient';
+import { AlbumJsonLd } from '@/components/seo/JsonLd';
 
 interface Props {
   params: { album_id: string };
@@ -68,6 +69,9 @@ export default async function AlbumPage({ params }: Props) {
   const album = await getAlbum(album_id);
 
   return (
-    <AlbumDetailClient params={{ album_id }} initialAlbum={album} />
+    <>
+      {album && <AlbumJsonLd album={album} />}
+      <AlbumDetailClient params={{ album_id }} initialAlbum={album} />
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { getTrackDetails } from '@/lib/spotify';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import SongDetailClient from './SongDetailClient';
+import { SongJsonLd } from '@/components/seo/JsonLd';
 
 interface Props {
   params: { song_id: string };
@@ -36,6 +37,31 @@ async function getTrack(song_id: string) {
   }
 }
 
+async function getReviews(song_id: string) {
+  try {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+    const { data: reviews } = await supabase
+      .from('reviews')
+      .select(`
+        id,
+        rating,
+        text,
+        users:user_id (
+          name
+        )
+      `)
+      .eq('item_id', song_id)
+      .eq('is_public', true)
+      .order('created_at', { ascending: false })
+      .limit(5);
+    return reviews || [];
+  } catch (error) {
+    console.error('Error fetching reviews for JSON-LD:', error);
+    return [];
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { song_id } = await params;
   const track = await getTrack(song_id);
@@ -66,9 +92,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SongPage({ params }: Props) {
   const { song_id } = await params;
-  const track = await getTrack(song_id);
+  const [track, reviews] = await Promise.all([
+    getTrack(song_id),
+    getReviews(song_id)
+  ]);
 
   return (
-    <SongDetailClient params={{ song_id }} initialTrack={track} />
+    <>
+      {track && <SongJsonLd song={{ ...track, topReviews: reviews as any }} />}
+      <SongDetailClient params={{ song_id }} initialTrack={track} />
+    </>
   );
 }

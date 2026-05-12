@@ -14,6 +14,7 @@ import { Heart, Star, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import ProfileReviewCard from "@/components/profile/ProfileReviewCard";
 import ProfileAnnotationCard from "@/components/profile/ProfileAnnotationCard";
+import { ProfileJsonLd } from "@/components/seo/JsonLd";
 
 interface ProfilePageProps {
     params: {
@@ -103,6 +104,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
     return (
         <div className="min-h-screen bg-[#FFFBEb]">
+            <ProfileJsonLd user={user as any} username={username} />
             {/* <Header /> */}
 
             <div className="max-w-5xl mx-auto px-4 py-8">
