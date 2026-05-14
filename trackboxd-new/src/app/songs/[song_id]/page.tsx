@@ -47,17 +47,52 @@ async function getReviews(song_id: string) {
         id,
         rating,
         text,
+        created_at,
+        like_count,
+        is_public,
         users:user_id (
-          name
+          id,
+          name,
+          image_url
         )
       `)
       .eq('item_id', song_id)
       .eq('is_public', true)
       .order('created_at', { ascending: false })
-      .limit(5);
+      .limit(10);
     return reviews || [];
   } catch (error) {
-    console.error('Error fetching reviews for JSON-LD:', error);
+    console.error('Error fetching reviews:', error);
+    return [];
+  }
+}
+
+async function getAnnotations(song_id: string) {
+  try {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+    const { data: annotations } = await supabase
+      .from('annotations')
+      .select(`
+        id,
+        timestamp,
+        text,
+        created_at,
+        like_count,
+        is_public,
+        users:user_id (
+          id,
+          name,
+          image_url
+        )
+      `)
+      .eq('track_id', song_id)
+      .eq('is_public', true)
+      .order('created_at', { ascending: false })
+      .limit(10);
+    return annotations || [];
+  } catch (error) {
+    console.error('Error fetching annotations:', error);
     return [];
   }
 }
@@ -92,15 +127,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SongPage({ params }: Props) {
   const { song_id } = await params;
-  const [track, reviews] = await Promise.all([
+  const [track, reviews, annotations] = await Promise.all([
     getTrack(song_id),
-    getReviews(song_id)
+    getReviews(song_id),
+    getAnnotations(song_id),
   ]);
 
   return (
     <>
       {track && <SongJsonLd song={{ ...track, topReviews: reviews as any }} />}
-      <SongDetailClient params={{ song_id }} initialTrack={track} />
+      <SongDetailClient
+        params={{ song_id }}
+        initialTrack={track}
+        initialReviews={reviews as any}
+        initialAnnotations={annotations as any}
+      />
     </>
   );
 }

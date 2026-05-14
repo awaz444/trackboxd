@@ -62,12 +62,16 @@ interface SpotifyTrack {
     };
 }
 
-const SongDetailClient = ({ 
-    params, 
-    initialTrack 
-}: { 
+const SongDetailClient = ({
+    params,
+    initialTrack,
+    initialReviews,
+    initialAnnotations,
+}: {
     params: { song_id: string },
-    initialTrack: SpotifyTrack | null 
+    initialTrack: SpotifyTrack | null,
+    initialReviews?: Review[],
+    initialAnnotations?: Annotation[],
 }) => {
     const [track, setTrack] = useState<SpotifyTrack | null>(initialTrack);
     const [loading, setLoading] = useState(!initialTrack);
@@ -79,8 +83,8 @@ const SongDetailClient = ({
         0, 0, 0, 0, 0,
     ]);
 
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [annotations, setAnnotations] = useState<Annotation[]>([]);
+    const [reviews, setReviews] = useState<Review[]>(initialReviews ?? []);
+    const [annotations, setAnnotations] = useState<Annotation[]>(initialAnnotations ?? []);
     const [loadingReviews, setLoadingReviews] = useState(false);
     const [loadingAnnotations, setLoadingAnnotations] = useState(false);
     const [reviewsError, setReviewsError] = useState<string | null>(null);
@@ -726,11 +730,13 @@ const SongDetailClient = ({
                     {activeTab === "reviews" && (
                         <div className="mt-4 space-y-4">
                             {reviews.map((review) => (
-                                <div
+                                <article
                                     key={review.id}
-                                    className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4">
-                                    {/* Consistent user section with fixed min-height */}
-                                    <div className="flex justify-between items-start min-h-[3.5rem]">
+                                    itemScope
+                                    itemType="https://schema.org/Review"
+                                    className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4"
+                                >
+                                    <header className="flex justify-between items-start min-h-[3.5rem]">
                                         <div className="flex items-start gap-3">
                                             <img
                                                 src={review.users.image_url || "/default-avatar.jpg"}
@@ -741,20 +747,23 @@ const SongDetailClient = ({
                                                 }}
                                             />
                                             <div>
-                                                <div className="font-medium text-sm text-[#5C5537]">
-                                                    {review.users.name}
-                                                </div>
-                                                <div className="mt-1">
-                                                    {renderStars(review.rating)}
+                                                <span itemProp="author" itemScope itemType="https://schema.org/Person">
+                                                    <span itemProp="name" className="font-medium text-sm text-[#5C5537]">
+                                                        {review.users.name}
+                                                    </span>
+                                                </span>
+                                                <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
+                                                    <meta itemProp="ratingValue" content={String(review.rating)} />
+                                                    <meta itemProp="bestRating" content="5" />
+                                                    <div className="mt-1">{renderStars(review.rating)}</div>
                                                 </div>
                                             </div>
                                         </div>
                                         <button
-                                            onClick={() =>
-                                                handleReviewLikeClick(review.id)
-                                            }
+                                            onClick={() => handleReviewLikeClick(review.id)}
                                             disabled={reviewLoading[review.id]}
-                                            className="group flex items-center space-x-1 focus:outline-none cursor-pointer">
+                                            className="group flex items-center space-x-1 focus:outline-none cursor-pointer"
+                                        >
                                             <Heart
                                                 className={`w-4 h-4 transition-all duration-200 ${
                                                     reviewLikes[review.id]
@@ -767,21 +776,21 @@ const SongDetailClient = ({
                                                     reviewLikes[review.id]
                                                         ? "text-[#5C5537] font-medium"
                                                         : "text-[#5C5537]/70 group-hover:text-[#5C5537]"
-                                                }`}>
-                                                {reviewLikeCounts[review.id] ||
-                                                    review.like_count}
+                                                }`}
+                                            >
+                                                {reviewLikeCounts[review.id] ?? review.like_count}
                                             </span>
                                         </button>
-                                    </div>
-                                    <p className="text-sm text-[#5C5537] mb-3 line-clamp-2">
+                                    </header>
+                                    <p itemProp="reviewBody" className="text-sm text-[#5C5537] mb-3 line-clamp-2">
                                         {review.text}
                                     </p>
-                                    <div className="flex justify-between items-center text-xs">
-                                        <span className="text-[#5C5537]/70">
+                                    <footer className="flex justify-between items-center text-xs">
+                                        <time dateTime={review.created_at} className="text-[#5C5537]/70">
                                             {formatDate(review.created_at)}
-                                        </span>
-                                    </div>
-                                </div>
+                                        </time>
+                                    </footer>
+                                </article>
                             ))}
                         </div>
                     )}
@@ -789,88 +798,82 @@ const SongDetailClient = ({
                     {activeTab === "annotations" && (
                         <div className="mt-4 space-y-4">
                             {annotations.map((annotation) => {
-                                const minutes = Math.floor(
-                                    annotation.timestamp / 60
-                                );
-                                const seconds = Math.floor(
-                                    annotation.timestamp % 60
-                                );
-                                const timestampStr = `${minutes}:${seconds
-                                    .toString()
-                                    .padStart(2, "0")}`;
+                                const minutes = Math.floor(annotation.timestamp / 60);
+                                const seconds = Math.floor(annotation.timestamp % 60);
+                                const timestampStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
                                 return (
-                                    <div
+                                    <article
                                         key={annotation.id}
-                                        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4">
-                                        {/* Consistent user section with fixed min-height */}
-                                        <div className="flex justify-between items-start min-h-[3.5rem]">
-                                            <div className="flex items-start gap-3">
+                                        itemScope
+                                        itemType="https://schema.org/Comment"
+                                        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4"
+                                    >
+                                        {/* Timestamp reference — keeps lyric position and annotation body together for LLM crawlers */}
+                                        <blockquote
+                                            itemProp="about"
+                                            cite={`https://trackboxd.com/songs/${params.song_id}`}
+                                            className="border-l-2 border-[#5C5537]/30 pl-3 mb-3"
+                                        >
+                                            <div className="flex items-center gap-2">
                                                 <img
-                                                    src={
-                                                        annotation.users.image_url || "/default-avatar.jpg"
-                                                    }
+                                                    src={annotation.users.image_url || "/default-avatar.jpg"}
                                                     alt={annotation.users.name}
-                                                    className="w-10 h-10 rounded-full mt-0.5"
-                                                    onError={(e) => {
-                                                        e.currentTarget.src = "/default-avatar.jpg";
-                                                    }}
+                                                    className="w-8 h-8 rounded-full"
+                                                    onError={(e) => { e.currentTarget.src = "/default-avatar.jpg"; }}
                                                 />
-                                                <div>
-                                                    <div className="font-medium text-sm text-[#5C5537]">
-                                                        {annotation.users.name}
-                                                    </div>
-                                                    <div className="text-xs text-[#5C5537]/70 mt-1">
-                                                        At {timestampStr}
-                                                    </div>
-                                                </div>
+                                                <span itemProp="author" itemScope itemType="https://schema.org/Person">
+                                                    <a
+                                                        itemProp="url"
+                                                        href={`/profile/${encodeURIComponent(annotation.users.name)}`}
+                                                        className="font-medium text-sm text-[#5C5537] hover:underline"
+                                                    >
+                                                        <span itemProp="name">{annotation.users.name}</span>
+                                                    </a>
+                                                </span>
+                                                <time
+                                                    dateTime={`PT${Math.floor(annotation.timestamp)}S`}
+                                                    className="text-xs text-[#5C5537]/70"
+                                                >
+                                                    at {timestampStr}
+                                                </time>
                                             </div>
+                                        </blockquote>
+
+                                        <aside itemProp="text">
+                                            <p className="text-sm text-[#5C5537] mb-3">
+                                                {annotation.text}
+                                            </p>
+                                        </aside>
+
+                                        <footer className="flex justify-between items-center text-xs">
+                                            <time dateTime={annotation.created_at} className="text-[#5C5537]/70">
+                                                {formatDate(annotation.created_at)}
+                                            </time>
                                             <button
-                                                onClick={() =>
-                                                    handleAnnotationLikeClick(
-                                                        annotation.id
-                                                    )
-                                                }
-                                                disabled={
-                                                    annotationLoading[
-                                                        annotation.id
-                                                    ]
-                                                }
-                                                className="group flex items-center space-x-1 focus:outline-none cursor-pointer">
+                                                onClick={() => handleAnnotationLikeClick(annotation.id)}
+                                                disabled={annotationLoading[annotation.id]}
+                                                className="group flex items-center space-x-1 focus:outline-none cursor-pointer"
+                                            >
                                                 <Heart
                                                     className={`w-4 h-4 transition-all duration-200 ${
-                                                        annotationLikes[
-                                                            annotation.id
-                                                        ]
+                                                        annotationLikes[annotation.id]
                                                             ? "text-[#5C5537] fill-[#5C5537]"
                                                             : "text-[#5C5537]/50 group-hover:text-[#5C5537]"
                                                     }`}
                                                 />
                                                 <span
                                                     className={`text-sm transition-colors duration-200 ${
-                                                        annotationLikes[
-                                                            annotation.id
-                                                        ]
+                                                        annotationLikes[annotation.id]
                                                             ? "text-[#5C5537] font-medium"
                                                             : "text-[#5C5537]/70 group-hover:text-[#5C5537]"
-                                                    }`}>
-                                                    {annotationLikeCounts[
-                                                        annotation.id
-                                                    ] || annotation.like_count}
+                                                    }`}
+                                                >
+                                                    {annotationLikeCounts[annotation.id] ?? annotation.like_count}
                                                 </span>
                                             </button>
-                                        </div>
-                                        <p className="text-sm text-[#5C5537] mb-3">
-                                            {annotation.text}
-                                        </p>
-                                        <div className="flex justify-between items-center text-xs">
-                                            <span className="text-[#5C5537]/70">
-                                                {formatDate(
-                                                    annotation.created_at
-                                                )}
-                                            </span>
-                                        </div>
-                                    </div>
+                                        </footer>
+                                    </article>
                                 );
                             })}
                         </div>
