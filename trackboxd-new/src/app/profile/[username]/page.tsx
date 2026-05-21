@@ -43,21 +43,31 @@ export async function generateMetadata({ params }: ProfilePageProps) {
         return {
             title: "Private Profile - Trackboxd",
             description: "This user's profile is private.",
+            robots: { index: false, follow: false },
             alternates: {
                 canonical: `https://trackboxd.com/profile/${params.username}`,
             },
         };
     }
 
+    const reviewedTracks = profileData.recentActivity
+        .filter((a) => a.type === 'review')
+        .slice(0, 3)
+        .map((a) => `${a.track.title} by ${a.track.artist}`);
+
+    const description = reviewedTracks.length > 0
+        ? `${user.name} reviewed ${reviewedTracks.join(', ')}${stats.reviews > 3 ? `, and ${stats.reviews - 3} more` : ''} on Trackboxd.`
+        : `${user.name} has written ${stats.reviews} reviews and ${stats.annotations} annotations on Trackboxd.`;
+
     return {
-        title: `${user.name} (@${user.name}) — Trackboxd`,
-        description: `${user.name} has written ${stats.reviews} reviews and ${stats.annotations} annotations on Trackboxd. View their music profile and favorite tracks.`,
+        title: `${user.name} (@${username}) — Trackboxd`,
+        description,
         alternates: {
             canonical: `https://trackboxd.com/profile/${username}`,
         },
         openGraph: {
-            title: `${user.name} (@${user.name}) — Trackboxd`,
-            description: `${user.name} has written ${stats.reviews} reviews on Trackboxd.`,
+            title: `${user.name} (@${username}) — Trackboxd`,
+            description,
             images: user.image_url ? [user.image_url] : [],
         },
     };
@@ -104,7 +114,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
     return (
         <div className="min-h-screen bg-[#FFFBEb]">
-            <ProfileJsonLd user={user as any} username={username} />
+            <ProfileJsonLd user={{ ...user, stats } as any} username={username} />
             {/* <Header /> */}
 
             <div className="max-w-5xl mx-auto px-4 py-8">

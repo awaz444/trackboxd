@@ -112,6 +112,23 @@ export function SongJsonLd({ song }: { song: Song }) {
 
 // 3.2 Profile Page JSON-LD
 export function ProfileJsonLd({ user, username }: { user: User, username: string }) {
+  const interactionStatistic = [
+    user.stats?.reviews
+      ? {
+          '@type': 'InteractionCounter',
+          interactionType: 'https://schema.org/ReviewAction',
+          userInteractionCount: user.stats.reviews,
+        }
+      : null,
+    user.stats?.annotations
+      ? {
+          '@type': 'InteractionCounter',
+          interactionType: 'https://schema.org/CommentAction',
+          userInteractionCount: user.stats.annotations,
+        }
+      : null,
+  ].filter(Boolean);
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
@@ -123,6 +140,7 @@ export function ProfileJsonLd({ user, username }: { user: User, username: string
       identifier: username,
       image: user.image_url,
       description: `Music listener with ${user.stats?.reviews || 0} reviews and ${user.stats?.annotations || 0} annotations on Trackboxd.`,
+      ...(interactionStatistic.length > 0 && { interactionStatistic }),
     },
   };
   return (
