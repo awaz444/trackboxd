@@ -36,12 +36,6 @@ interface HeaderProps {
     };
 }
 
-interface SpotifyUser {
-    name: string;
-    email: string;
-    image_url?: string;
-    id: string;
-}
 
 interface SearchResult {
     id: string;
@@ -68,7 +62,6 @@ const Header: React.FC<HeaderProps> = ({ }) => {
     const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
     const [isLogModalOpen, setIsLogModalOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [spotifyUser, setSpotifyUser] = useState<SpotifyUser | null>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
     const pathname = usePathname();
@@ -203,26 +196,6 @@ const Header: React.FC<HeaderProps> = ({ }) => {
         }
     };
 
-    useEffect(() => {
-        const fetchSpotifyUser = async () => {
-            try {
-                const res = await fetch("/api/me");
-                if (!res.ok) throw new Error("Failed to fetch user");
-                const data = await res.json();
-                setSpotifyUser(data);
-            } catch (error) {
-                console.error("Error fetching Spotify user:", error);
-                setSpotifyUser(null);
-            }
-        };
-
-        if (authUser) {
-            fetchSpotifyUser();
-        } else {
-            setSpotifyUser(null);
-        }
-    }, [authUser]);
-
     const getInitials = (name: string) => {
         return name
             .split(" ")
@@ -232,9 +205,9 @@ const Header: React.FC<HeaderProps> = ({ }) => {
     };
 
     const user = {
-        name: spotifyUser?.name || "Guest User",
-        avatar: spotifyUser?.image_url,
-        username: spotifyUser?.email?.split("@")[0] || "guest",
+        name: authUser?.name || "Guest User",
+        avatar: authUser?.image_url,
+        username: authUser?.email?.split("@")[0] || "guest",
     };
 
     useEffect(() => {
@@ -250,22 +223,6 @@ const Header: React.FC<HeaderProps> = ({ }) => {
     const toggleMobileSearch = () => {
         setIsMobileSearchExpanded(!isMobileSearchExpanded);
     };
-
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (
-                searchRef.current &&
-                !searchRef.current.contains(e.target as Node)
-            ) {
-                setIsSearchExpanded(false);
-                setIsMobileSearchExpanded(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () =>
-            document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
@@ -611,7 +568,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                 ) : (
                                                     <span className="text-[#FFFBEb] text-sm font-semibold">
                                                         {getInitials(
-                                                            spotifyUser?.name ||
+                                                            authUser?.name ||
                                                             "Guest User"
                                                         )}
                                                     </span>
@@ -620,7 +577,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                         </div>
 
                                         <span className="text-sm font-medium text-[#5C5537]">
-                                            {spotifyUser?.name || "Guest User"}
+                                            {authUser?.name || "Guest User"}
                                         </span>
 
                                         <ChevronDown
@@ -895,13 +852,13 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                     {user.avatar ? (
                                         <img
                                             src={user.avatar}
-                                            alt={spotifyUser?.name}
+                                            alt={authUser?.name}
                                             className="w-full h-full rounded-full object-cover"
                                         />
                                     ) : (
                                         <span className="text-[#FFFBEb] text-base font-semibold">
                                             {getInitials(
-                                                spotifyUser?.name ||
+                                                authUser?.name ||
                                                 "Guest User"
                                             )}
                                         </span>
@@ -910,10 +867,10 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                             </div>
                             <div>
                                 <div className="font-medium text-[#5C5537]">
-                                    {spotifyUser?.name || "Guest User"}
+                                    {authUser?.name || "Guest User"}
                                 </div>
                                 <div className="text-sm text-[#5C5537]/70">
-                                    {spotifyUser?.email || "guest@example.com"}
+                                    {authUser?.email || "guest@example.com"}
                                 </div>
                             </div>
                         </div>

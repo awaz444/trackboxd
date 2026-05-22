@@ -1,26 +1,35 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Music } from 'lucide-react';
 import Footer from '@/components/Footer';
 import AuthModal from '@/components/AuthModal';
 import Image from "next/image";
+import { useAuth } from '@/contexts/AuthContext';
 
 const LandingPage = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup' | 'forgot-password' | 'update-password'>('login');
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace('/activity');
+    }
+  }, [user, loading, router]);
 
   useEffect(() => {
     const authParam = searchParams.get('auth');
-    console.log('LandingPage: auth param:', authParam);
     if (authParam && ['login', 'signup', 'forgot-password', 'update-password'].includes(authParam)) {
-      console.log('LandingPage: Setting auth mode to', authParam);
       setAuthMode(authParam as 'login' | 'signup' | 'forgot-password' | 'update-password');
       setShowAuthModal(true);
     }
   }, [searchParams]);
+
+  if (loading || user) return null;
 
   return (
     <div className="min-h-screen bg-[#FFFBEb] flex flex-col relative">
