@@ -156,7 +156,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     </div>
                 ) : (
                     <>
-                        {/* Favorite Songs */}
+                        {/* Favorite Tracks */}
                         <FavoriteTracks
                             tracks={favoriteTracks}
                             isOwnProfile={isOwnProfile}

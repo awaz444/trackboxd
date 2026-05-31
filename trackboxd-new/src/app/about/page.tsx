@@ -63,12 +63,12 @@ export default function AboutPage() {
             <p className="text-base text-[#5C5537]/80 leading-relaxed mb-4">
               Trackboxd is a track-first social platform. Unlike Last.fm (which
               focuses on scrobbling) or RateYourMusic (which is album-focused),
-              Trackboxd is built around individual songs — their lyrics,
+              Trackboxd is built around individual tracks — their lyrics,
               timestamps, emotional weight, and what they mean to the people who
               listen to them.
             </p>
             <p className="text-base text-[#5C5537]/80 leading-relaxed">
-              Think of it as a listening diary. Every song you care about can
+              Think of it as a listening diary. Every track you care about can
               have a rating, a review, and annotations tied directly to specific
               lines or moments — the 43-second mark where the bass drops, the
               bridge that changes everything, the lyric that hits different at 2am.
@@ -81,7 +81,7 @@ export default function AboutPage() {
             </h2>
             <ul className="space-y-2 text-base text-[#5C5537]/80">
               <li>— Per-track ratings and written reviews</li>
-              <li>— Timestamped annotations on any part of a song</li>
+              <li>— Timestamped annotations on any part of a track</li>
               <li>— Listening diary with date logging</li>
               <li>— Social profiles showing taste and listening history</li>
               <li>— Follow friends and discover music through people you trust</li>
@@ -99,7 +99,7 @@ export default function AboutPage() {
               is annotation-first. The annotation feature — attaching your words
               directly to a timestamp or lyric — is the core differentiator. No
               other platform in this space supports inline lyric annotation at
-              the song level.
+              the track level.
             </p>
           </section>
 

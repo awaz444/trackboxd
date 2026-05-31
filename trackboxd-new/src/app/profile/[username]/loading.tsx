@@ -23,7 +23,7 @@ export default function ProfileLoading() {
             </div>
           </div>
           
-          {/* Favorite Songs Skeleton */}
+          {/* Favorite Tracks Skeleton */}
           <div className="mb-8">
             <div className="h-6 bg-[#5C5537]/10 rounded w-48 mb-6"></div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

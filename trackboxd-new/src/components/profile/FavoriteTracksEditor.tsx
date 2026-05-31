@@ -99,7 +99,7 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
       <div className="bg-[#FFFBEb] rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-[#5C5537]">Edit Favorite Songs</h2>
+            <h2 className="text-2xl font-bold text-[#5C5537]">Edit Favorite Tracks</h2>
             <Button
               variant="outline"
               onClick={onClose}

@@ -122,10 +122,10 @@ const MyReviewsPage = () => {
           <div className="text-center py-12">
             <p className="text-[#5C5537]/70 mb-4">You haven't written any reviews yet</p>
             <a 
-              href="/songs" 
+              href="/tracks"
               className="bg-[#5C5537] text-white px-4 py-2 rounded-full hover:bg-[#3E3725]"
             >
-              Browse songs to review
+              Browse tracks to review
             </a>
           </div>
         ) : (

@@ -552,7 +552,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                     </div>
                 </div>
 
-                {/* Favorite Songs - Read Only */}
+                {/* Favorite Tracks - Read Only */}
                 <FavoriteTracks tracks={favoriteTracks} isOwnProfile={true} />
 
                 {/* Following Section - Read Only */}

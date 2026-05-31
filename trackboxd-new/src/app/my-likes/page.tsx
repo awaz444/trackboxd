@@ -282,7 +282,7 @@ export default function LikesPage() {
             </h1>
           </div>
           <p className="text-[#0C3B2E]/70">
-            All the songs, albums, playlists, reviews and annotations you've liked
+            All the tracks, albums, playlists, reviews and annotations you've liked
           </p>
         </div>
 

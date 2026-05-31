@@ -76,10 +76,10 @@ const Filters: React.FC<FiltersProps> = ({
                 <div className="flex flex-wrap gap-3 flex-1">
                     <div>
                         <h1 className="text-3xl font-bold text-[#5C5537]">
-                            Songs
+                            Tracks
                         </h1>
                         <p className="text-[#5C5537]/70 mt-2">
-                            Discover global songs and artists, explore genres, moods, and more.
+                            Discover global tracks and artists, explore genres, moods, and more.
                         </p>
                     </div>
                 </div>

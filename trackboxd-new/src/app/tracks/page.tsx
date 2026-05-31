@@ -425,7 +425,7 @@ const Tracks = () => {
                     </div>
                 )}
 
-                {/* Trending This Week - 4 songs only */}
+                {/* Trending This Week - 4 tracks only */}
                 {!showSearchResults && (
                     <>
                         <div className="mb-8">

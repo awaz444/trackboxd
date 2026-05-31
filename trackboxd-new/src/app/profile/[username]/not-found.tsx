@@ -24,9 +24,9 @@ export default function ProfileNotFound() {
               Go Home
             </Button>
           </Link>
-          <Link href="/songs">
+          <Link href="/tracks">
             <Button variant="outline" className="border-[#5C5537] bg-[#FFFBEb] text-[#5C5537] hover:bg-[#FFFBEb]">
-              Browse Songs
+              Browse Tracks
             </Button>
           </Link>
         </div>
