@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# private / internal files
+schema.sql
+schema.txt
+*.sql
+dev_plan*.md
+featues.md
+tech_guide.md
+structure.txt
+trackboxd-seo-geo-plan.md
+geo-json-from-chatgpt.json
+palette.txt
+AUTH_SETUP.md
