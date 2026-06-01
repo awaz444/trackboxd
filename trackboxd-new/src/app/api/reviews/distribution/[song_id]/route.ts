@@ -38,16 +38,21 @@ export async function GET(
       5: 0
     };
 
-    // Count ratings manually
+    // Count ratings — half-star ratings (e.g. 4.5) split 0.5 between floor and ceil
     data.forEach((item) => {
-      const rating = item.rating as keyof typeof distribution;
-      if (distribution[rating] !== undefined) {
+      const rating = item.rating as number;
+      if (rating % 1 === 0.5) {
+        const lower = Math.floor(rating);
+        const upper = Math.ceil(rating);
+        if (lower >= 1) distribution[lower] += 0.5;
+        if (upper <= 5) distribution[upper] += 0.5;
+      } else if (distribution[rating] !== undefined) {
         distribution[rating] += 1;
       }
     });
 
     // Calculate total reviews and percentages
-    const totalReviews = Object.values(distribution).reduce((sum, count) => sum + count, 0);
+    const totalReviews = data.length;
     const percentageDistribution = {
       1: totalReviews > 0 ? Math.round((distribution[1] / totalReviews) * 100) : 0,
       2: totalReviews > 0 ? Math.round((distribution[2] / totalReviews) * 100) : 0,
