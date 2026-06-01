@@ -296,16 +296,53 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
     if (loading) {
         return (
             <div className="min-h-screen bg-[#FFFBEb]">
-                <div className="max-w-5xl mx-auto px-4 py-8 text-center">
+                <div className="max-w-5xl mx-auto px-4 py-8">
                     <div className="animate-pulse">
-                        <div className="rounded-full bg-[#5C5537]/10 h-32 w-32 mx-auto mb-4"></div>
-                        <div className="h-6 bg-[#5C5537]/10 rounded w-48 mx-auto mb-4"></div>
-                        <div className="grid grid-cols-4 gap-4 mt-8">
-                            {[...Array(4)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="bg-[#5C5537]/10 rounded-lg aspect-square"></div>
-                            ))}
+                        {/* Avatar + form fields row */}
+                        <div className="flex flex-col items-center md:flex-row gap-8 mb-8">
+                            {/* Avatar circle */}
+                            <div className="flex-shrink-0">
+                                <div className="rounded-full bg-[#5C5537]/10 h-32 w-32 md:h-40 md:w-40" />
+                            </div>
+
+                            {/* Form fields */}
+                            <div className="flex-1 w-full">
+                                <div className="flex flex-col md:flex-row md:justify-between gap-4">
+                                    <div className="w-full">
+                                        {/* Username */}
+                                        <div className="mb-4">
+                                            <div className="h-4 bg-[#5C5537]/10 rounded w-20 mb-2 ml-1" />
+                                            <div className="h-10 bg-[#5C5537]/10 rounded w-full md:w-80" />
+                                        </div>
+                                        {/* Country */}
+                                        <div className="mb-4">
+                                            <div className="h-4 bg-[#5C5537]/10 rounded w-16 mb-2 ml-1" />
+                                            <div className="h-10 bg-[#5C5537]/10 rounded w-full md:w-80" />
+                                            <div className="h-3 bg-[#5C5537]/10 rounded w-48 mt-1 ml-1" />
+                                        </div>
+                                        {/* Spotify URL */}
+                                        <div className="mb-4">
+                                            <div className="h-4 bg-[#5C5537]/10 rounded w-32 mb-2 ml-1" />
+                                            <div className="h-10 bg-[#5C5537]/10 rounded w-full md:w-80" />
+                                        </div>
+                                        {/* Instagram URL */}
+                                        <div className="mb-4">
+                                            <div className="h-4 bg-[#5C5537]/10 rounded w-36 mb-2 ml-1" />
+                                            <div className="h-10 bg-[#5C5537]/10 rounded w-full md:w-80" />
+                                        </div>
+                                        {/* Private checkbox */}
+                                        <div className="mb-4 flex items-center gap-3">
+                                            <div className="h-4 w-4 bg-[#5C5537]/10 rounded" />
+                                            <div className="h-4 bg-[#5C5537]/10 rounded w-32" />
+                                        </div>
+                                    </div>
+                                    {/* Save / Cancel buttons */}
+                                    <div className="flex gap-3 md:self-start">
+                                        <div className="h-10 bg-[#5C5537]/10 rounded w-28" />
+                                        <div className="h-10 bg-[#5C5537]/10 rounded w-20" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -425,6 +462,9 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                             ))}
                                         </SelectContent>
                                     </Select>
+                                    <p className="text-xs text-gray-600 mt-1 ml-1">
+                                        Your country will be shown on your profile
+                                    </p>
                                 </div>
 
                                 <div className="mb-4">
