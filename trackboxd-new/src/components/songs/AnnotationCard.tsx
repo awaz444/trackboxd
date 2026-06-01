@@ -124,7 +124,6 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({ annotation }) => {
                         <div className="mb-2">
                             <h3 className="font-semibold text-[#5C5537] text-sm">{trackName}</h3>
                             <p className="text-[#5C5537]/70 text-xs">{artistNames}</p>
-                            {albumName && <p className="text-[#5C5537]/60 text-xs italic">{albumName}</p>}
                         </div>
 
                         {annotation.text && (
@@ -197,9 +196,6 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({ annotation }) => {
                                 <div className="flex-1 min-w-0">
                                     <h3 className="font-bold text-[#5C5537] text-lg leading-tight">{trackName}</h3>
                                     <p className="text-[#5C5537]/70 text-sm mt-0.5">{artistNames}</p>
-                                    {albumName && (
-                                        <p className="text-[#5C5537]/50 text-xs italic mt-0.5">{albumName}</p>
-                                    )}
                                     <div className="flex items-center gap-1.5 mt-2">
                                         <Clock className="w-3.5 h-3.5 text-[#5C5537]/60 flex-shrink-0" />
                                         <span className="text-xs text-[#5C5537]/60">at {timestamp}</span>
