@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Heart, Clock, X } from "lucide-react";
+import { Heart, Clock, X, Share2, ExternalLink } from "lucide-react";
+import ShareSheet from "@/components/share/ShareSheet";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ProfileAnnotationCardProps {
@@ -18,11 +19,13 @@ interface ProfileAnnotationCardProps {
     timestamp: string;
     like_count?: number;
     text?: string;
+    is_public?: boolean;
   };
 }
 
 const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotation }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(annotation.like_count || 0);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,16 +108,27 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
           >
             View track
           </Link>
-          <button
-            onClick={handleLikeClick}
-            disabled={isLoading || !user}
-            className={`flex items-center gap-1 text-xs transition-colors ${
-              isLiked ? "text-[#5C5537]" : "text-[#5C5537]/40 hover:text-[#5C5537]/70"
-            }`}
-          >
-            <Heart className={`w-4 h-4 ${isLiked ? "fill-[#5C5537]" : ""}`} />
-            {likeCount > 0 && <span className={isLiked ? "font-medium" : ""}>{likeCount}</span>}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleLikeClick}
+              disabled={isLoading || !user}
+              className={`flex items-center gap-1 text-xs transition-colors ${
+                isLiked ? "text-[#5C5537]" : "text-[#5C5537]/40 hover:text-[#5C5537]/70"
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${isLiked ? "fill-[#5C5537]" : ""}`} />
+              {likeCount > 0 && <span className={isLiked ? "font-medium" : ""}>{likeCount}</span>}
+            </button>
+            {(annotation.is_public !== false) && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setShareOpen(true); }}
+                className="text-[#5C5537]/40 hover:text-[#5C5537] transition-colors"
+                aria-label="Share"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -125,7 +139,18 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
           <div className="relative bg-[#FFFBEb] rounded-xl w-full max-w-lg border border-[#5C5537]/20 shadow-xl max-h-[85vh] flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#5C5537]/10 flex-shrink-0">
-              <span className="text-sm font-semibold text-[#5C5537]">Annotation</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-semibold text-[#5C5537]">Annotation</span>
+                <Link
+                  href={`/annotations/${annotation.id}`}
+                  target="_blank"
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-[#5C5537]/35 hover:text-[#5C5537] transition-colors"
+                  aria-label="Open annotation page"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-[#5C5537]/60 hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1.5 rounded-full transition-colors"
@@ -182,11 +207,22 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
                 >
                   View track
                 </Link>
+                {(annotation.is_public !== false) && (
+                  <button
+                    onClick={() => setShareOpen(true)}
+                    className="text-[#5C5537]/50 hover:text-[#5C5537] transition-colors"
+                    aria-label="Share"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <ShareSheet type="annotation" id={annotation.id} open={shareOpen} onOpenChange={setShareOpen} />
     </>
   );
 };
