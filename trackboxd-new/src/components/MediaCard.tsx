@@ -140,22 +140,24 @@ const MediaCard: React.FC<MediaCardProps> = ({
               </div>
             )}
           </div>
-          {/* Bottom info: name, stars, text indicator */}
-          <div className="p-3 flex items-center justify-between gap-2">
-            <div className="min-w-0 flex-1">
+          {/* Bottom info: name, artist, then stars on next line on mobile */}
+          <div className="p-3 flex flex-col gap-1">
+            <div className="min-w-0">
               <p className="text-xs font-semibold text-[#5C5537] truncate">{name}</p>
               {artist && (
                 <p className="text-xs text-[#5C5537]/60 truncate">{artist}</p>
               )}
             </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              {reviewRating !== undefined && reviewRating > 0 && (
-                <StarRating rating={reviewRating} />
-              )}
-              {hasReviewText && (
-                <Star className="w-3 h-3 text-[#5C5537]/60" />
-              )}
-            </div>
+            {((reviewRating !== undefined && reviewRating > 0) || hasReviewText) && (
+              <div className="flex items-center gap-1.5">
+                {reviewRating !== undefined && reviewRating > 0 && (
+                  <StarRating rating={reviewRating} />
+                )}
+                {hasReviewText && (
+                  <Star className="w-3 h-3 text-[#5C5537]/60" />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </Link>

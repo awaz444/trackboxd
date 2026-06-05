@@ -35,7 +35,7 @@ export default function PopularAnnotationsSection({ data }: Props) {
     <section className="mb-10">
       <HomeSectionHeader
         title="Popular Annotations This Week"
-        subtitle="Most liked annotations in the past 14 days"
+        subtitle="Most liked annotations this week"
         viewMoreHref="/tracks"
       />
       <div className="space-y-3">

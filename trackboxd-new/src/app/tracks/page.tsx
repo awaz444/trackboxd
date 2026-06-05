@@ -239,14 +239,9 @@ const Tracks = () => {
                       coverUrl={track.album?.images?.[0]?.url || ""}
                       name={track.name}
                       artist={track.artists?.map((a) => a.name).join(", ")}
-                      avgRating={track.stats?.avg_rating}
-                      likeCount={track.stats?.like_count}
-                      reviewCount={track.stats?.review_count}
-                      annotationCount={track.stats?.annotation_count}
                       itemType="track"
                       itemId={track.id}
                       isLiked={likes[track.id] || false}
-                      showPopularStats
                     />
                   ))}
                 </div>

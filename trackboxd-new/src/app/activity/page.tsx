@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Footer from "@/components/Footer";
 import ActivityItem, { ActivityItem as ActivityItemType } from "@/components/activity/ActivityItem";
 import SuggestedUsers from "@/components/activity/SuggestedUsers";
@@ -28,11 +28,14 @@ export default function ActivityPage() {
   const [suggestedUsers, setSuggestedUsers] = useState<User[]>([]);
   const [popularUsers, setPopularUsers] = useState<any[]>([]);
   const { user } = useUser();
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadingMoreRef = useRef(false);
 
-  const fetchActivities = async (pageNum: number, append = false) => {
+  const fetchActivities = useCallback(async (pageNum: number, append = false) => {
     if (!user) return;
     const setter = append ? setLoadingMore : setLoading;
     setter(true);
+    loadingMoreRef.current = true;
     try {
       const res = await fetch(`/api/activity?limit=${PAGE_SIZE}&page=${pageNum}`);
       if (!res.ok) throw new Error("Failed to fetch activities");
@@ -49,8 +52,10 @@ export default function ActivityPage() {
       // silently fail — show what we have
     } finally {
       setter(false);
+      loadingMoreRef.current = false;
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const fetchSparseContent = async () => {
     const [usersRes, popularRes] = await Promise.allSettled([
@@ -63,13 +68,29 @@ export default function ActivityPage() {
 
   useEffect(() => {
     if (user) fetchActivities(0);
-  }, [user]);
+  }, [user, fetchActivities]);
 
-  const loadMore = () => {
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchActivities(nextPage, true);
-  };
+  // Scroll-to-bottom infinite load via IntersectionObserver.
+  // Depends on `loading` so it re-runs once the sentinel element is in the DOM.
+  useEffect(() => {
+    if (loading) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMoreRef.current) {
+          setPage((prev) => {
+            const next = prev + 1;
+            fetchActivities(next, true);
+            return next;
+          });
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchActivities, loading]);
 
   if (loading) {
     return (
@@ -122,21 +143,10 @@ export default function ActivityPage() {
                   />
                 ))}
                 {hasMore && (
-                  <div className="pt-4 flex justify-center">
-                    <button
-                      onClick={loadMore}
-                      disabled={loadingMore}
-                      className="flex items-center gap-2 px-6 py-2 rounded-full border border-[#5C5537]/30 text-[#5C5537] hover:bg-[#5C5537]/10 transition-colors text-sm font-medium disabled:opacity-50"
-                    >
-                      {loadingMore ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Loading…
-                        </>
-                      ) : (
-                        "Load more"
-                      )}
-                    </button>
+                  <div ref={sentinelRef} className="pt-4 flex justify-center h-12">
+                    {loadingMore && (
+                      <Loader2 className="w-5 h-5 animate-spin text-[#5C5537]/50" />
+                    )}
                   </div>
                 )}
               </>
