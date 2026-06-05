@@ -9,9 +9,9 @@ interface CompactTrackCardProps {
 const CompactTrackCard: React.FC<CompactTrackCardProps> = ({ track }) => {
   return (
     <Link href={`/songs/${track.id}`}>
-            <div className="bg-[#FFFFF5] border border-[#D9D9D9] rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
+            <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center space-x-3 p-3">
-                    <div className="w-16 h-16 relative overflow-hidden rounded-lg bg-gray-200 flex-shrink-0">
+                    <div className="w-16 h-16 relative overflow-hidden rounded-lg bg-[#5C5537]/10 flex-shrink-0">
                         <img
                             src={track.coverArt}
                             alt={`${track.title} cover`}
@@ -19,10 +19,10 @@ const CompactTrackCard: React.FC<CompactTrackCardProps> = ({ track }) => {
                         />
                     </div>
                     <div className="min-w-0">
-                        <h3 className="font-medium text-[#1F2C24] truncate">
+                        <h3 className="font-medium text-[#5C5537] truncate">
                             {track.title}
                         </h3>
-                        <p className="text-[#A0A0A0] text-sm truncate">
+                        <p className="text-[#5C5537]/70 text-sm truncate">
                             {track.artist}
                         </p>
                     </div>

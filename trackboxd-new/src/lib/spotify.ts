@@ -157,6 +157,15 @@ export async function getTrackDetails(trackId: string) {
   return fetchSpotifyJson<any>(url);
 }
 
+export async function getArtistDetails(artistId: string) {
+  if (!artistId || !/^[A-Za-z0-9]{22}$/.test(artistId)) return null;
+  try {
+    return await fetchSpotifyJson<any>(`https://api.spotify.com/v1/artists/${artistId}`);
+  } catch {
+    return null;
+  }
+}
+
 export const searchPlaylists = async (
   query: string,
   options: { limit?: number; market?: string } = {}

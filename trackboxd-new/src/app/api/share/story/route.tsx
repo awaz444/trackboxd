@@ -304,7 +304,7 @@ export async function GET(req: NextRequest) {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
               <img
                 src={logoDataUrl}
-                style={{ height: '32px', width: '130px', objectFit: 'contain', objectPosition: 'right center', opacity: 0.6 }}
+                style={{ height: '52px', width: '210px', objectFit: 'contain', objectPosition: 'right center', opacity: 0.7 }}
               />
               <div style={{ display: 'flex', fontSize: '30px', color: '#5C5537', opacity: 0.45 }}>
                 trackboxd.com

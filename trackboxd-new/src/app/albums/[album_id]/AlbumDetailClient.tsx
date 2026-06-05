@@ -9,6 +9,7 @@ import useUser from "@/hooks/useUser";
 import ReviewForm from "@/components/log/forms/ReviewForm";
 import { spotifyToTrack } from "@/utils/trackConverters";
 import Link from "next/link";
+import MediaCard from "@/components/MediaCard";
 
 interface Review {
     id: string;
@@ -82,6 +83,15 @@ const AlbumDetailClient = ({
     const [isLiked, setIsLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
     const [showReviewForm, setShowReviewForm] = useState(false);
+    const [similarAlbums, setSimilarAlbums] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (!params.album_id) return;
+        fetch(`/api/albums/similar?id=${params.album_id}`)
+            .then((r) => r.json())
+            .then((data) => setSimilarAlbums(data || []))
+            .catch(console.error);
+    }, [params.album_id]);
 
     // Fetch album details
     useEffect(() => {
@@ -592,6 +602,28 @@ const AlbumDetailClient = ({
                     )}
                 </div>
             </div>
+            {/* Similar Albums */}
+            {similarAlbums.length > 0 && (
+                <div className="max-w-5xl mx-auto px-4 pb-8">
+                    <h2 className="text-xl font-bold text-[#5C5537] mb-4">
+                        Similar Albums
+                    </h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                        {similarAlbums.map((a: any) => (
+                            <MediaCard
+                                key={a.id}
+                                coverUrl={a.cover_url || "/default-album.jpg"}
+                                name={a.name}
+                                artist={a.artist}
+                                avgRating={a.avg_rating}
+                                itemType="album"
+                                itemId={a.id}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <Footer variant="light" />
         </div>
     );

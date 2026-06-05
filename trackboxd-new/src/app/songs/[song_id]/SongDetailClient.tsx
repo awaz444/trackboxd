@@ -10,6 +10,7 @@ import useUser from "@/hooks/useUser";
 import ReviewForm from "@/components/log/forms/ReviewForm";
 import AnnotationForm from "@/components/log/forms/AnnotationForm";
 import { spotifyToTrack } from "@/utils/trackConverters";
+import MediaCard from "@/components/MediaCard";
 
 interface Review {
     id: string;
@@ -97,6 +98,15 @@ const SongDetailClient = ({
     const [likeLoading, setLikeLoading] = useState(false);
     const [showReviewForm, setShowReviewForm] = useState(false);
     const [showAnnotationForm, setShowAnnotationForm] = useState(false);
+    const [similarTracks, setSimilarTracks] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (!params.song_id) return;
+        fetch(`/api/tracks/similar?id=${params.song_id}`)
+            .then((r) => r.json())
+            .then((data) => setSimilarTracks(data || []))
+            .catch(console.error);
+    }, [params.song_id]);
 
     const [reviewLikes, setReviewLikes] = useState<Record<string, boolean>>({});
     const [reviewLikeCounts, setReviewLikeCounts] = useState<
@@ -926,6 +936,28 @@ const SongDetailClient = ({
                     )}
                 </div>
             </div>
+            {/* Similar Tracks */}
+            {similarTracks.length > 0 && (
+                <div className="max-w-5xl mx-auto px-4 pb-8">
+                    <h2 className="text-xl font-bold text-[#5C5537] mb-4">
+                        Similar Tracks
+                    </h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                        {similarTracks.map((t: any) => (
+                            <MediaCard
+                                key={t.id}
+                                coverUrl={t.cover_url || "/default-album.jpg"}
+                                name={t.name}
+                                artist={t.artist}
+                                avgRating={t.avg_rating}
+                                itemType="track"
+                                itemId={t.id}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <Footer variant="light" />
         </div>
     );

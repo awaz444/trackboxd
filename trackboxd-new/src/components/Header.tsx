@@ -244,9 +244,10 @@ const Header: React.FC<HeaderProps> = ({ }) => {
     };
 
     const navItems = [
-        { label: "Activity", href: "/activity", active: false },
-        { label: "Tracks", href: "/tracks", active: false },
-        { label: "Albums", href: "/albums", active: false },
+        { label: "Home", href: "/home" },
+        { label: "Activity", href: "/activity" },
+        { label: "Tracks", href: "/tracks" },
+        { label: "Albums", href: "/albums" },
     ];
 
     const dropdownItems = [
@@ -340,20 +341,37 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                 <div className="flex items-center justify-between h-16">
                     {/* Left - Logo and Title */}
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-3">
-                            <div className="h-12 w-auto">
-                                <Image
-                                    src="/logo.svg"
-                                    alt="Trackboxd Logo"
-                                    width={40}
-                                    height={60}
-                                    className="h-full w-auto"
-                                />
+                        {authUser ? (
+                            <Link href="/home" className="flex items-center gap-3">
+                                <div className="h-12 w-auto">
+                                    <Image
+                                        src="/logo.svg"
+                                        alt="Trackboxd Logo"
+                                        width={40}
+                                        height={60}
+                                        className="h-full w-auto"
+                                    />
+                                </div>
+                                <h1 className="hidden md:block text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
+                                    Trackboxd
+                                </h1>
+                            </Link>
+                        ) : (
+                            <div className="flex items-center gap-3">
+                                <div className="h-12 w-auto">
+                                    <Image
+                                        src="/logo.svg"
+                                        alt="Trackboxd Logo"
+                                        width={40}
+                                        height={60}
+                                        className="h-full w-auto"
+                                    />
+                                </div>
+                                <h1 className="hidden md:block text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
+                                    Trackboxd
+                                </h1>
                             </div>
-                            <h1 className="hidden md:block text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
-                                Trackboxd
-                            </h1>
-                        </div>
+                        )}
                     </div>
 
                     {/* Middle - Navigation (desktop) */}
@@ -362,7 +380,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                             <a
                                 key={item.label}
                                 href={item.href}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${item.active
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${pathname === item.href
                                     ? "bg-[#5C5537] text-[#FFFBEb]"
                                     : "text-[#5C5537] hover:bg-[#5C5537]/10"
                                     }`}>
@@ -834,7 +852,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                 <a
                                     key={item.label}
                                     href={item.href}
-                                    className={`px-3 py-3 rounded-lg text-base font-medium transition-colors duration-200 ${item.active
+                                    className={`px-3 py-3 rounded-lg text-base font-medium transition-colors duration-200 ${pathname === item.href
                                         ? "bg-[#5C5537] text-[#FFFBEb]"
                                         : "text-[#5C5537] hover:bg-[#5C5537]/10"
                                         }`}>

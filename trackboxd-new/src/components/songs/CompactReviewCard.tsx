@@ -140,11 +140,11 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
                   <span className={isLiked ? "font-medium text-[#5C5537]" : ""}>{likeCount}</span>
                 </button>
                 <Link
-                  href={`/songs/${review.item_id}`}
+                  href={review.item?.type === "album" ? `/albums/${review.item_id}` : `/songs/${review.item_id}`}
                   onClick={(e) => e.stopPropagation()}
                   className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
                 >
-                  View track
+                  {review.item?.type === "album" ? "View album" : "View track"}
                 </Link>
               </div>
             </div>
@@ -226,10 +226,10 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
                   <span className={isLiked ? "font-medium" : ""}>{likeCount}</span>
                 </button>
                 <Link
-                  href={`/songs/${review.item_id}`}
+                  href={review.item?.type === "album" ? `/albums/${review.item_id}` : `/songs/${review.item_id}`}
                   className="text-xs text-[#5C5537]/70 hover:text-[#5C5537] hover:underline"
                 >
-                  View track
+                  {review.item?.type === "album" ? "View album" : "View track"}
                 </Link>
               </div>
             </div>

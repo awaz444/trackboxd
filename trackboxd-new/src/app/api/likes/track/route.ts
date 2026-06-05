@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { getTrackDetails } from '@/lib/spotify';
+import { enrichItemGenres } from '@/lib/enrichGenres';
 
 export async function POST(req: NextRequest) {
   return handleLikeRequest(req, 'POST');
@@ -70,9 +71,14 @@ async function handleLikeRequest(req: NextRequest, method: 'POST' | 'DELETE') {
         throw fetchError;
       }
 
+      let primaryArtistId: string | null = null;
+
       if (!existingItem) {
         // Step 2: Fetch from Spotify
         const track = await getTrackDetails(trackId);
+
+        // Capture primary artist Spotify ID for genre enrichment
+        primaryArtistId = track.artists?.[0]?.id ?? null;
 
         // Step 3: Extract essentials
         const newItem = {
@@ -84,6 +90,8 @@ async function handleLikeRequest(req: NextRequest, method: 'POST' | 'DELETE') {
           duration_ms: track.duration_ms,
           cover_url: track.album?.images?.[0]?.url ?? null,
           spotify_url: track.external_urls?.spotify,
+          popularity: track.popularity ?? null,
+          release_date: track.album?.release_date ?? null,
         };
 
         // Step 4: Insert into spotify_items
@@ -111,6 +119,9 @@ async function handleLikeRequest(req: NextRequest, method: 'POST' | 'DELETE') {
 
       // Step 6: Increment like count
       await supabase.rpc('increment_like_count', { item_id: trackId });
+
+      // Step 7: Enrich genres + update user interests (fire and forget)
+      enrichItemGenres(supabase, trackId, primaryArtistId, userId).catch(console.error);
 
       return NextResponse.json({ success: true });
     } else {

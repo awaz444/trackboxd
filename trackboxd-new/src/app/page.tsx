@@ -17,7 +17,7 @@ const LandingPage = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      router.replace('/activity');
+      router.replace('/home');
     }
   }, [user, loading, router]);
 
