@@ -75,7 +75,7 @@ export async function GET() {
             : (item.like_count || 0) * 2 + (item.review_count || 0) * 3,
       }))
       .sort((a, b) => b.score - a.score)
-      .slice(0, 4);
+      .slice(0, 5);
 
     return NextResponse.json(recommendations);
   } catch (error) {
