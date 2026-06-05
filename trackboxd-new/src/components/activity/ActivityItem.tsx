@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Music, Album, Clock, Heart, Share2, Check } from "lucide-react";
 import useUser from "@/hooks/useUser";
+import { VipBadge } from "@/components/VipBadge";
 
 export interface ActivityItem {
   id: string;
@@ -173,10 +174,12 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                 alt={activity.user.name}
                 className="w-6 h-6 rounded-full"
               />
-              <span className="text-sm text-[#5C5537]/70">
+              <span className="text-sm text-[#5C5537]/70 inline-flex items-center gap-1 flex-wrap">
                 <Link href={`/profile/${encodeURIComponent(activity.user.name)}`} className="hover:underline">
                   {activity.user.name}
-                </Link> reviewed
+                </Link>
+                <VipBadge username={activity.user.name} />
+                reviewed
               </span>
               {isAlbum ? (
                 <Album className="w-4 h-4 text-[#5C5537]" />
@@ -238,10 +241,12 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                 alt={activity.user.name}
                 className="w-6 h-6 rounded-full"
               />
-              <span className="text-sm text-[#5C5537]/70">
+              <span className="text-sm text-[#5C5537]/70 inline-flex items-center gap-1 flex-wrap">
                 <Link href={`/profile/${encodeURIComponent(activity.user.name)}`} className="hover:underline">
                   {activity.user.name}
-                </Link> annotated
+                </Link>
+                <VipBadge username={activity.user.name} />
+                annotated
               </span>
               <Clock className="w-4 h-4 text-[#5C5537]" />
             </div>
@@ -294,13 +299,15 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                 alt={activity.user.name}
                 className="w-6 h-6 rounded-full"
               />
-              <span className="text-sm text-[#5C5537]/70">
+              <span className="text-sm text-[#5C5537]/70 inline-flex items-center gap-1 flex-wrap">
                 <Link
                   href={`/profile/${encodeURIComponent(activity.user.name)}`}
                   className="hover:underline"
                 >
                   {activity.user.name}
-                </Link>{" "}liked
+                </Link>
+                <VipBadge username={activity.user.name} />
+                liked
               </span>
               <Heart className="w-4 h-4 text-[#5C5537]" />
             </div>

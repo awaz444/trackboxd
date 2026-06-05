@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Heart, Clock, X } from "lucide-react";
 import { Annotation } from "@/app/tracks/types";
 import useUser from "@/hooks/useUser";
+import { VipBadge } from "@/components/VipBadge";
 
 interface CompactAnnotationCardProps {
   annotation: Annotation;
@@ -105,10 +106,11 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
                 className="w-6 h-6 rounded-full object-cover"
                 onError={(e) => { e.currentTarget.src = "/default-avatar.jpg"; }}
               />
-              <div className="font-medium text-[#5C5537]" onClick={(e) => e.stopPropagation()}>
+              <div className="font-medium text-[#5C5537] flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                 <Link href={`/profile/${encodeURIComponent(annotation.users.name)}`} className="hover:underline">
                   {annotation.users.name}
                 </Link>
+                <VipBadge username={annotation.users.name} />
               </div>
               <div className="flex items-center text-[#5C5537]/70 text-xs">
                 <Clock className="h-4 w-4 mr-1" />
@@ -212,6 +214,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
                 >
                   @{annotation.users.name}
                 </Link>
+                <VipBadge username={annotation.users.name} />
                 <span className="text-[#5C5537]/30 text-xs">·</span>
                 <span className="text-xs text-[#5C5537]/50 flex-shrink-0">{timeAgo}</span>
               </div>

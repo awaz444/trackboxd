@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { X, UserMinus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { VipBadge } from "@/components/VipBadge";
 
 interface Following {
   id: string;
@@ -121,8 +122,9 @@ const FollowingModal: React.FC<FollowingModalProps> = ({
                       className="w-10 h-10 rounded-full object-cover"
                     />
                     <div>
-                      <div className="font-medium text-[#5C5537]">
+                      <div className="font-medium text-[#5C5537] flex items-center gap-1">
                         {user.name}
+                        <VipBadge username={user.name} />
                       </div>
                       {/* <div className="text-sm text-[#5C5537]/70">
                         @{user.username}

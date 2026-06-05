@@ -6,6 +6,7 @@ import { Heart, Clock, X, Share2, ExternalLink } from "lucide-react";
 import ShareSheet from "@/components/share/ShareSheet";
 import { Annotation } from "@/app/tracks/types";
 import useUser from "@/hooks/useUser";
+import { VipBadge } from "@/components/VipBadge";
 
 const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -110,12 +111,13 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({ annotation }) => {
                                 onError={(e) => { e.currentTarget.src = "/default-avatar.jpg"; }}
                             />
                             <div
-                                className="font-medium text-[#5C5537]"
+                                className="font-medium text-[#5C5537] flex items-center gap-1"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <Link href={`/profile/${encodeURIComponent(annotation.users.name)}`} className="hover:underline">
                                     {annotation.users.name}
                                 </Link>
+                                <VipBadge username={annotation.users.name} />
                             </div>
                             <div className="flex items-center text-[#5C5537]/70 text-xs">
                                 <Clock className="h-4 w-4 mr-1" />
@@ -246,6 +248,7 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({ annotation }) => {
                                 >
                                     @{annotation.users.name}
                                 </Link>
+                                <VipBadge username={annotation.users.name} />
                                 <span className="text-[#5C5537]/30 text-xs">·</span>
                                 <span className="text-xs text-[#5C5537]/50 flex-shrink-0">{timeAgo}</span>
                             </div>

@@ -8,6 +8,7 @@ import Footer from '@/components/Footer'
 import { getServerUser } from '@/lib/supabase/get-server-user'
 import LikeButton from '@/components/share/LikeButton'
 import ShareButton from '@/components/share/ShareButton'
+import { VipBadge } from '@/components/VipBadge'
 
 interface PageProps {
   params: { id: string }
@@ -159,8 +160,9 @@ export default async function ReviewPage({ params }: PageProps) {
                 onError={undefined}
               />
                 <div className="min-w-0">
-                  <p className="text-[#5C5537] text-sm font-medium group-hover:underline truncate">
+                  <p className="text-[#5C5537] text-sm font-medium group-hover:underline truncate flex items-center gap-1">
                     @{username}
+                    <VipBadge username={username} />
                   </p>
                   <p className="text-[#5C5537]/50 text-xs">{timeAgo}</p>
                 </div>
@@ -209,7 +211,10 @@ export default async function ReviewPage({ params }: PageProps) {
             />
             <div className="min-w-0">
               <p className="text-[#5C5537]/45 text-xs uppercase tracking-wide mb-1">Reviewer</p>
-              <p className="font-semibold text-[#5C5537] text-sm truncate">@{username}</p>
+              <p className="font-semibold text-[#5C5537] text-sm truncate flex items-center gap-1">
+                @{username}
+                <VipBadge username={username} />
+              </p>
               <p className="text-[#5C5537]/40 text-xs mt-1 group-hover:text-[#5C5537]/60 transition-colors">
                 View profile →
               </p>

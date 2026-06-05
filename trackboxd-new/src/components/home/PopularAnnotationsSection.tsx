@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import HomeSectionHeader from "./HomeSectionHeader";
+import { VipBadge } from "@/components/VipBadge";
 
 interface PopularAnnotation {
   id: string;
@@ -72,8 +73,9 @@ export default function PopularAnnotationsSection({ data }: Props) {
                     alt={ann.user.name}
                     className="w-5 h-5 rounded-full object-cover"
                   />
-                  <span className="text-xs font-medium text-[#5C5537]">
+                  <span className="text-xs font-medium text-[#5C5537] inline-flex items-center gap-1">
                     {ann.user.name}
+                    <VipBadge username={ann.user.name} />
                   </span>
                 </div>
                 {/* Annotation text */}

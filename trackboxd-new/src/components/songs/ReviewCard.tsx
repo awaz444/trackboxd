@@ -6,6 +6,7 @@ import { Heart, Star, X, Share2, ExternalLink } from "lucide-react";
 import ShareSheet from "@/components/share/ShareSheet";
 import { Review } from "@/app/tracks/types";
 import useUser from "@/hooks/useUser";
+import { VipBadge } from "@/components/VipBadge";
 
 interface ReviewCardProps {
     review: Review;
@@ -105,12 +106,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
                                 onError={(e) => { e.currentTarget.src = "/default-avatar.jpg"; }}
                             />
                             <div
-                                className="font-medium text-[#5C5537]"
+                                className="font-medium text-[#5C5537] flex items-center gap-1"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <Link href={`/profile/${encodeURIComponent(review.users.name)}`} className="hover:underline">
                                     {review.users.name}
                                 </Link>
+                                <VipBadge username={review.users.name} />
                             </div>
                             <div className="flex items-center text-[#FFBA00] text-sm">
                                 <Star className="h-4 w-4 mr-0.5 fill-current" />
@@ -250,6 +252,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
                                 >
                                     @{review.users.name}
                                 </Link>
+                                <VipBadge username={review.users.name} />
                                 <span className="text-[#5C5537]/30 text-xs">·</span>
                                 <span className="text-xs text-[#5C5537]/50 flex-shrink-0">{timeAgo}</span>
                             </div>

@@ -11,6 +11,7 @@ import FollowingModal from "./FollowingModal";
 import FollowRequestsModal from "./FollowRequestsModal";
 import AuthModal from "@/components/AuthModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { VipBadge } from "@/components/VipBadge";
 
 interface ProfileHeaderProps {
   user: {
@@ -130,8 +131,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <div className="text-center md:text-left">
               {/* Name and stats in one row */}
               <div className="flex flex-col sm:flex-row items-center gap-3 mb-2">
-                <h1 className="text-xl md:text-2xl font-semibold text-[#5C5537]">
+                <h1 className="text-xl md:text-2xl font-semibold text-[#5C5537] flex items-center gap-1.5">
                   {user.name}
+                  <VipBadge username={username} />
                 </h1>
               </div>
 

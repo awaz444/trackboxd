@@ -5,6 +5,7 @@ import HomeSectionHeader from "./HomeSectionHeader";
 import { useFollow } from "@/hooks/useFollow";
 import { Loader2, UserPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { VipBadge } from "@/components/VipBadge";
 
 interface PopularUser {
   id: string;
@@ -44,7 +45,10 @@ function UserRow({ user }: { user: PopularUser }) {
           </div>
         )}
         <div className="min-w-0">
-          <p className="font-medium text-[#5C5537] truncate">{user.name}</p>
+          <p className="font-medium text-[#5C5537] truncate flex items-center gap-1">
+            {user.name}
+            <VipBadge username={user.name} />
+          </p>
           <p className="text-xs text-[#5C5537]/60">
             {user.followers} follower{user.followers !== 1 ? "s" : ""} ·{" "}
             {user.review_count} review{user.review_count !== 1 ? "s" : ""}
