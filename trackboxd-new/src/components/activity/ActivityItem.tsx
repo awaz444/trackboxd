@@ -283,16 +283,18 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
           </>
         );
       case "like": {
-        const likeHref = activity.like_target_type === "album"
+        // Song/album always links to the item itself
+        const songHref = activity.item_type === "album"
           ? `/albums/${activity.item_id}`
-          : activity.like_target_type === "review"
+          : `/songs/${activity.item_id}`;
+        // The review/annotation target href (for the word "review"/"annotation")
+        const targetHref = activity.like_target_type === "review"
           ? `/reviews/${activity.target_id}`
           : activity.like_target_type === "annotation"
           ? `/annotations/${activity.target_id}`
-          : `/songs/${activity.item_id}`;
+          : songHref;
         const isLikeAlbum = activity.item_type === "album";
 
-        // Build the action label and icon based on what was liked
         let actionLabel: React.ReactNode;
         let actionIcon: React.ReactNode;
         const authorName = activity.like_author?.name;
@@ -309,7 +311,11 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                   {authorName}
                 </Link>
               ) : "someone"}
-              {"'s review of"}
+              {"'s "}
+              <Link href={targetHref} className="hover:underline font-medium">
+                review
+              </Link>
+              {" of"}
             </>
           );
           actionIcon = <Heart className="w-4 h-4 text-[#5C5537]" />;
@@ -325,7 +331,11 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                   {authorName}
                 </Link>
               ) : "someone"}
-              {"'s annotation on"}
+              {"'s "}
+              <Link href={targetHref} className="hover:underline font-medium">
+                annotation
+              </Link>
+              {" on"}
             </>
           );
           actionIcon = <Heart className="w-4 h-4 text-[#5C5537]" />;
@@ -358,7 +368,7 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
               </span>
               {actionIcon}
             </div>
-            {/* Cover + item info row */}
+            {/* Cover + item info row — title always goes to the song/album */}
             <div className="mb-2 flex items-start gap-3">
               {activity.cover_url ? (
                 <img
@@ -378,7 +388,7 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
               <div>
                 <h4 className="font-medium text-[#5C5537]">
                   {activity.title ? (
-                    <Link href={likeHref} className="hover:underline">
+                    <Link href={songHref} className="hover:underline">
                       {activity.title}
                     </Link>
                   ) : (
