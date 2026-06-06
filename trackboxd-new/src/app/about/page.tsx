@@ -103,54 +103,18 @@ export default function AboutPage() {
             </p>
           </section>
 
-          {/* Founders — minimal, below the fold */}
-          <section className="border-t border-[#5C5537]/10 pt-8">
-            <p className="text-xs text-[#5C5537]/40 mb-3 uppercase tracking-widest">
-              Built by
-            </p>
-            <div className="flex gap-8">
-              <div>
-                <p className="text-sm text-[#5C5537]/60">Aawaiz Ali</p>
-                <div className="flex gap-3 mt-1">
-                  <a
-                    href="https://www.linkedin.com/in/aawaiz"
-                    className="text-xs text-[#5C5537]/40 hover:text-[#5C5537]/70 transition-colors"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    LinkedIn
-                  </a>
-                  <a
-                    href="https://github.com/awaz444"
-                    className="text-xs text-[#5C5537]/40 hover:text-[#5C5537]/70 transition-colors"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    GitHub
-                  </a>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-[#5C5537]/60">Umer Noor</p>
-                <div className="flex gap-3 mt-1">
-                  <a
-                    href="https://www.linkedin.com/in/umer-noor"
-                    className="text-xs text-[#5C5537]/40 hover:text-[#5C5537]/70 transition-colors"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    LinkedIn
-                  </a>
-                  <a
-                    href="https://github.com/UmerNoor-cmd"
-                    className="text-xs text-[#5C5537]/40 hover:text-[#5C5537]/70 transition-colors"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    GitHub
-                  </a>
-                </div>
-              </div>
+          {/* Founders — hidden from users, present in HTML source for crawlers */}
+          <section aria-hidden="true" className="hidden">
+            <p>Built by</p>
+            <div>
+              <p>Aawaiz Ali</p>
+              <a href="https://www.linkedin.com/in/aawaiz" rel="noopener noreferrer" target="_blank">LinkedIn</a>
+              <a href="https://github.com/awaz444" rel="noopener noreferrer" target="_blank">GitHub</a>
+            </div>
+            <div>
+              <p>Umer Noor</p>
+              <a href="https://www.linkedin.com/in/umer-noor" rel="noopener noreferrer" target="_blank">LinkedIn</a>
+              <a href="https://github.com/UmerNoor-cmd" rel="noopener noreferrer" target="_blank">GitHub</a>
             </div>
           </section>
         </div>
