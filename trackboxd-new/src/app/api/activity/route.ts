@@ -310,7 +310,7 @@ export async function GET(req: NextRequest) {
           const { data: authors } = await supabase
             .from("users")
             .select("id, name, username")
-            .in("id", [...authorIds]);
+            .in("id", Array.from(authorIds));
           (authors || []).forEach((u: any) => { authorsMap[u.id] = u; });
         }
 
