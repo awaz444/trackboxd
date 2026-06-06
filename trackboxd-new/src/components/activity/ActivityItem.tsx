@@ -28,6 +28,7 @@ export interface ActivityItem {
   target_id?: string; // review id or annotation id
   // For like events
   like_target_type?: "track" | "album" | "review" | "annotation";
+  like_author?: { id: string; name: string; username?: string } | null;
   is_global?: boolean; // true when shown as fallback from non-followed users
 }
 
@@ -290,9 +291,55 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
           ? `/annotations/${activity.target_id}`
           : `/songs/${activity.item_id}`;
         const isLikeAlbum = activity.item_type === "album";
+
+        // Build the action label and icon based on what was liked
+        let actionLabel: React.ReactNode;
+        let actionIcon: React.ReactNode;
+        const authorName = activity.like_author?.name;
+
+        if (activity.like_target_type === "review") {
+          actionLabel = (
+            <>
+              liked{" "}
+              {authorName ? (
+                <Link
+                  href={`/profile/${encodeURIComponent(authorName)}`}
+                  className="hover:underline font-medium"
+                >
+                  {authorName}
+                </Link>
+              ) : "someone"}
+              {"'s review of"}
+            </>
+          );
+          actionIcon = <Heart className="w-4 h-4 text-[#5C5537]" />;
+        } else if (activity.like_target_type === "annotation") {
+          actionLabel = (
+            <>
+              liked{" "}
+              {authorName ? (
+                <Link
+                  href={`/profile/${encodeURIComponent(authorName)}`}
+                  className="hover:underline font-medium"
+                >
+                  {authorName}
+                </Link>
+              ) : "someone"}
+              {"'s annotation on"}
+            </>
+          );
+          actionIcon = <Heart className="w-4 h-4 text-[#5C5537]" />;
+        } else if (isLikeAlbum) {
+          actionLabel = "liked the album";
+          actionIcon = <Album className="w-4 h-4 text-[#5C5537]" />;
+        } else {
+          actionLabel = "liked the song";
+          actionIcon = <Music className="w-4 h-4 text-[#5C5537]" />;
+        }
+
         return (
           <>
-            {/* Header row — matches review/annotation style */}
+            {/* Header row */}
             <div className="flex items-center gap-2 mb-3">
               <img
                 src={activity.user.image_url || "./default-avatar.jpg"}
@@ -307,11 +354,11 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                   {activity.user.name}
                 </Link>
                 <VipBadge username={activity.user.name} />
-                liked
+                {actionLabel}
               </span>
-              <Heart className="w-4 h-4 text-[#5C5537]" />
+              {actionIcon}
             </div>
-            {/* Cover + item info row — same as review/annotation */}
+            {/* Cover + item info row */}
             <div className="mb-2 flex items-start gap-3">
               {activity.cover_url ? (
                 <img

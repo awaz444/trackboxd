@@ -280,11 +280,11 @@ export async function GET(req: NextRequest) {
           const { data: reviewItems } = await supabase
             .from("reviews")
             .select(
-              "id, spotify_items!reviews_item_id_fkey (id, name, artist, cover_url, type)"
+              "id, user_id, spotify_items!reviews_item_id_fkey (id, name, artist, cover_url, type)"
             )
             .in("id", reviewLikeIds);
           (reviewItems || []).forEach((r: any) => {
-            reviewsMap[r.id] = r.spotify_items;
+            reviewsMap[r.id] = { spotifyItem: r.spotify_items, authorId: r.user_id };
           });
         }
 
@@ -292,22 +292,41 @@ export async function GET(req: NextRequest) {
           const { data: annItems } = await supabase
             .from("annotations")
             .select(
-              "id, spotify_items!annotations_track_id_fkey (id, name, artist, cover_url)"
+              "id, user_id, spotify_items!annotations_track_id_fkey (id, name, artist, cover_url)"
             )
             .in("id", annotationLikeIds);
           (annItems || []).forEach((a: any) => {
-            annotationsMap[a.id] = a.spotify_items;
+            annotationsMap[a.id] = { spotifyItem: a.spotify_items, authorId: a.user_id };
           });
+        }
+
+        // Batch-fetch authors for review/annotation likes
+        const authorIds = new Set<string>();
+        Object.values(reviewsMap).forEach((r: any) => r.authorId && authorIds.add(r.authorId));
+        Object.values(annotationsMap).forEach((a: any) => a.authorId && authorIds.add(a.authorId));
+
+        let authorsMap: Record<string, any> = {};
+        if (authorIds.size > 0) {
+          const { data: authors } = await supabase
+            .from("users")
+            .select("id, name, username")
+            .in("id", [...authorIds]);
+          (authors || []).forEach((u: any) => { authorsMap[u.id] = u; });
         }
 
         likeActivities = recentLikes.map((l: any) => {
           let spotifyItem: any = null;
+          let likeAuthor: any = null;
           if (l.target_type === "track" || l.target_type === "album") {
             spotifyItem = spotifyItemsMap[l.target_id];
           } else if (l.target_type === "review") {
-            spotifyItem = reviewsMap[l.target_id];
+            const reviewData = reviewsMap[l.target_id];
+            spotifyItem = reviewData?.spotifyItem;
+            likeAuthor = reviewData?.authorId ? authorsMap[reviewData.authorId] : null;
           } else if (l.target_type === "annotation") {
-            spotifyItem = annotationsMap[l.target_id];
+            const annData = annotationsMap[l.target_id];
+            spotifyItem = annData?.spotifyItem;
+            likeAuthor = annData?.authorId ? authorsMap[annData.authorId] : null;
           }
           if (!spotifyItem) return null;
 
@@ -323,6 +342,7 @@ export async function GET(req: NextRequest) {
             title: spotifyItem.name,
             artist: spotifyItem.artist,
             cover_url: spotifyItem.cover_url,
+            like_author: likeAuthor,
           };
         }).filter(Boolean);
       }
