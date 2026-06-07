@@ -17,9 +17,10 @@ interface PopularItem {
 
 interface Props {
   data: PopularItem[];
+  likes?: Record<string, boolean>;
 }
 
-export default function PopularOnTrackboxd({ data }: Props) {
+export default function PopularOnTrackboxd({ data, likes = {} }: Props) {
   if (data.length === 0) return null;
 
   return (
@@ -41,6 +42,7 @@ export default function PopularOnTrackboxd({ data }: Props) {
             annotationCount={item.annotation_count}
             itemType={item.type === "album" ? "album" : "track"}
             itemId={item.id}
+            isLiked={likes[item.id] || false}
             showPopularStats
           />
         ))}

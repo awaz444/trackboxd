@@ -18,9 +18,10 @@ interface RecommendedItem {
 interface Props {
   data: RecommendedItem[];
   fallbackData?: RecommendedItem[]; // Popular items shown when no interest profile yet
+  likes?: Record<string, boolean>;
 }
 
-export default function RecommendedForYou({ data, fallbackData = [] }: Props) {
+export default function RecommendedForYou({ data, fallbackData = [], likes = {} }: Props) {
   const items = data.length > 0 ? data : fallbackData;
   if (items.length === 0) return null;
 
@@ -46,6 +47,7 @@ export default function RecommendedForYou({ data, fallbackData = [] }: Props) {
             avgRating={item.avg_rating}
             itemType={item.type === "album" ? "album" : "track"}
             itemId={item.id}
+            isLiked={likes[item.id] || false}
           />
         ))}
       </div>

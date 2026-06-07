@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import NewOnTrackboxd from "@/components/home/NewOnTrackboxd";
@@ -23,7 +23,37 @@ export default function HomePage() {
   const [recommended, setRecommended] = useState<any[]>([]);
   const [peopleYouMayKnow, setPeopleYouMayKnow] = useState<any[]>([]);
   const [popularUsers, setPopularUsers] = useState<any[]>([]);
+  const [likes, setLikes] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+
+  const fetchLikeStatuses = useCallback(
+    async (items: { id: string; type: string }[]) => {
+      if (!user) return;
+      const uniqueItems = Array.from(
+        new Map(items.map((item) => [item.id, item])).values()
+      );
+      const statuses = await Promise.all(
+        uniqueItems.map((item) => {
+          const endpoint = item.type === "album" ? "album" : "track";
+          const queryParam = item.type === "album" ? "albumId" : "trackId";
+          return fetch(
+            `/api/likes/${endpoint}?userId=${user.id}&${queryParam}=${item.id}`
+          )
+            .then((r) => r.json())
+            .then((d) => ({ id: item.id, isLiked: d.isLiked }))
+            .catch(() => ({ id: item.id, isLiked: false }));
+        })
+      );
+      setLikes((prev) => {
+        const next = { ...prev };
+        statuses.forEach(({ id, isLiked }) => {
+          next[id] = isLiked;
+        });
+        return next;
+      });
+    },
+    [user]
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -51,14 +81,28 @@ export default function HomePage() {
           fetch("/api/users/popular").then((r) => r.json()),
         ]);
 
+        let popItems: any[] = [];
+        let recItems: any[] = [];
+
         if (newRes.status === "fulfilled") setNewContent(newRes.value || []);
-        if (popularRes.status === "fulfilled") setPopularItems(popularRes.value || []);
+        if (popularRes.status === "fulfilled") {
+          popItems = popularRes.value || [];
+          setPopularItems(popItems);
+        }
         if (reviewsRes.status === "fulfilled") setPopularReviews(reviewsRes.value || []);
         if (annotationsRes.status === "fulfilled") setPopularAnnotations(annotationsRes.value || []);
         if (activityRes.status === "fulfilled") setFriendsActivity(activityRes.value || []);
-        if (recommendedRes.status === "fulfilled") setRecommended(recommendedRes.value || []);
+        if (recommendedRes.status === "fulfilled") {
+          recItems = recommendedRes.value || [];
+          setRecommended(recItems);
+        }
         if (peopleRes.status === "fulfilled") setPeopleYouMayKnow(peopleRes.value || []);
         if (usersRes.status === "fulfilled") setPopularUsers(usersRes.value || []);
+
+        const allItems = [...popItems, ...recItems];
+        if (allItems.length > 0) {
+          fetchLikeStatuses(allItems);
+        }
       } catch (err) {
         console.error("Home page fetch error:", err);
       } finally {
@@ -67,7 +111,7 @@ export default function HomePage() {
     };
 
     fetchAll();
-  }, [user]);
+  }, [user, fetchLikeStatuses]);
 
   if (loading) {
     return (
@@ -89,7 +133,7 @@ export default function HomePage() {
         <NewOnTrackboxd data={newContent} />
 
         {/* Popular on Trackboxd (items) */}
-        <PopularOnTrackboxd data={popularItems} />
+        <PopularOnTrackboxd data={popularItems} likes={likes} />
 
         {/* Popular Reviews This Week */}
         <PopularReviewsSection data={popularReviews} />
@@ -104,6 +148,7 @@ export default function HomePage() {
         <RecommendedForYou
           data={recommended}
           fallbackData={popularItems}
+          likes={likes}
         />
 
         {/* People You May Know */}
