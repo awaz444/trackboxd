@@ -96,6 +96,11 @@ type NotificationEmailParams =
   | { type: 'follow'; recipientUserId: string; actorUserId: string };
 
 export async function sendNotificationEmail(params: NotificationEmailParams): Promise<void> {
+  // Populated inside the try block; used by the dev-mode fallback in the catch block.
+  let logRecipientEmail: string | undefined;
+  let logRecipientName: string | undefined;
+  let logSubject: string | undefined;
+
   try {
     // Enforce 1-hour cooldown per (recipient, notification type)
     const { data: cooldown } = await supabaseAdmin
@@ -119,7 +124,10 @@ export async function sendNotificationEmail(params: NotificationEmailParams): Pr
     if (!recipient?.email || !actor) return;
 
     const actorName = actor.username || actor.name;
+    const recipientEmail = recipient.email;
     const recipientName = recipient.username || recipient.name;
+    logRecipientEmail = recipientEmail;
+    logRecipientName = recipientName;
 
     let subject: string;
     let htmlBody: string;
@@ -146,8 +154,9 @@ export async function sendNotificationEmail(params: NotificationEmailParams): Pr
         : `${actorName} liked your ${params.targetType} on Trackboxd`;
       htmlBody = buildLikeEmail(actorName, recipientName, params.targetType, trackName);
     }
+    logSubject = subject;
 
-    await mailjetSend({ toEmail: recipient.email, toName: recipientName, subject, htmlBody });
+    await mailjetSend({ toEmail: recipientEmail, toName: recipientName, subject, htmlBody });
 
     // Stamp the cooldown after a successful send
     await supabaseAdmin
@@ -161,11 +170,11 @@ export async function sendNotificationEmail(params: NotificationEmailParams): Pr
     const causeCode = err?.cause?.code || err?.code;
     if (causeCode === 'ENOTFOUND' || causeCode === 'EAI_AGAIN') {
       console.warn(`[email] sendNotificationEmail skipped: Mailjet API is unreachable (${causeCode}).`);
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'development' && logRecipientEmail) {
         console.log(`[email] [DEV MODE FALLBACK] Would send email:
-To: ${recipientName} (${recipient.email})
-Subject: ${subject}
-Body preview: ${subject}`);
+To: ${logRecipientName} (${logRecipientEmail})
+Subject: ${logSubject}
+Body preview: ${logSubject}`);
       }
     } else {
       console.error('[email] sendNotificationEmail failed:', err);
