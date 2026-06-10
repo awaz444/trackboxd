@@ -10,11 +10,12 @@ import ActivityCard from "@/components/profile/ActivityCard";
 import FavoriteTracks from "@/components/profile/FavoriteTracks";
 import FollowingSection from "@/components/profile/FollowingSection";
 import ProfilePrompts from "@/components/profile/ProfilePrompts";
-import { Heart, Star, MessageCircle } from "lucide-react";
+import { Heart, Star, MessageCircle, BookOpen, Plus } from "lucide-react";
 import Link from "next/link";
 import ProfileReviewCard from "@/components/profile/ProfileReviewCard";
 import ProfileAnnotationCard from "@/components/profile/ProfileAnnotationCard";
 import { ProfileJsonLd } from "@/components/seo/JsonLd";
+import JournalCard from "@/components/journals/JournalCard";
 
 interface ProfilePageProps {
     params: {
@@ -85,6 +86,44 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     const isOwnProfile = currentUser?.id === profileData.user.id;
     const initialIsFollowing = profileData.isFollowing || false;
     const followStatus = profileData.followStatus || 'not_following';
+
+    // Fetch journals (public only for others; all for own profile)
+    let journals: any[] = [];
+    try {
+        const cookieStore = cookies();
+        const supabase = createClient(cookieStore);
+        const { data: profileUser } = await supabase
+            .from("users")
+            .select("id")
+            .eq("name", username)
+            .single();
+
+        if (profileUser) {
+            let jq = supabase
+                .from("journals")
+                .select("id, title, subtitle, cover_url, is_public, source_type, created_at")
+                .eq("user_id", profileUser.id)
+                .order("created_at", { ascending: false });
+
+            if (!isOwnProfile) jq = jq.eq("is_public", true);
+
+            const { data: jData } = await jq;
+            if (jData && jData.length > 0) {
+                // Fetch progress counts
+                journals = await Promise.all(
+                    jData.map(async (j: any) => {
+                        const [{ count: total }, { count: reviewed }] = await Promise.all([
+                            supabase.from("journal_items").select("*", { count: "exact", head: true }).eq("journal_id", j.id),
+                            supabase.from("journal_items").select("*", { count: "exact", head: true }).eq("journal_id", j.id).not("review_id", "is", null),
+                        ]);
+                        return { ...j, total_tracks: total ?? 0, reviewed_tracks: reviewed ?? 0 };
+                    })
+                );
+            }
+        }
+    } catch {
+        // Non-critical: journals silently fail
+    }
 
     const {
         user,
@@ -173,7 +212,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         {(reviews.length > 0 || annotations.length > 0) && (
                             <div className="mb-8">
                                 <h2 className="text-2xl font-bold text-[#5C5537] mb-6">
-                                    my recent reviews & annotations...
+                                    My recent reviews & annotations...
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Reviews Column */}
@@ -223,7 +262,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         <div className="mb-8">
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-2xl font-bold text-[#5C5537]">
-                                    my recent likes...
+                                    My recent likes...
                                 </h2>
                             </div>
                             <div className="space-y-3">
@@ -348,6 +387,60 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                 )}
                             </div>
                         </div>
+
+                        {/* Journals Section */}
+                        {(journals.length > 0 || isOwnProfile) && (
+                            <div className="mb-8">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <BookOpen className="text-[#5C5537] w-5 h-5" />
+                                        <h2 className="text-2xl font-bold text-[#5C5537]">
+                                            My journals...
+                                        </h2>
+                                    </div>
+                                    {isOwnProfile && (
+                                        <Link
+                                            href="/journals/new"
+                                            className="flex items-center gap-1.5 text-xs font-medium text-[#5C5537]/60 hover:text-[#5C5537] border border-[#5C5537]/20 hover:border-[#5C5537]/40 rounded-full px-3 py-1.5 transition-colors"
+                                        >
+                                            <Plus className="w-3 h-3" />
+                                            New
+                                        </Link>
+                                    )}
+                                </div>
+                                {journals.length > 0 ? (
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                        {journals.map((journal: any) => (
+                                            <JournalCard
+                                                key={journal.id}
+                                                id={journal.id}
+                                                title={journal.title}
+                                                subtitle={journal.subtitle}
+                                                cover_url={journal.cover_url}
+                                                is_public={journal.is_public}
+                                                source_type={journal.source_type}
+                                                total_tracks={journal.total_tracks}
+                                                reviewed_tracks={journal.reviewed_tracks}
+                                                reviewedBy={user.name}
+                                                reviewedByImage={user.image_url}
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-10 border border-dashed border-[#5C5537]/20 rounded-xl">
+                                        <BookOpen className="w-10 h-10 text-[#5C5537]/20 mx-auto mb-2" />
+                                        <p className="text-sm text-[#5C5537]/50">No journals yet.</p>
+                                        <Link
+                                            href="/journals/new"
+                                            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5C5537]/60 hover:text-[#5C5537] mt-2"
+                                        >
+                                            <Plus className="w-3 h-3" />
+                                            Start your first journal
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Following Section */}
                         <FollowingSection

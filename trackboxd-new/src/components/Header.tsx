@@ -266,6 +266,12 @@ const Header: React.FC<HeaderProps> = ({ }) => {
             icon: FileText,
             link: true,
         },
+        {
+            label: "My Journals",
+            href: "/my-journals",
+            icon: BookOpen,
+            link: true,
+        },
         { type: "divider" },
         { label: "Logout", onClick: handleLogout, icon: LogOut },
     ];

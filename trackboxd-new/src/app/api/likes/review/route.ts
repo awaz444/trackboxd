@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
+import { sendNotificationEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   return handleReviewLikeRequest(req, 'POST');
@@ -109,6 +110,14 @@ async function handleReviewLikeRequest(req: NextRequest, method: 'POST' | 'DELET
             target_id: reviewId,
             is_read: false
           });
+
+        void sendNotificationEmail({
+          type: 'like',
+          recipientUserId: reviewData.user_id,
+          actorUserId: userId,
+          targetId: reviewId,
+          targetType: 'review',
+        });
       }
 
       await supabase.rpc('commit');

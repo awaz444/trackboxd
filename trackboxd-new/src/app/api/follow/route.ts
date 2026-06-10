@@ -2,6 +2,7 @@ import { getServerUser } from "@/lib/supabase/get-server-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { sendNotificationEmail } from "@/lib/email";
 
 export async function POST(request: Request) {
   const user = await getServerUser();
@@ -112,6 +113,12 @@ export async function POST(request: Request) {
     if (notificationError) {
       console.error('Failed to create notification:', notificationError);
       // Don't fail the request if notification fails
+    } else {
+      void sendNotificationEmail({
+        type: 'follow',
+        recipientUserId: followingId,
+        actorUserId: user.id,
+      });
     }
 
     return NextResponse.json({

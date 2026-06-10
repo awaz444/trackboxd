@@ -55,7 +55,7 @@ const ProfilePrompts: React.FC<ProfilePromptsProps> = ({ username, isOwnProfile 
     <div className="mb-10">
       {isOwnProfile && (
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#5C5537]">Profile Prompts</h2>
+          <h2 className="text-2xl font-bold text-[#5C5537]">Profile prompts</h2>
           <Button 
             variant="outline"
             className="border-[#5C5537]/20 bg-[#FFFBEb] text-[#5C5537] hover:bg-[#5C5537]/10"

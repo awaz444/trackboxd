@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
+import { sendNotificationEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   return handleAnnotationLikeRequest(req, 'POST');
@@ -106,6 +107,14 @@ async function handleAnnotationLikeRequest(req: NextRequest, method: 'POST' | 'D
             target_id: annotationId,
             is_read: false
           });
+
+        void sendNotificationEmail({
+          type: 'like',
+          recipientUserId: annotationData.user_id,
+          actorUserId: userId,
+          targetId: annotationId,
+          targetType: 'annotation',
+        });
       }
 
       await supabase.rpc('commit');
