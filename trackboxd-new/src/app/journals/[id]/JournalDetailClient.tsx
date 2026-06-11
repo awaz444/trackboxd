@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
     Lock, Globe, Trash2, Edit2, Check, X, Music, BookOpen, Plus, Search, Link2, ExternalLink
@@ -169,18 +169,40 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
         );
     };
 
+    const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const searchRequestIdRef = useRef(0);
+
+    useEffect(() => {
+        return () => {
+            if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+        };
+    }, []);
+
     const searchTracks = async (q: string) => {
-        if (!q.trim()) { setTrackResults([]); return; }
+        const requestId = ++searchRequestIdRef.current;
         setIsSearching(true);
         try {
-            const res = await fetch(`/api/search/spotify?q=${encodeURIComponent(q)}&trackLimit=8&albumLimit=0`);
+            const res = await fetch(`/api/search/spotify?q=${encodeURIComponent(q)}&trackLimit=3&albumLimit=0`);
             const data = await res.json();
+            if (requestId !== searchRequestIdRef.current) return;
             setTrackResults(data.tracks || []);
         } catch {
-            setTrackResults([]);
+            if (requestId === searchRequestIdRef.current) setTrackResults([]);
         } finally {
-            setIsSearching(false);
+            if (requestId === searchRequestIdRef.current) setIsSearching(false);
         }
+    };
+
+    const handleSearchChange = (value: string) => {
+        setTrackSearch(value);
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+        if (!value.trim()) {
+            searchRequestIdRef.current++;
+            setTrackResults([]);
+            setIsSearching(false);
+            return;
+        }
+        searchTimeoutRef.current = setTimeout(() => searchTracks(value), 400);
     };
 
     const handleAddTrack = async (track: any) => {
@@ -392,47 +414,48 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                                 <input
                                     type="text"
                                     value={trackSearch}
-                                    onChange={(e) => {
-                                        setTrackSearch(e.target.value);
-                                        const q = e.target.value;
-                                        const timer = setTimeout(() => searchTracks(q), 400);
-                                        return () => clearTimeout(timer);
-                                    }}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
                                     placeholder="Search for a track..."
                                     className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-[#5C5537]/20 bg-[#FFFBEb] text-[#5C5537] focus:outline-none focus:ring-1 focus:ring-[#5C5537]/40"
                                 />
-                            </div>
-                            {isSearching && (
-                                <p className="text-xs text-[#5C5537]/50 text-center py-2">Searching...</p>
-                            )}
-                            {trackResults.length > 0 && (
-                                <div className="space-y-1 max-h-60 overflow-y-auto">
-                                    {trackResults.map((track: any) => (
-                                        <button
-                                            key={track.id}
-                                            onClick={() => handleAddTrack(track)}
-                                            disabled={isAddingTrack}
-                                            className="w-full flex items-center gap-2.5 p-2 hover:bg-[#5C5537]/5 rounded-lg text-left"
-                                        >
-                                            {track.album?.images?.[0]?.url ? (
-                                                <img
-                                                    src={track.album.images[0].url}
-                                                    alt={track.name}
-                                                    className="w-9 h-9 rounded object-cover flex-shrink-0"
-                                                />
-                                            ) : (
-                                                <div className="w-9 h-9 rounded bg-[#5C5537]/10 flex-shrink-0" />
-                                            )}
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-[#5C5537] truncate">{track.name}</p>
-                                                <p className="text-xs text-[#5C5537]/50 truncate">
-                                                    {track.artists?.map((a: any) => a.name).join(", ")}
-                                                </p>
+                                {trackSearch.trim() && (
+                                    <div className="absolute left-0 right-0 top-full mt-1 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg shadow-lg z-20 overflow-hidden">
+                                        {isSearching ? (
+                                            <p className="text-xs text-[#5C5537]/50 text-center py-3">Searching...</p>
+                                        ) : trackResults.length > 0 ? (
+                                            <div className="divide-y divide-[#5C5537]/10">
+                                                {trackResults.slice(0, 3).map((track: any) => (
+                                                    <button
+                                                        key={track.id}
+                                                        onClick={() => handleAddTrack(track)}
+                                                        disabled={isAddingTrack}
+                                                        className="w-full flex items-center gap-2.5 p-2 hover:bg-[#5C5537]/5 text-left disabled:opacity-50"
+                                                    >
+                                                        {track.album?.images?.[0]?.url ? (
+                                                            <img
+                                                                src={track.album.images[0].url}
+                                                                alt={track.name}
+                                                                className="w-9 h-9 rounded object-cover flex-shrink-0"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-9 h-9 rounded bg-[#5C5537]/10 flex-shrink-0" />
+                                                        )}
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-[#5C5537] truncate">{track.name}</p>
+                                                            <p className="text-xs text-[#5C5537]/50 truncate">
+                                                                {track.artists?.map((a: any) => a.name).join(", ")}
+                                                            </p>
+                                                        </div>
+                                                        <Plus className="w-4 h-4 text-[#5C5537]/40 flex-shrink-0" />
+                                                    </button>
+                                                ))}
                                             </div>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                                        ) : (
+                                            <p className="text-xs text-[#5C5537]/50 text-center py-3">No tracks found.</p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ) : (
                         <button
