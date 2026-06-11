@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    // Fetch reviews with Spotify metadata
+    // Fetch reviews with Spotify metadata - ONLY PUBLIC ONES
     let reviewsData: Review[] = [];
     if (reviewIds.length > 0) {
       const { data: reviews, error: reviewError } = await supabase
@@ -126,8 +126,9 @@ export async function GET(req: NextRequest) {
             type
           )
         `)
-        .in("id", reviewIds);
-      
+        .in("id", reviewIds)
+        .eq("is_public", true);
+
       if (reviewError) throw reviewError;
       reviewsData = reviews as unknown as Review[] || [];
     }
