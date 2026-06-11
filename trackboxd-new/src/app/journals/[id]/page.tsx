@@ -45,7 +45,7 @@ export default async function JournalDetailPage({ params }: Props) {
             users(id, name, image_url),
             journal_items(
                 id, track_id, review_id, is_native_review, sort_order, created_at,
-                spotify_items(id, name, artist, album, cover_url, spotify_url, duration_ms),
+                spotify_items(id, name, artist, album, cover_url, spotify_url),
                 reviews(id, rating, text, is_public, created_at)
             )
         `)
@@ -59,6 +59,29 @@ export default async function JournalDetailPage({ params }: Props) {
     // direct link can view. They're simply omitted from profile listings.
 
     const journalUsername = (journal.users as any)?.name as string | null;
+
+    // Fetch all public comments (annotations) for the tracks in this journal
+    // so the shared viewer can see the full conversation around each song.
+    const trackIds = (journal.journal_items || []).map((item: any) => item.track_id);
+    const annotationsByTrack: Record<string, any[]> = {};
+
+    if (trackIds.length > 0) {
+        const { data: annotations } = await supabase
+            .from("annotations")
+            .select(`
+                id, track_id, timestamp, text, created_at,
+                users:user_id (id, name, image_url)
+            `)
+            .in("track_id", trackIds)
+            .eq("is_public", true)
+            .order("timestamp", { ascending: true });
+
+        for (const annotation of annotations || []) {
+            const key = annotation.track_id as string;
+            if (!annotationsByTrack[key]) annotationsByTrack[key] = [];
+            annotationsByTrack[key].push(annotation);
+        }
+    }
 
     return (
         <div className="min-h-screen bg-[#FFFBEb]">
@@ -77,6 +100,7 @@ export default async function JournalDetailPage({ params }: Props) {
                     items: (journal.journal_items || []) as any,
                 }}
                 currentUserId={currentUser?.id ?? null}
+                annotationsByTrack={annotationsByTrack}
             />
         </div>
     );

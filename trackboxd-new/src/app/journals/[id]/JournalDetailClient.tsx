@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-    Lock, Globe, Trash2, Edit2, Check, X, Music, BookOpen, Plus, Search, Link2
+    Lock, Globe, Trash2, Edit2, Check, X, Music, BookOpen, Plus, Search, Link2, ExternalLink
 } from "lucide-react";
 import JournalTrackRow from "@/components/journals/JournalTrackRow";
 import Link from "next/link";
@@ -14,7 +14,6 @@ interface Track {
     artist: string;
     album?: string | null;
     cover_url?: string | null;
-    duration_ms?: number | null;
 }
 
 interface JournalItem {
@@ -37,6 +36,18 @@ interface JournalUser {
     image_url?: string | null;
 }
 
+interface AnnotationItem {
+    id: string;
+    timestamp: number;
+    text: string;
+    created_at: string;
+    users: {
+        id: string;
+        name: string;
+        image_url?: string | null;
+    };
+}
+
 interface JournalDetailClientProps {
     journal: {
         id: string;
@@ -44,6 +55,7 @@ interface JournalDetailClientProps {
         subtitle: string | null;
         is_public: boolean;
         source_type: "manual" | "spotify_playlist";
+        spotify_playlist_id?: string | null;
         cover_url: string | null;
         user_id: string;
         users: JournalUser;
@@ -51,6 +63,7 @@ interface JournalDetailClientProps {
         created_at: string;
     };
     currentUserId: string | null;
+    annotationsByTrack: Record<string, AnnotationItem[]>;
 }
 
 const ProgressBar = ({ reviewed, total }: { reviewed: number; total: number }) => {
@@ -72,7 +85,7 @@ const ProgressBar = ({ reviewed, total }: { reviewed: number; total: number }) =
     );
 };
 
-export default function JournalDetailClient({ journal, currentUserId }: JournalDetailClientProps) {
+export default function JournalDetailClient({ journal, currentUserId, annotationsByTrack }: JournalDetailClientProps) {
     const router = useRouter();
     const isOwner = currentUserId === journal.user_id;
 
@@ -263,9 +276,21 @@ export default function JournalDetailClient({ journal, currentUserId }: JournalD
                                     </p>
                                 </Link>
                                 {journal.source_type === "spotify_playlist" && (
-                                    <span className="block mt-1 text-xs text-[#5C5537]/40 italic">
-                                        Imported from Spotify · track list locked
-                                    </span>
+                                    journal.spotify_playlist_id ? (
+                                        <a
+                                            href={`https://open.spotify.com/playlist/${journal.spotify_playlist_id}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 mt-1 text-xs text-[#5C5537]/40 hover:text-[#5C5537]/70 italic transition-colors"
+                                        >
+                                            Imported from Spotify
+                                            <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                    ) : (
+                                        <span className="block mt-1 text-xs text-[#5C5537]/40 italic">
+                                            Imported from Spotify
+                                        </span>
+                                    )
                                 )}
                                 {!isPublic && !isOwner && (
                                     <span className="flex items-center gap-1 mt-1 text-xs text-[#5C5537]/40 italic">
@@ -439,6 +464,7 @@ export default function JournalDetailClient({ journal, currentUserId }: JournalD
                             journalId={journal.id}
                             track={item.spotify_items}
                             review={item.reviews}
+                            annotations={annotationsByTrack[item.track_id] || []}
                             isOwner={isOwner}
                             journalIsPublic={isPublic}
                             onReviewSaved={handleReviewSaved}
