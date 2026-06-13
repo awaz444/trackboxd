@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/songs/", "/albums/", "/profile/", "/about", "/tracks/"],
+        allow: ["/", "/songs/", "/albums/", "/profile/", "/about", "/tracks/", "/annotations/", "/reviews/", "/api/share/"],
         disallow: ["/api/", "/settings/", "/notifications/", "/my-reviews", "/my-annotations", "/my-likes"],
       },
       { userAgent: "GPTBot", allow: "/" },

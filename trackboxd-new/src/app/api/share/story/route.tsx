@@ -1,39 +1,17 @@
 import { NextRequest } from 'next/server'
 import { ImageResponse } from 'next/og'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
-import { readFileSync } from 'fs'
-import { join } from 'path'
+import {
+  loadShareCardData,
+  truncate,
+  formatTimestamp,
+  type ShareCardType,
+} from '@/lib/share-card-data'
 
 export const runtime = 'nodejs'
 
-async function fetchAsBase64(url: string): Promise<string> {
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000) })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const buf = await res.arrayBuffer()
-    const ct = res.headers.get('content-type') || 'image/jpeg'
-    return `data:${ct};base64,${Buffer.from(buf).toString('base64')}`
-  } catch {
-    return ''
-  }
-}
-
-function truncate(text: string, max: number): string {
-  if (text.length <= max) return text
-  return text.slice(0, max).trimEnd() + '…'
-}
-
-
-function formatTimestamp(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  const s = Math.floor(seconds % 60)
-  return `${m}:${s.toString().padStart(2, '0')}`
-}
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const type = searchParams.get('type')
+  const type = searchParams.get('type') as ShareCardType | null
   const id = searchParams.get('id')
 
   if (!type || !id || !['review', 'annotation'].includes(type)) {
@@ -41,82 +19,23 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const data = await loadShareCardData(type, id)
+    if (!data) return new Response('Not found', { status: 404 })
 
-    let trackName = ''
-    let artistName = ''
-    let albumName = ''
-    let coverUrl = ''
-    let contentText = ''
-    let username = ''
-    let avatarUrl = ''
-    let rating = 0
-    let timestamp = 0
-
-    if (type === 'review') {
-      const { data, error } = await supabase
-        .from('reviews')
-        .select(`
-          id, rating, text, is_public, item_id,
-          users:user_id (id, name, image_url),
-          spotify_items!reviews_item_id_fkey (id, name, artist, album, cover_url)
-        `)
-        .eq('id', id)
-        .eq('is_public', true)
-        .single()
-
-      if (error || !data) return new Response('Not found', { status: 404 })
-
-      const d = data as any
-      trackName = d.spotify_items?.name || 'Unknown Track'
-      artistName = d.spotify_items?.artist || 'Unknown Artist'
-      albumName = d.spotify_items?.album || ''
-      coverUrl = d.spotify_items?.cover_url || ''
-      contentText = d.text || ''
-      username = d.users?.name || 'trackboxd user'
-      avatarUrl = d.users?.image_url || ''
-      rating = d.rating || 0
-    } else {
-      const { data, error } = await supabase
-        .from('annotations')
-        .select(`
-          id, text, timestamp, is_public, track_id,
-          users:user_id (id, name, image_url),
-          spotify_items!annotations_track_id_fkey (id, name, artist, album, cover_url)
-        `)
-        .eq('id', id)
-        .eq('is_public', true)
-        .single()
-
-      if (error || !data) return new Response('Not found', { status: 404 })
-
-      const d = data as any
-      trackName = d.spotify_items?.name || 'Unknown Track'
-      artistName = d.spotify_items?.artist || 'Unknown Artist'
-      albumName = d.spotify_items?.album || ''
-      coverUrl = d.spotify_items?.cover_url || ''
-      contentText = d.text || ''
-      username = d.users?.name || 'trackboxd user'
-      avatarUrl = d.users?.image_url || ''
-      timestamp = d.timestamp || 0
-    }
-
-    // Load external images and local assets in parallel
-    const defaultAvatarPath = join(process.cwd(), 'public', 'default-avatar.jpg')
-
-    const [coverDataUrl, avatarDataUrlRaw] = await Promise.all([
-      coverUrl ? fetchAsBase64(coverUrl) : Promise.resolve(''),
-      avatarUrl ? fetchAsBase64(avatarUrl) : Promise.resolve(''),
-    ])
-
-    const fallbackAvatar = `data:image/jpeg;base64,${readFileSync(defaultAvatarPath).toString('base64')}`
-    const avatarDataUrl = avatarDataUrlRaw || fallbackAvatar
-
-    const fontRegular = readFileSync(join(process.cwd(), 'public', 'fonts', 'Lora-Regular copy.ttf'))
-    const fontBold = readFileSync(join(process.cwd(), 'public', 'fonts', 'Lora-Bold copy.ttf'))
-    const logoBuffer = readFileSync(join(process.cwd(), 'public', 'trackboxd-logo.png'))
-    const logoDataUrl = `data:image/png;base64,${logoBuffer.toString('base64')}`
+    const {
+      trackName,
+      artistName,
+      albumName,
+      contentText,
+      username,
+      rating,
+      timestamp,
+      coverDataUrl,
+      avatarDataUrl,
+      logoDataUrl,
+      fontRegular,
+      fontBold,
+    } = data
 
     const displayText = truncate(contentText, 280)
     const displayTrack = truncate(trackName, 42)
@@ -135,10 +54,7 @@ export async function GET(req: NextRequest) {
             padding: '88px 80px 72px',
           }}
         >
-          {/* Main content — vertically centered in remaining space above footer */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-
-            {/* Cover art */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '56px' }}>
               {coverDataUrl ? (
                 <img
@@ -162,7 +78,6 @@ export async function GET(req: NextRequest) {
               )}
             </div>
 
-            {/* Track name */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
               <div
                 style={{
@@ -178,14 +93,12 @@ export async function GET(req: NextRequest) {
               </div>
             </div>
 
-            {/* Artist */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: albumName ? '8px' : '0px' }}>
               <div style={{ display: 'flex', fontSize: '32px', color: '#5C5537', opacity: 0.65, textAlign: 'center' }}>
                 {displayArtist}
               </div>
             </div>
 
-            {/* Album */}
             {albumName ? (
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <div
@@ -203,7 +116,6 @@ export async function GET(req: NextRequest) {
               </div>
             ) : null}
 
-            {/* Rating pills (review) or timestamp (annotation) */}
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '36px' }}>
               {type === 'review' ? (
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -243,7 +155,6 @@ export async function GET(req: NextRequest) {
               )}
             </div>
 
-            {/* Review / annotation text */}
             {displayText ? (
               <div
                 style={{
@@ -268,10 +179,8 @@ export async function GET(req: NextRequest) {
                 </div>
               </div>
             ) : null}
+          </div>
 
-          </div>{/* end centered content */}
-
-          {/* Divider */}
           <div
             style={{
               display: 'flex',
@@ -281,7 +190,6 @@ export async function GET(req: NextRequest) {
             }}
           />
 
-          {/* Footer: user + branding */}
           <div
             style={{
               display: 'flex',
@@ -289,7 +197,6 @@ export async function GET(req: NextRequest) {
               justifyContent: 'space-between',
             }}
           >
-            {/* User */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <img
                 src={avatarDataUrl}
@@ -300,7 +207,6 @@ export async function GET(req: NextRequest) {
               </div>
             </div>
 
-            {/* Logo + URL */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
               <img
                 src={logoDataUrl}

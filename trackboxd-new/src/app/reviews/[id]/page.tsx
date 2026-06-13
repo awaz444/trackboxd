@@ -56,7 +56,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description = review.text
     ? review.text.slice(0, 160)
     : `${username} rated ${trackName} ${rating} out of 5 on Trackboxd.`
-  const ogImage = `/api/share/story?type=review&id=${params.id}`
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://trackboxd.com'
+  const pageUrl = `${baseUrl}/reviews/${params.id}`
+  const ogImage = `/api/share/og?type=review&id=${params.id}`
 
   return {
     title,
@@ -64,7 +66,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title,
       description,
-      images: [{ url: ogImage, width: 1080, height: 1920 }],
+      url: pageUrl,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',

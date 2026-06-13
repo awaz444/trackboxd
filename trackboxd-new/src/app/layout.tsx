@@ -106,55 +106,56 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify([
-              {
-                "@context": "https://schema.org",
-                "@type": "WebSite",
-                name: "Trackboxd",
-                alternateName: "The Letterboxd for Tracks",
-                url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
-                description:
-                  "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary.",
-                potentialAction: {
-                  "@type": "SearchAction",
-                  target: {
-                    "@type": "EntryPoint",
-                    urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"}/search?q={search_term_string}`,
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  name: "Trackboxd",
+                  alternateName: "The Letterboxd for Tracks",
+                  url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
+                  description:
+                    "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary.",
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: {
+                      "@type": "EntryPoint",
+                      urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"}/search?q={search_term_string}`,
+                    },
+                    "query-input": "required name=search_term_string",
                   },
-                  "query-input": "required name=search_term_string",
                 },
-              },
-              {
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                name: "Trackboxd",
-                url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
-                description:
-                  "Trackboxd is a track-first social platform for rating songs, writing reviews, and annotating lyrics.",
-                founder: [
-                  {
-                    "@type": "Person",
-                    name: "Aawaiz Ali",
-                    url: "https://www.linkedin.com/in/aawaiz",
-                    sameAs: [
-                      "https://www.linkedin.com/in/aawaiz",
-                      "https://www.instagram.com/aawaiz_",
-                      "https://github.com/awaz444",
-                    ],
-                  },
-                  {
-                    "@type": "Person",
-                    name: "Umer Noor",
-                    url: "https://www.linkedin.com/in/umer-noor",
-                    sameAs: [
-                      "https://www.linkedin.com/in/umer-noor",
-                      "https://www.instagram.com/umer1300",
-                      "https://github.com/UmerNoor-cmd",
-                    ],
-                  },
-                ],
-              },
-            ]),
+                {
+                  "@type": "Organization",
+                  name: "Trackboxd",
+                  url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
+                  description:
+                    "Trackboxd is a track-first social platform for rating songs, writing reviews, and annotating lyrics.",
+                  founder: [
+                    {
+                      "@type": "Person",
+                      name: "Aawaiz Ali",
+                      url: "https://www.linkedin.com/in/aawaiz",
+                      sameAs: [
+                        "https://www.linkedin.com/in/aawaiz",
+                        "https://www.instagram.com/aawaiz_",
+                        "https://github.com/awaz444",
+                      ],
+                    },
+                    {
+                      "@type": "Person",
+                      name: "Umer Noor",
+                      url: "https://www.linkedin.com/in/umer-noor",
+                      sameAs: [
+                        "https://www.linkedin.com/in/umer-noor",
+                        "https://www.instagram.com/umer1300",
+                        "https://github.com/UmerNoor-cmd",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            }),
           }}
         />
       </head>

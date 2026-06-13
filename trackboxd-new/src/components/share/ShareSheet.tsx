@@ -96,6 +96,14 @@ export default function ShareSheet({
     }
   }
 
+  function handleShareOnX() {
+    window.open(
+      `https://x.com/intent/tweet?url=${encodeURIComponent(shareUrl)}`,
+      '_blank',
+      'noopener,noreferrer'
+    )
+  }
+
   async function handleCopyLink() {
     try {
       await navigator.clipboard.writeText(shareUrl)
@@ -156,6 +164,22 @@ export default function ShareSheet({
                 <div>
                   <p className="text-sm font-semibold text-[#5C5537]">Instagram Story</p>
                   <p className="text-xs text-[#5C5537]/50 mt-0.5">Download a 9:16 card to share</p>
+                </div>
+              </button>
+
+              {/* X */}
+              <button
+                onClick={handleShareOnX}
+                className="flex items-center gap-3 w-full p-4 rounded-xl border border-[#5C5537]/15 hover:border-[#5C5537]/30 hover:bg-[#5C5537]/5 transition-all text-left"
+              >
+                <span className="w-5 h-5 flex items-center justify-center text-[#5C5537]/55 flex-shrink-0 text-sm font-bold leading-none">
+                  𝕏
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-[#5C5537]">X</p>
+                  <p className="text-xs text-[#5C5537]/50 mt-0.5">
+                    Post this {type === 'review' ? 'review' : 'annotation'} with a link preview
+                  </p>
                 </div>
               </button>
 
