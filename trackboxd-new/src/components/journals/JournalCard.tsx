@@ -2,13 +2,15 @@
 
 import React from "react";
 import Link from "next/link";
-import { Lock, BookOpen } from "lucide-react";
+import { Lock } from "lucide-react";
+import JournalCover from "./JournalCover";
 
 export interface JournalCardProps {
     id: string;
     title: string;
     subtitle?: string | null;
     cover_url?: string | null;
+    track_covers?: (string | null | undefined)[];
     is_public: boolean;
     source_type: "manual" | "spotify_playlist";
     total_tracks: number;
@@ -36,6 +38,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
     title,
     subtitle,
     cover_url,
+    track_covers,
     is_public,
     source_type,
     total_tracks,
@@ -48,18 +51,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
             <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-200 flex flex-col h-full">
                 {/* Cover */}
                 <div className="relative aspect-square bg-[#5C5537]/5">
-                    {cover_url ? (
-                        <img
-                            src={cover_url}
-                            alt={title}
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.currentTarget.src = "/default-album.jpg"; }}
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                            <BookOpen className="w-12 h-12 text-[#5C5537]/30" />
-                        </div>
-                    )}
+                    <JournalCover coverUrl={cover_url} trackCovers={track_covers} title={title} />
                     {/* Privacy badge */}
                     {!is_public && (
                         <div className="absolute top-2 right-2 bg-[#5C5537]/80 rounded-full p-1.5">

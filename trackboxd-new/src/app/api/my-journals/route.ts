@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
         .from("journals")
         .select(`
             *,
-            journal_items(count)
+            journal_items(track_id, review_id, sort_order, spotify_items(cover_url))
         `)
         .eq("user_id", authUser.id)
         .order("created_at", { ascending: false });
@@ -39,27 +39,19 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 
-    // Compute review progress for each journal
-    const journalsWithProgress = await Promise.all(
-        (data || []).map(async (journal: any) => {
-            const { count: totalCount } = await supabase
-                .from("journal_items")
-                .select("*", { count: "exact", head: true })
-                .eq("journal_id", journal.id);
+    // Compute review progress and a track-cover collage for each journal
+    const journalsWithProgress = (data || []).map((journal: any) => {
+        const { journal_items, ...rest } = journal;
+        const items = (journal_items || []) as any[];
+        const sorted = [...items].sort((a, b) => a.sort_order - b.sort_order);
 
-            const { count: reviewedCount } = await supabase
-                .from("journal_items")
-                .select("*", { count: "exact", head: true })
-                .eq("journal_id", journal.id)
-                .not("review_id", "is", null);
-
-            return {
-                ...journal,
-                total_tracks: totalCount ?? 0,
-                reviewed_tracks: reviewedCount ?? 0,
-            };
-        })
-    );
+        return {
+            ...rest,
+            total_tracks: items.length,
+            reviewed_tracks: items.filter((i) => i.review_id !== null).length,
+            track_covers: sorted.slice(0, 4).map((i) => i.spotify_items?.cover_url ?? null),
+        };
+    });
 
     return NextResponse.json(journalsWithProgress);
 }

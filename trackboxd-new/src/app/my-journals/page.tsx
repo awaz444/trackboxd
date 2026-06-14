@@ -12,6 +12,7 @@ interface Journal {
     title: string;
     subtitle: string | null;
     cover_url: string | null;
+    track_covers?: (string | null)[];
     is_public: boolean;
     source_type: "manual" | "spotify_playlist";
     total_tracks: number;
@@ -83,6 +84,7 @@ export default function MyJournalsPage() {
                                 title={journal.title}
                                 subtitle={journal.subtitle}
                                 cover_url={journal.cover_url}
+                                track_covers={journal.track_covers}
                                 is_public={journal.is_public}
                                 source_type={journal.source_type}
                                 total_tracks={journal.total_tracks}

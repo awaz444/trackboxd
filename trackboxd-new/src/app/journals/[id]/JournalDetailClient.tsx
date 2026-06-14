@@ -3,9 +3,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-    Lock, Globe, Trash2, Edit2, Check, X, Music, BookOpen, Plus, Search, Link2, ExternalLink
+    Lock, Globe, Trash2, Edit2, Check, X, Music, Plus, Search, Link2, ExternalLink
 } from "lucide-react";
 import JournalTrackRow from "@/components/journals/JournalTrackRow";
+import JournalCover from "@/components/journals/JournalCover";
 import Link from "next/link";
 
 interface Track {
@@ -182,10 +183,10 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
         const requestId = ++searchRequestIdRef.current;
         setIsSearching(true);
         try {
-            const res = await fetch(`/api/search/spotify?q=${encodeURIComponent(q)}&trackLimit=3&albumLimit=0`);
+            const res = await fetch(`/api/tracks/search?q=${encodeURIComponent(q)}&limit=3`);
             const data = await res.json();
             if (requestId !== searchRequestIdRef.current) return;
-            setTrackResults(data.tracks || []);
+            setTrackResults(data.tracks?.items || []);
         } catch {
             if (requestId === searchRequestIdRef.current) setTrackResults([]);
         } finally {
@@ -237,18 +238,12 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                 <div className="flex gap-4">
                     {/* Cover */}
                     <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-xl overflow-hidden flex-shrink-0 bg-[#5C5537]/5 border border-[#5C5537]/10">
-                        {journal.cover_url ? (
-                            <img
-                                src={journal.cover_url}
-                                alt={journal.title}
-                                className="w-full h-full object-cover"
-                                onError={(e) => { e.currentTarget.src = "/default-album.jpg"; }}
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                                <BookOpen className="w-10 h-10 text-[#5C5537]/30" />
-                            </div>
-                        )}
+                        <JournalCover
+                            coverUrl={journal.cover_url}
+                            trackCovers={journal.items.map((item) => item.spotify_items?.cover_url)}
+                            title={journal.title}
+                            iconClassName="w-10 h-10"
+                        />
                     </div>
 
                     {/* Info */}

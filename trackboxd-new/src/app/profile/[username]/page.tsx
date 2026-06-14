@@ -101,7 +101,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         if (profileUser) {
             let jq = supabase
                 .from("journals")
-                .select("id, title, subtitle, cover_url, is_public, source_type, created_at")
+                .select(`
+                    id, title, subtitle, cover_url, is_public, source_type, created_at,
+                    journal_items(track_id, review_id, sort_order, spotify_items(cover_url))
+                `)
                 .eq("user_id", profileUser.id)
                 .order("created_at", { ascending: false });
 
@@ -109,16 +112,17 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
             const { data: jData } = await jq;
             if (jData && jData.length > 0) {
-                // Fetch progress counts
-                journals = await Promise.all(
-                    jData.map(async (j: any) => {
-                        const [{ count: total }, { count: reviewed }] = await Promise.all([
-                            supabase.from("journal_items").select("*", { count: "exact", head: true }).eq("journal_id", j.id),
-                            supabase.from("journal_items").select("*", { count: "exact", head: true }).eq("journal_id", j.id).not("review_id", "is", null),
-                        ]);
-                        return { ...j, total_tracks: total ?? 0, reviewed_tracks: reviewed ?? 0 };
-                    })
-                );
+                journals = jData.map((j: any) => {
+                    const { journal_items, ...rest } = j;
+                    const items = (journal_items || []) as any[];
+                    const sorted = [...items].sort((a, b) => a.sort_order - b.sort_order);
+                    return {
+                        ...rest,
+                        total_tracks: items.length,
+                        reviewed_tracks: items.filter((i) => i.review_id !== null).length,
+                        track_covers: sorted.slice(0, 4).map((i) => i.spotify_items?.cover_url ?? null),
+                    };
+                });
             }
         }
     } catch {
@@ -417,6 +421,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                                 title={journal.title}
                                                 subtitle={journal.subtitle}
                                                 cover_url={journal.cover_url}
+                                                track_covers={journal.track_covers}
                                                 is_public={journal.is_public}
                                                 source_type={journal.source_type}
                                                 total_tracks={journal.total_tracks}
