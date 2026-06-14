@@ -18,9 +18,10 @@ interface NewReview {
 
 interface Props {
   data: NewReview[];
+  likes?: Record<string, boolean>;
 }
 
-export default function NewOnTrackboxd({ data }: Props) {
+export default function NewOnTrackboxd({ data, likes = {} }: Props) {
   if (data.length === 0) return null;
 
   return (
@@ -40,6 +41,7 @@ export default function NewOnTrackboxd({ data }: Props) {
             reviewRating={review.rating}
             hasReviewText={review.has_text}
             user={review.user}
+            isLiked={likes[review.item_id] || false}
           />
         ))}
       </div>

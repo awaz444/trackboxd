@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, Star, Clock, Share2, Check } from "lucide-react";
 import useUser from "@/hooks/useUser";
@@ -65,6 +65,17 @@ const MediaCard: React.FC<MediaCardProps> = ({
   const [copied, setCopied] = useState(false);
   const { user: currentUser } = useUser();
 
+  // Parent often resolves like status asynchronously after this card has
+  // already mounted (e.g. home page batches like-status fetches). Keep
+  // local state in sync when that arrives.
+  useEffect(() => {
+    setIsLiked(initialIsLiked);
+  }, [initialIsLiked]);
+
+  useEffect(() => {
+    setLikeCount(initialLikeCount);
+  }, [initialLikeCount]);
+
   const cardHref = itemType === "track" ? `/songs/${itemId}` : `/albums/${itemId}`;
 
   const handleLike = async (e: React.MouseEvent) => {
@@ -122,6 +133,21 @@ const MediaCard: React.FC<MediaCardProps> = ({
                 e.currentTarget.src = "/default-album.jpg";
               }}
             />
+            {/* Like status/toggle */}
+            {currentUser && (
+              <button
+                onClick={handleLike}
+                disabled={isLiking}
+                aria-label={isLiked ? "Unlike" : "Like"}
+                className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-[#FFFBEb]/85 hover:bg-[#FFFBEb] shadow-sm"
+              >
+                <Heart
+                  className={`w-3.5 h-3.5 transition-colors ${
+                    isLiked ? "text-[#5C5537] fill-[#5C5537]" : "text-[#5C5537]/60"
+                  }`}
+                />
+              </button>
+            )}
             {/* Gradient overlay with user attribution */}
             {user && (
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 flex items-center gap-2">
@@ -178,19 +204,8 @@ const MediaCard: React.FC<MediaCardProps> = ({
               e.currentTarget.src = "/default-album.jpg";
             }}
           />
-          {/* Hover actions: like + share */}
-          <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <button
-              onClick={handleShare}
-              aria-label="Share"
-              className="p-1.5 rounded-full bg-[#FFFBEb]/85 hover:bg-[#FFFBEb] shadow-sm"
-            >
-              {copied ? (
-                <Check className="w-3.5 h-3.5 text-[#5C5537]" />
-              ) : (
-                <Share2 className="w-3.5 h-3.5 text-[#5C5537]/70" />
-              )}
-            </button>
+          {/* Like (always visible) + Share (on hover) */}
+          <div className="absolute top-2 right-2 flex items-center gap-1">
             {currentUser && (
               <button
                 onClick={handleLike}
@@ -205,6 +220,17 @@ const MediaCard: React.FC<MediaCardProps> = ({
                 />
               </button>
             )}
+            <button
+              onClick={handleShare}
+              aria-label="Share"
+              className="p-1.5 rounded-full bg-[#FFFBEb]/85 hover:bg-[#FFFBEb] shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            >
+              {copied ? (
+                <Check className="w-3.5 h-3.5 text-[#5C5537]" />
+              ) : (
+                <Share2 className="w-3.5 h-3.5 text-[#5C5537]/70" />
+              )}
+            </button>
           </div>
         </div>
         {/* Info */}
@@ -220,8 +246,12 @@ const MediaCard: React.FC<MediaCardProps> = ({
           )}
           {showPopularStats && (
             <div className="flex items-center gap-3 mt-1">
-              <span className="flex items-center gap-1 text-xs text-[#5C5537]/60">
-                <Heart className="w-3 h-3" />
+              <span
+                className={`flex items-center gap-1 text-xs ${
+                  isLiked ? "text-[#5C5537]" : "text-[#5C5537]/60"
+                }`}
+              >
+                <Heart className={`w-3 h-3 ${isLiked ? "fill-[#5C5537]" : ""}`} />
                 {likeCount}
               </span>
               {reviewCount !== undefined && (

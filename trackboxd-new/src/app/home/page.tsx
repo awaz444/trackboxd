@@ -83,8 +83,12 @@ export default function HomePage() {
 
         let popItems: any[] = [];
         let recItems: any[] = [];
+        let newItems: any[] = [];
 
-        if (newRes.status === "fulfilled") setNewContent(newRes.value || []);
+        if (newRes.status === "fulfilled") {
+          newItems = newRes.value || [];
+          setNewContent(newItems);
+        }
         if (popularRes.status === "fulfilled") {
           popItems = popularRes.value || [];
           setPopularItems(popItems);
@@ -99,7 +103,11 @@ export default function HomePage() {
         if (peopleRes.status === "fulfilled") setPeopleYouMayKnow(peopleRes.value || []);
         if (usersRes.status === "fulfilled") setPopularUsers(usersRes.value || []);
 
-        const allItems = [...popItems, ...recItems];
+        const allItems = [
+          ...popItems,
+          ...recItems,
+          ...newItems.map((r) => ({ id: r.item_id, type: r.item_type })),
+        ];
         if (allItems.length > 0) {
           fetchLikeStatuses(allItems);
         }
@@ -130,7 +138,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#FFFBEb]">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* New on Trackboxd */}
-        <NewOnTrackboxd data={newContent} />
+        <NewOnTrackboxd data={newContent} likes={likes} />
 
         {/* Popular on Trackboxd (items) */}
         <PopularOnTrackboxd data={popularItems} likes={likes} />
