@@ -24,6 +24,8 @@ export default function HomePage() {
   const [peopleYouMayKnow, setPeopleYouMayKnow] = useState<any[]>([]);
   const [popularUsers, setPopularUsers] = useState<any[]>([]);
   const [likes, setLikes] = useState<Record<string, boolean>>({});
+  const [reviewLikes, setReviewLikes] = useState<Record<string, boolean>>({});
+  const [annotationLikes, setAnnotationLikes] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
 
   const fetchLikeStatuses = useCallback(
@@ -51,6 +53,24 @@ export default function HomePage() {
         });
         return next;
       });
+    },
+    [user]
+  );
+
+  // Like status for reviews/annotations (e.g. Popular Reviews/Annotations sections)
+  const fetchTargetLikeStatuses = useCallback(
+    async (ids: string[], type: "review" | "annotation") => {
+      if (!user || ids.length === 0) return {} as Record<string, boolean>;
+      const idParam = type === "review" ? "reviewId" : "annotationId";
+      const statuses = await Promise.all(
+        ids.map((id) =>
+          fetch(`/api/likes/${type}?userId=${user.id}&${idParam}=${id}`)
+            .then((r) => r.json())
+            .then((d) => ({ id, isLiked: !!d.isLiked }))
+            .catch(() => ({ id, isLiked: false }))
+        )
+      );
+      return Object.fromEntries(statuses.map((s) => [s.id, s.isLiked])) as Record<string, boolean>;
     },
     [user]
   );
@@ -93,8 +113,16 @@ export default function HomePage() {
           popItems = popularRes.value || [];
           setPopularItems(popItems);
         }
-        if (reviewsRes.status === "fulfilled") setPopularReviews(reviewsRes.value || []);
-        if (annotationsRes.status === "fulfilled") setPopularAnnotations(annotationsRes.value || []);
+        if (reviewsRes.status === "fulfilled") {
+          const reviews = reviewsRes.value || [];
+          setPopularReviews(reviews);
+          fetchTargetLikeStatuses(reviews.map((r: any) => r.id), "review").then(setReviewLikes);
+        }
+        if (annotationsRes.status === "fulfilled") {
+          const annotations = annotationsRes.value || [];
+          setPopularAnnotations(annotations);
+          fetchTargetLikeStatuses(annotations.map((a: any) => a.id), "annotation").then(setAnnotationLikes);
+        }
         if (activityRes.status === "fulfilled") setFriendsActivity(activityRes.value || []);
         if (recommendedRes.status === "fulfilled") {
           recItems = recommendedRes.value || [];
@@ -119,7 +147,7 @@ export default function HomePage() {
     };
 
     fetchAll();
-  }, [user, fetchLikeStatuses]);
+  }, [user, fetchLikeStatuses, fetchTargetLikeStatuses]);
 
   if (loading) {
     return (
@@ -144,10 +172,10 @@ export default function HomePage() {
         <PopularOnTrackboxd data={popularItems} likes={likes} />
 
         {/* Popular Reviews This Week */}
-        <PopularReviewsSection data={popularReviews} />
+        <PopularReviewsSection data={popularReviews} likes={reviewLikes} />
 
         {/* Popular Annotations This Week */}
-        <PopularAnnotationsSection data={popularAnnotations} />
+        <PopularAnnotationsSection data={popularAnnotations} likes={annotationLikes} />
 
         {/* Recent Activity */}
         <RecentFriendsActivity data={friendsActivity} />
