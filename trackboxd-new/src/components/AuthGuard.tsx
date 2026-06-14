@@ -30,6 +30,8 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const isPublicRoute =
     publicRoutes.some(route => pathname === route) ||
     pathname?.startsWith('/profile/') ||
+    pathname?.startsWith('/reviews/') ||
+    pathname?.startsWith('/annotations/') ||
     (pathname?.startsWith('/journals/') && pathname !== '/journals/new');
 
   useEffect(() => {
