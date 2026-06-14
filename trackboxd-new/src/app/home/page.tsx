@@ -11,6 +11,9 @@ import RecentFriendsActivity from "@/components/home/RecentFriendsActivity";
 import RecommendedForYou from "@/components/home/RecommendedForYou";
 import PeopleYouMayKnow from "@/components/home/PeopleYouMayKnow";
 import PopularUsersSection from "@/components/home/PopularUsersSection";
+import JournalsPromoModal from "@/components/home/JournalsPromoModal";
+
+const JOURNALS_PROMO_KEY = "trackboxd_journals_promo_seen";
 
 export default function HomePage() {
   const { user } = useUser();
@@ -27,6 +30,7 @@ export default function HomePage() {
   const [reviewLikes, setReviewLikes] = useState<Record<string, boolean>>({});
   const [annotationLikes, setAnnotationLikes] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [showJournalsPromo, setShowJournalsPromo] = useState(false);
 
   const fetchLikeStatuses = useCallback(
     async (items: { id: string; type: string }[]) => {
@@ -74,6 +78,20 @@ export default function HomePage() {
     },
     [user]
   );
+
+  useEffect(() => {
+    if (!user) return;
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem(JOURNALS_PROMO_KEY)) return;
+
+    const timer = setTimeout(() => setShowJournalsPromo(true), 1200);
+    return () => clearTimeout(timer);
+  }, [user]);
+
+  const dismissJournalsPromo = () => {
+    setShowJournalsPromo(false);
+    window.localStorage.setItem(JOURNALS_PROMO_KEY, "1");
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -194,6 +212,10 @@ export default function HomePage() {
         <PopularUsersSection data={popularUsers} />
       </div>
       <Footer variant="light" />
+
+      {showJournalsPromo && (
+        <JournalsPromoModal onClose={dismissJournalsPromo} />
+      )}
     </div>
   );
 }
