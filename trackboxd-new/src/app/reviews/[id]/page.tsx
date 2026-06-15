@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     : `${username} rated ${trackName} ${rating} out of 5 on Trackboxd.`
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://trackboxd.com'
   const pageUrl = `${baseUrl}/reviews/${params.id}`
-  const ogImage = `/api/share/og?type=review&id=${params.id}`
+  const ogImage = `${baseUrl}/api/share/og?type=review&id=${params.id}`
 
   return {
     title,

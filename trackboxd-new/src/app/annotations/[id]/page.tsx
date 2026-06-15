@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     : `${username} annotated ${trackName} at ${ts} on Trackboxd.`
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://trackboxd.com'
   const pageUrl = `${baseUrl}/annotations/${params.id}`
-  const ogImage = `/api/share/og?type=annotation&id=${params.id}`
+  const ogImage = `${baseUrl}/api/share/og?type=annotation&id=${params.id}`
 
   return {
     title,
