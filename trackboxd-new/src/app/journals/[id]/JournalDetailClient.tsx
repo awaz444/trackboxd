@@ -3,11 +3,46 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-    Lock, Globe, Trash2, Edit2, Check, X, Music, Plus, Search, Link2, ExternalLink
+    Lock, Globe, Trash2, Edit2, Check, X, Music, Plus, Search, Link2, ExternalLink, Upload, Loader2
 } from "lucide-react";
 import JournalTrackRow from "@/components/journals/JournalTrackRow";
 import JournalCover from "@/components/journals/JournalCover";
 import Link from "next/link";
+import { createClient as createSupabaseClient } from "@/lib/supabase/client";
+
+// Center-crops an image file to a square and re-encodes it as JPEG.
+const cropImageToSquare = (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+            const size = Math.min(img.width, img.height);
+            const canvas = document.createElement("canvas");
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+                URL.revokeObjectURL(objectUrl);
+                reject(new Error("Could not process image"));
+                return;
+            }
+            const sx = (img.width - size) / 2;
+            const sy = (img.height - size) / 2;
+            ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+            URL.revokeObjectURL(objectUrl);
+            canvas.toBlob(
+                (blob) => (blob ? resolve(blob) : reject(new Error("Could not process image"))),
+                "image/jpeg",
+                0.9
+            );
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error("Could not load image"));
+        };
+        img.src = objectUrl;
+    });
+};
 
 interface Track {
     id: string;
@@ -92,6 +127,9 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
 
     const [items, setItems] = useState<JournalItem[]>(journal.items);
     const [isPublic, setIsPublic] = useState(journal.is_public);
+    const [coverUrl, setCoverUrl] = useState(journal.cover_url);
+    const [isUploadingCover, setIsUploadingCover] = useState(false);
+    const [coverError, setCoverError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(journal.title);
     const [editSubtitle, setEditSubtitle] = useState(journal.subtitle ?? "");
@@ -132,6 +170,44 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
             // keep editing state on error
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file) return;
+
+        setCoverError(null);
+        setIsUploadingCover(true);
+        try {
+            const squareBlob = await cropImageToSquare(file);
+            const supabase = createSupabaseClient();
+            const fileName = `journal-covers/${journal.id}-${Date.now()}.jpg`;
+
+            const { error: uploadError } = await supabase.storage
+                .from("avatars")
+                .upload(fileName, squareBlob, {
+                    cacheControl: "3600",
+                    upsert: false,
+                    contentType: "image/jpeg",
+                });
+            if (uploadError) throw new Error(uploadError.message);
+
+            const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(fileName);
+
+            const res = await fetch(`/api/journals/${journal.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ coverUrl: urlData.publicUrl }),
+            });
+            if (!res.ok) throw new Error("Failed to save cover");
+
+            setCoverUrl(urlData.publicUrl);
+        } catch (err) {
+            setCoverError(err instanceof Error ? err.message : "Failed to upload cover");
+        } finally {
+            setIsUploadingCover(false);
         }
     };
 
@@ -237,13 +313,31 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
             <div className="mb-8">
                 <div className="flex gap-4">
                     {/* Cover */}
-                    <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-xl overflow-hidden flex-shrink-0 bg-[#5C5537]/5 border border-[#5C5537]/10">
+                    <div className="relative group w-28 h-28 sm:w-36 sm:h-36 rounded-xl overflow-hidden flex-shrink-0 bg-[#5C5537]/5 border border-[#5C5537]/10">
                         <JournalCover
-                            coverUrl={journal.cover_url}
+                            coverUrl={coverUrl}
                             trackCovers={journal.items.map((item) => item.spotify_items?.cover_url)}
                             title={journal.title}
                             iconClassName="w-10 h-10"
                         />
+                        {isOwner && (
+                            <label
+                                className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity cursor-pointer ${isUploadingCover ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                            >
+                                {isUploadingCover ? (
+                                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                                ) : (
+                                    <Upload className="w-6 h-6 text-white" />
+                                )}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleCoverUpload}
+                                    disabled={isUploadingCover}
+                                />
+                            </label>
+                        )}
                     </div>
 
                     {/* Info */}
@@ -359,6 +453,10 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                         )}
                     </div>
                 </div>
+
+                {coverError && (
+                    <p className="mt-2 text-xs text-red-500">{coverError}</p>
+                )}
 
                 {/* Progress */}
                 <div className="mt-5">

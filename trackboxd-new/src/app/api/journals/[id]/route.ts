@@ -73,11 +73,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (!journal) return NextResponse.json({ error: "Journal not found" }, { status: 404 });
     if (journal.user_id !== authUser.id) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
 
-    const { title, subtitle, isPublic } = body;
+    const { title, subtitle, isPublic, coverUrl } = body;
     const updateData: any = { updated_at: new Date().toISOString() };
     if (title !== undefined) updateData.title = title.trim();
     if (subtitle !== undefined) updateData.subtitle = subtitle?.trim() || null;
     if (isPublic !== undefined) updateData.is_public = isPublic;
+    if (coverUrl !== undefined) updateData.cover_url = coverUrl || null;
 
     const { data: updated, error } = await supabase
         .from("journals")
