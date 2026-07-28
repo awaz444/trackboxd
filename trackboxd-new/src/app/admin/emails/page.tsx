@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search, X, Send, Loader2, Check, UserPlus } from "lucide-react";
+import { Search, X, Send, Loader2, Check, UserPlus, Users } from "lucide-react";
 
 interface UserResult {
     id: string;
@@ -38,6 +38,7 @@ export default function AdminEmailsPage() {
     const [userResults, setUserResults] = useState<UserResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [manualEmail, setManualEmail] = useState("");
+    const [isAddingAll, setIsAddingAll] = useState(false);
 
     const [showConfirm, setShowConfirm] = useState(false);
     const [isSending, setIsSending] = useState(false);
@@ -86,6 +87,28 @@ export default function AdminEmailsPage() {
         if (recipients.some((r) => r.type === "email" && r.email.toLowerCase() === email.toLowerCase())) return;
         setRecipients((prev) => [...prev, { type: "email", email, label: email }]);
         setManualEmail("");
+    };
+
+    const addAllUsers = async () => {
+        setIsAddingAll(true);
+        try {
+            const res = await fetch("/api/admin/users/all");
+            const data = await res.json();
+            if (!Array.isArray(data)) return;
+            setRecipients((prev) => {
+                const existingIds = new Set(prev.filter((r) => r.type === "user").map((r) => (r as any).id));
+                const additions: Recipient[] = data
+                    .filter((u: UserResult) => !existingIds.has(u.id))
+                    .map((u: UserResult) => ({
+                        type: "user" as const,
+                        id: u.id,
+                        label: `${u.username || u.name} <${u.email}>`,
+                    }));
+                return [...prev, ...additions];
+            });
+        } finally {
+            setIsAddingAll(false);
+        }
     };
 
     const removeRecipient = (index: number) => {
@@ -209,22 +232,48 @@ export default function AdminEmailsPage() {
 
                     {/* Recipients */}
                     <div>
-                        <label className="block text-sm font-medium text-[#5C5537] mb-1.5">Recipients</label>
+                        <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-sm font-medium text-[#5C5537]">Recipients</label>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={addAllUsers}
+                                    disabled={isAddingAll}
+                                    className="flex items-center gap-1.5 text-xs font-medium text-[#5C5537] hover:underline disabled:opacity-50"
+                                >
+                                    {isAddingAll ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Users className="w-3.5 h-3.5" />}
+                                    Add all users
+                                </button>
+                                {recipients.length > 0 && (
+                                    <button
+                                        onClick={() => setRecipients([])}
+                                        className="text-xs text-[#5C5537]/50 hover:text-[#5C5537] hover:underline"
+                                    >
+                                        Clear all
+                                    </button>
+                                )}
+                            </div>
+                        </div>
 
                         {recipients.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                {recipients.map((r, i) => (
-                                    <span
-                                        key={i}
-                                        className="inline-flex items-center gap-1.5 text-xs bg-[#5C5537]/10 text-[#5C5537] px-2.5 py-1 rounded-full"
-                                    >
-                                        {r.label}
-                                        <button onClick={() => removeRecipient(i)}>
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
+                            recipients.length > 20 ? (
+                                <div className="mb-3 text-sm text-[#5C5537] bg-[#5C5537]/10 rounded-lg px-3 py-2">
+                                    {recipients.length} recipients selected
+                                </div>
+                            ) : (
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {recipients.map((r, i) => (
+                                        <span
+                                            key={i}
+                                            className="inline-flex items-center gap-1.5 text-xs bg-[#5C5537]/10 text-[#5C5537] px-2.5 py-1 rounded-full"
+                                        >
+                                            {r.label}
+                                            <button onClick={() => removeRecipient(i)}>
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                            )
                         )}
 
                         <div className="relative mb-2">
