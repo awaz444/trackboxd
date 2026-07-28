@@ -7,6 +7,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
+  username?: string | null;
   image_url?: string | null;
 }
 
@@ -31,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from("users")
-      .select("id, email, name, image_url")
+      .select("id, email, name, username, image_url")
       .eq("id", userId)
       .single();
     setUser(data ?? null);

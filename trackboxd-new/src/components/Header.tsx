@@ -19,6 +19,7 @@ import {
     Disc,
     Disc3,
     Bell,
+    Mail,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -272,6 +273,9 @@ const Header: React.FC<HeaderProps> = ({ }) => {
             icon: BookOpen,
             link: true,
         },
+        ...(authUser?.username?.toLowerCase() === "aawaiz"
+            ? [{ label: "Admin: Emails", href: "/admin/emails", icon: Mail, link: true }]
+            : []),
         { type: "divider" },
         { label: "Logout", onClick: handleLogout, icon: LogOut },
     ];
