@@ -21,7 +21,7 @@ export default function AdminEmailsPage() {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
 
-    const isAdmin = user?.username?.toLowerCase() === "aawaiz";
+    const isAdmin = user?.username?.toLowerCase() === "aawaiz" || user?.name?.toLowerCase() === "aawaiz";
 
     useEffect(() => {
         if (!authLoading && !isAdmin) router.replace("/");

@@ -273,7 +273,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
             icon: BookOpen,
             link: true,
         },
-        ...(authUser?.username?.toLowerCase() === "aawaiz"
+        ...(authUser?.username?.toLowerCase() === "aawaiz" || authUser?.name?.toLowerCase() === "aawaiz"
             ? [{ label: "Admin: Emails", href: "/admin/emails", icon: Mail, link: true }]
             : []),
         { type: "divider" },
