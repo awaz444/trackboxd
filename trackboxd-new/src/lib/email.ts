@@ -44,7 +44,14 @@ function textToParagraphs(text: string): string {
 // mode unless the email explicitly opts out via color-scheme meta tags AND
 // uses solid bgcolor attributes (not just CSS) on every colored container —
 // CSS-only backgrounds get stripped/inverted first.
-function emailWrapper(content: string): string {
+function emailWrapper(content: string, footerText?: string): string {
+  const footer = footerText
+    ? `<div style="margin-top:32px;padding-top:20px;border-top:1px solid #E5DFC0;">
+    <p style="color:#5C5537;font-size:12px;text-align:center;margin:0;font-family:'Lora',Georgia,serif;">
+      ${footerText}
+    </p>
+  </div>`
+    : '';
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -66,11 +73,7 @@ function emailWrapper(content: string): string {
     <img src="${LOGO_URL}" alt="Trackboxd" height="32" style="height:32px;width:auto;display:inline-block;" />
   </div>
   ${content}
-  <div style="margin-top:32px;padding-top:20px;border-top:1px solid #E5DFC0;">
-    <p style="color:#5C5537;font-size:12px;text-align:center;margin:0;font-family:'Lora',Georgia,serif;">
-      You're receiving this because someone interacted with your content on Trackboxd.
-    </p>
-  </div>
+  ${footer}
 </td></tr>
 </table>
 </td></tr>
@@ -78,6 +81,8 @@ function emailWrapper(content: string): string {
 </body>
 </html>`;
 }
+
+const INTERACTION_FOOTER = "You're receiving this because someone interacted with your content on Trackboxd.";
 
 function buildFollowEmail(actorName: string, recipientName: string): string {
   return emailWrapper(`
@@ -92,7 +97,7 @@ function buildFollowEmail(actorName: string, recipientName: string): string {
        style="display:block;text-align:center;background:#5C5537;color:#FFFBEb;font-weight:700;font-size:15px;padding:14px 24px;border-radius:8px;text-decoration:none;">
       View on Trackboxd
     </a>
-  `);
+  `, INTERACTION_FOOTER);
 }
 
 function buildLikeEmail(
@@ -113,7 +118,7 @@ function buildLikeEmail(
        style="display:block;text-align:center;background:#5C5537;color:#FFFBEb;font-weight:700;font-size:15px;padding:14px 24px;border-radius:8px;text-decoration:none;">
       View on Trackboxd
     </a>
-  `);
+  `, INTERACTION_FOOTER);
 }
 
 type NotificationEmailParams =
