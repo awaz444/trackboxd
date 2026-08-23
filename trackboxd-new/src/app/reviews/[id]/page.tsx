@@ -100,7 +100,7 @@ export default async function ReviewPage({ params }: PageProps) {
       <main className="max-w-2xl mx-auto px-4 py-8">
         {/* Back link */}
         <Link
-          href={`/songs/${review.item_id}`}
+          href={review.spotify_items?.type === 'album' ? `/albums/${review.item_id}` : `/songs/${review.item_id}`}
           className="inline-flex items-center gap-1.5 text-sm text-[#5C5537]/60 hover:text-[#5C5537] transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -187,7 +187,7 @@ export default async function ReviewPage({ params }: PageProps) {
         {/* Track + Author info cards */}
         <div className="mt-6 grid grid-cols-2 gap-4">
           <Link
-            href={`/songs/${review.item_id}`}
+            href={review.spotify_items?.type === 'album' ? `/albums/${review.item_id}` : `/songs/${review.item_id}`}
             className="bg-[#FFFBEb] border border-[#5C5537]/15 rounded-xl p-4 flex gap-3 items-center hover:shadow-md transition-shadow group"
           >
             {coverUrl && (

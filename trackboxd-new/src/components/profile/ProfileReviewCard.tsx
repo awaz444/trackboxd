@@ -15,6 +15,7 @@ interface ProfileReviewCardProps {
       title: string;
       artist: string;
       cover_url?: string;
+      type?: string;
     };
     timestamp: string;
     rating?: number;
@@ -109,11 +110,11 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
         )}
         <div className="mt-3 flex items-center justify-between">
           <Link
-            href={`/songs/${review.track.id}`}
+            href={review.track.type === "album" ? `/albums/${review.track.id}` : `/songs/${review.track.id}`}
             onClick={(e) => e.stopPropagation()}
             className="text-xs text-[#5C5537]/70 hover:text-[#5C5537] hover:underline"
           >
-            View track
+            {review.track.type === "album" ? "View album" : "View track"}
           </Link>
           <div className="flex items-center gap-2">
             <button
@@ -216,10 +217,10 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
                   <span className="text-xs">{isLiked ? "Liked" : "Like"}</span>
                 </button>
                 <Link
-                  href={`/songs/${review.track.id}`}
+                  href={review.track.type === "album" ? `/albums/${review.track.id}` : `/songs/${review.track.id}`}
                   className="text-xs text-[#5C5537]/70 hover:text-[#5C5537] hover:underline"
                 >
-                  View track
+                  {review.track.type === "album" ? "View album" : "View track"}
                 </Link>
                 {(review.is_public !== false) && (
                   <button

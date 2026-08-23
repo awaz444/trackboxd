@@ -593,9 +593,11 @@ const SongDetailClient = ({
                                     Release Date
                                 </p>
                                 <p className="text-sm font-medium text-[#5C5537]">
-                                    {new Date(
-                                        track.album.release_date
-                                    ).toLocaleDateString()}
+                                    {track.album.release_date
+                                        ? new Date(
+                                              track.album.release_date
+                                          ).toLocaleDateString()
+                                        : "Unknown"}
                                 </p>
                             </div>
                             <div>

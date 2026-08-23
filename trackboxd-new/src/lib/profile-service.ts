@@ -7,6 +7,7 @@ export interface ActivityTrack {
   title: string;
   artist: string;
   cover_url?: string;
+  type?: string;
 }
 
 export interface RecentActivity {
@@ -175,7 +176,8 @@ export async function getProfileByUsername(username: string, currentUserId: stri
           id,
           name,
           artist,
-          cover_url
+          cover_url,
+          type
         )
       `)
       .eq("user_id", user.id)
@@ -195,6 +197,7 @@ export async function getProfileByUsername(username: string, currentUserId: stri
               title: track.name,
               artist: track.artist,
               cover_url: track.cover_url,
+              type: track.type,
             },
             timestamp: new Date(review.created_at).toLocaleDateString(),
             rating: (review as any).rating ?? undefined,

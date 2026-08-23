@@ -117,9 +117,11 @@ async function fetchSpotifyJson<T>(url: string, options: RequestInit = {}): Prom
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(
+    const error = new Error(
       `Spotify error: ${response.status} ${response.statusText}\n${body}`
-    );
+    ) as Error & { status?: number };
+    error.status = response.status;
+    throw error;
   }
 
   return response.json();
