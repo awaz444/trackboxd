@@ -194,7 +194,9 @@ export default async function ReviewPage({ params }: PageProps) {
               <img src={coverUrl} alt={trackName} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
             )}
             <div className="min-w-0">
-              <p className="text-[#5C5537]/45 text-xs uppercase tracking-wide mb-1">Track</p>
+              <p className="text-[#5C5537]/45 text-xs uppercase tracking-wide mb-1">
+                {review.spotify_items?.type === 'album' ? 'Album' : 'Track'}
+              </p>
               <p className="font-semibold text-[#5C5537] text-sm truncate">{trackName}</p>
               <p className="text-[#5C5537]/60 text-xs truncate">{artistName}</p>
               <p className="text-[#5C5537]/40 text-xs mt-1 group-hover:text-[#5C5537]/60 transition-colors">
