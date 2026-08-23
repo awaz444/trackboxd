@@ -42,7 +42,7 @@ export default function MyJournalsPage() {
             <div className="max-w-5xl mx-auto px-4 py-8">
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-[#5C5537]">my journals</h1>
+                        <h1 className="text-3xl font-bold text-[#5C5537]">My Journals</h1>
                         <p className="text-[#5C5537]/60 mt-1">
                             Curated sets of songs reviewed together.
                         </p>
