@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Music } from 'lucide-react';
 import Footer from '@/components/Footer';
@@ -8,10 +8,31 @@ import AuthModal from '@/components/AuthModal';
 import Image from "next/image";
 import { useAuth } from '@/contexts/AuthContext';
 
+type AuthMode = 'login' | 'signup' | 'forgot-password' | 'update-password';
+
+// `useSearchParams` opts its component out of prerendering. Isolating it here,
+// behind its own Suspense boundary, keeps the rest of the landing page — the
+// hero copy search engines rank us on — in the static HTML.
+const AuthParamWatcher = ({
+  onAuthParam,
+}: {
+  onAuthParam: (mode: AuthMode) => void;
+}) => {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const authParam = searchParams.get('auth');
+    if (authParam && ['login', 'signup', 'forgot-password', 'update-password'].includes(authParam)) {
+      onAuthParam(authParam as AuthMode);
+    }
+  }, [searchParams, onAuthParam]);
+
+  return null;
+};
+
 const LandingPage = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'forgot-password' | 'update-password'>('login');
-  const searchParams = useSearchParams();
+  const [authMode, setAuthMode] = useState<AuthMode>('login');
   const router = useRouter();
   const { user, loading } = useAuth();
 
@@ -21,18 +42,20 @@ const LandingPage = () => {
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
-    const authParam = searchParams.get('auth');
-    if (authParam && ['login', 'signup', 'forgot-password', 'update-password'].includes(authParam)) {
-      setAuthMode(authParam as 'login' | 'signup' | 'forgot-password' | 'update-password');
-      setShowAuthModal(true);
-    }
-  }, [searchParams]);
+  const handleAuthParam = React.useCallback((mode: AuthMode) => {
+    setAuthMode(mode);
+    setShowAuthModal(true);
+  }, []);
 
-  if (loading || user) return null;
+  // Only hide once the auth check has actually resolved. `loading` is true during
+  // server rendering, so gating on it here would blank the page for crawlers.
+  if (!loading && user) return null;
 
   return (
     <div className="min-h-screen bg-[#FFFBEb] flex flex-col relative">
+      <Suspense fallback={null}>
+        <AuthParamWatcher onAuthParam={handleAuthParam} />
+      </Suspense>
       {/* Header with Auth buttons */}
       {/* <div className="absolute top-6 right-6 z-20 flex gap-3">
         <button

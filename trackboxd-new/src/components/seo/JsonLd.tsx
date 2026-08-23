@@ -1,4 +1,5 @@
 import React from 'react';
+import { SITE_URL } from '@/lib/site';
 
 // Types for the components
 interface Song {
@@ -72,7 +73,7 @@ export function SongJsonLd({ song }: { song: Song }) {
           image: song.album.images?.[0]?.url,
         }
       : undefined,
-    url: `https://trackboxd.com/songs/${song.id}`,
+    url: `${SITE_URL}/songs/${song.id}`,
     sameAs: [
       song.external_urls?.spotify ? song.external_urls.spotify : null,
     ].filter(Boolean),
@@ -91,7 +92,7 @@ export function SongJsonLd({ song }: { song: Song }) {
       author: {
         '@type': 'Person',
         name: r.users.name,
-        url: `https://trackboxd.com/profile/${r.users.name}`,
+        url: `${SITE_URL}/profile/${r.users.name}`,
       },
       reviewBody: r.text,
       reviewRating: {
@@ -133,7 +134,7 @@ export function ProfileJsonLd({ user, username }: { user: User, username: string
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
     name: `${user.name} (@${username}) on Trackboxd`,
-    url: `https://trackboxd.com/profile/${username}`,
+    url: `${SITE_URL}/profile/${username}`,
     mainEntity: {
       '@type': 'Person',
       name: user.name,
@@ -165,7 +166,7 @@ export function AlbumJsonLd({ album }: { album: Album }) {
     track: album.tracks?.items.map((t) => ({
       '@type': 'MusicRecording',
       name: t.name,
-      url: `https://trackboxd.com/songs/${t.id}`,
+      url: `${SITE_URL}/songs/${t.id}`,
     })),
     aggregateRating: album.stats && album.stats.review_count > 0
       ? {

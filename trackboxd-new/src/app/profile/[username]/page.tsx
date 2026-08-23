@@ -24,6 +24,7 @@ interface ProfilePageProps {
 }
 
 import { getProfileByUsername, type ProfileData } from "@/lib/profile-service";
+import { SITE_URL } from '@/lib/site';
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -46,7 +47,7 @@ export async function generateMetadata({ params }: ProfilePageProps) {
             description: "This user's profile is private.",
             robots: { index: false, follow: false },
             alternates: {
-                canonical: `https://trackboxd.com/profile/${params.username}`,
+                canonical: `${SITE_URL}/profile/${params.username}`,
             },
         };
     }
@@ -64,7 +65,7 @@ export async function generateMetadata({ params }: ProfilePageProps) {
         title: `${user.name} (@${username}) — Trackboxd`,
         description,
         alternates: {
-            canonical: `https://trackboxd.com/profile/${username}`,
+            canonical: `${SITE_URL}/profile/${username}`,
         },
         openGraph: {
             title: `${user.name} (@${username}) — Trackboxd`,

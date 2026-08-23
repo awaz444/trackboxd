@@ -25,13 +25,23 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     '/forgot-password',
     '/update-password',
     '/auth/auth-code-error',
+    '/tracks',
+    '/letterboxd-for-music',
+    '/alternatives',
+    '/song-annotations',
   ];
 
+  // Routes that must render their content to logged-out visitors and crawlers.
+  // These are the indexable surfaces — gating them behind the auth modal makes
+  // them worthless in search results.
   const isPublicRoute =
     publicRoutes.some(route => pathname === route) ||
     pathname?.startsWith('/profile/') ||
     pathname?.startsWith('/reviews/') ||
     pathname?.startsWith('/annotations/') ||
+    pathname?.startsWith('/songs/') ||
+    pathname?.startsWith('/albums/') ||
+    pathname?.startsWith('/playlists/') ||
     (pathname?.startsWith('/journals/') && pathname !== '/journals/new');
 
   useEffect(() => {
@@ -43,14 +53,10 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     setShowAuthModal(!user);
   }, [user, loading, pathname, isPublicRoute]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#FFFBEb] flex items-center justify-center">
-        <div className="text-[#5C5537] text-lg">Loading...</div>
-      </div>
-    );
-  }
-
+  // NOTE: children are always rendered, including during the initial auth check.
+  // `loading` starts as `true` and is only resolved in a client-side effect, so
+  // returning a loading gate here blanks the server-rendered HTML for every
+  // route — crawlers that do not execute JS then see an empty page.
   return (
     <>
       {children}

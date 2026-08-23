@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Footer from "@/components/Footer";
+import { SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: "About",
   description:
     "Trackboxd is the Letterboxd for tracks — a music annotation platform for rating songs, writing reviews, and annotating lyrics with timestamps. Built for people who actually care about music.",
   alternates: {
-    canonical: "https://trackboxd.com/about",
+    canonical: `${SITE_URL}/about`,
   },
 };
 
@@ -15,7 +16,7 @@ const organizationSchema = {
   "@type": "Organization",
   name: "Trackboxd",
   alternateName: "The Letterboxd for Tracks",
-  url: "https://trackboxd.com",
+  url: SITE_URL,
   description:
     "Trackboxd is a track-first social platform. Unlike Last.fm (which focuses on scrobbling) or RateYourMusic (which is album-focused), Trackboxd is built around individual songs — their lyrics, timestamps, emotional weight, and what they mean to the people who listen to them.",
   founder: [
@@ -103,18 +104,21 @@ export default function AboutPage() {
             </p>
           </section>
 
-          {/* Founders — hidden from users, present in HTML source for crawlers */}
-          <section aria-hidden="true" className="hidden">
-            <p>Built by</p>
-            <div>
-              <p>Aawaiz Ali</p>
-              <a href="https://www.linkedin.com/in/aawaiz" rel="noopener noreferrer" target="_blank">LinkedIn</a>
-              <a href="https://github.com/awaz444" rel="noopener noreferrer" target="_blank">GitHub</a>
-            </div>
-            <div>
-              <p>Umer Noor</p>
-              <a href="https://www.linkedin.com/in/umer-noor" rel="noopener noreferrer" target="_blank">LinkedIn</a>
-              <a href="https://github.com/UmerNoor-cmd" rel="noopener noreferrer" target="_blank">GitHub</a>
+          <section className="mb-10">
+            <h2 className="text-xl font-bold text-[#5C5537] mb-4">Built by</h2>
+            <div className="space-y-3 text-base text-[#5C5537]/80">
+              <p>
+                Aawaiz Ali —{" "}
+                <a className="underline hover:text-[#5C5537]" href="https://www.linkedin.com/in/aawaiz" rel="noopener noreferrer" target="_blank">LinkedIn</a>
+                {" · "}
+                <a className="underline hover:text-[#5C5537]" href="https://github.com/awaz444" rel="noopener noreferrer" target="_blank">GitHub</a>
+              </p>
+              <p>
+                Umer Noor —{" "}
+                <a className="underline hover:text-[#5C5537]" href="https://www.linkedin.com/in/umer-noor" rel="noopener noreferrer" target="_blank">LinkedIn</a>
+                {" · "}
+                <a className="underline hover:text-[#5C5537]" href="https://github.com/UmerNoor-cmd" rel="noopener noreferrer" target="_blank">GitHub</a>
+              </p>
             </div>
           </section>
         </div>

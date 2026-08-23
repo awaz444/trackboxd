@@ -1,9 +1,31 @@
 import type { Metadata } from 'next';
 import { getAlbumDetails } from '@/lib/spotify';
-import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
+import { createPublicClient } from '@/lib/supabase/public';
 import AlbumDetailClient from './AlbumDetailClient';
 import { AlbumJsonLd } from '@/components/seo/JsonLd';
+import { SITE_URL } from '@/lib/site';
+
+// Public album pages are the same for every visitor — serve from the ISR cache
+// so crawlers get a fast response instead of a cold render each time.
+export const revalidate = 3600;
+
+// Prerender the albums that already have activity; the rest render on demand
+// and are cached for `revalidate` seconds.
+export async function generateStaticParams() {
+  try {
+    const supabase = createPublicClient();
+    const { data } = await supabase
+      .from('spotify_items')
+      .select('id')
+      .eq('type', 'album')
+      .order('review_count', { ascending: false })
+      .limit(50);
+    return (data || []).map((a) => ({ album_id: a.id as string }));
+  } catch {
+    return [];
+  }
+}
+
 
 interface Props {
   params: { album_id: string };
@@ -11,9 +33,8 @@ interface Props {
 
 async function getAlbum(album_id: string) {
   try {
-    const albumDetails = await getAlbumDetails(album_id);
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const albumDetails = await getAlbumDetails(album_id, { revalidate });
+  const supabase = createPublicClient();
 
     const { data: stats } = await supabase
       .from('spotify_items')
@@ -59,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
     },
     alternates: {
-      canonical: `https://trackboxd.com/albums/${album_id}`,
+      canonical: `${SITE_URL}/albums/${album_id}`,
     },
   };
 }

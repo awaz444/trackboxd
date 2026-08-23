@@ -1,14 +1,21 @@
 "use client";
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from "next/link";
 
-const AuthCodeErrorPage: React.FC = () => {
+// Isolated so `useSearchParams` does not opt the whole page out of prerendering.
+const AuthErrorMessage: React.FC = () => {
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
 
+  return (
+    <>{error ? `Error: ${decodeURIComponent(error)}` : 'The authentication link you clicked is invalid or has expired.'}</>
+  );
+};
+
+const AuthCodeErrorPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FFFBEb] flex items-center justify-center px-5">
       <div className="bg-white rounded-lg p-8 w-full max-w-md border border-[#5C5537]/20 shadow-lg text-center">
@@ -34,7 +41,9 @@ const AuthCodeErrorPage: React.FC = () => {
             Authentication Error
           </h1>
           <p className="text-[#5C5537]/70">
-            {error ? `Error: ${decodeURIComponent(error)}` : 'The authentication link you clicked is invalid or has expired.'}
+            <Suspense fallback="The authentication link you clicked is invalid or has expired.">
+              <AuthErrorMessage />
+            </Suspense>
           </p>
         </div>
 

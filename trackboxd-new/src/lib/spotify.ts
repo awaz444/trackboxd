@@ -71,19 +71,27 @@ async function getAccessToken() {
 // Add this helper at the top or bottom of the file
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function fetchSpotify(url: string, options: RequestInit = {}): Promise<Response> {
+type SpotifyFetchInit = RequestInit & { next?: { revalidate?: number } };
+
+async function fetchSpotify(url: string, options: SpotifyFetchInit = {}): Promise<Response> {
   const MAX_RETRIES = 5;
   let attempt = 0;
+
+  // Default to 'no-store' so retries actually hit the network. Callers rendering
+  // cacheable pages pass `next: { revalidate }` instead — a 'no-store' fetch
+  // opts the whole route into dynamic rendering, which defeats ISR.
+  const wantsCaching = options.next?.revalidate !== undefined;
 
   while (attempt < MAX_RETRIES) {
     try {
       await getAccessToken(); // Ensure token is available
-      
+
       const res = await fetch(url, {
         ...options,
-        // FORCE 'no-store' to bypass Next.js memoization/caching. 
-        // This ensures retries actually hit the network.
-        cache: 'no-store', 
+        // On a retry always bypass the cache, so we re-request with the new token.
+        ...(wantsCaching && attempt === 0
+          ? { next: options.next }
+          : { cache: 'no-store' as RequestCache, next: undefined }),
         headers: {
           ...options.headers,
           Authorization: `Bearer ${cachedToken}`,
@@ -112,7 +120,7 @@ async function fetchSpotify(url: string, options: RequestInit = {}): Promise<Res
   throw new Error("Failed to authenticate with Spotify after multiple attempts");
 }
 
-async function fetchSpotifyJson<T>(url: string, options: RequestInit = {}): Promise<T> {
+async function fetchSpotifyJson<T>(url: string, options: SpotifyFetchInit = {}): Promise<T> {
   const response = await fetchSpotify(url, options);
 
   if (!response.ok) {
@@ -149,14 +157,20 @@ export const searchTracks = async (
   return data.tracks?.items || [];
 };
 
-export async function getTrackDetails(trackId: string) {
+export async function getTrackDetails(
+  trackId: string,
+  options: { revalidate?: number } = {}
+) {
   // Validate track ID: should be 22-char alphanumeric Spotify ID
   if (!/^[A-Za-z0-9]{22}$/.test(trackId)) {
     throw new Error(`Invalid track ID format: "${trackId}"`);
   }
 
   const url = `https://api.spotify.com/v1/tracks/${trackId}`;
-  return fetchSpotifyJson<any>(url);
+  return fetchSpotifyJson<any>(
+    url,
+    options.revalidate !== undefined ? { next: { revalidate: options.revalidate } } : {}
+  );
 }
 
 export async function getArtistDetails(artistId: string) {
@@ -214,9 +228,15 @@ export const getPlaylistItems = async (playlistId: string, options?: PlaylistIte
   return fetchSpotifyJson<any>(url.toString());
 };
 
-export const getAlbumDetails = async (albumId: string) => {
+export const getAlbumDetails = async (
+  albumId: string,
+  options: { revalidate?: number } = {}
+) => {
   if (!albumId) throw new Error("Album ID is required");
-  return fetchSpotifyJson<any>(`${ALBUMS_ENDPOINT}/${albumId}`);
+  return fetchSpotifyJson<any>(
+    `${ALBUMS_ENDPOINT}/${albumId}`,
+    options.revalidate !== undefined ? { next: { revalidate: options.revalidate } } : {}
+  );
 };
 
 interface AlbumTracksOptions {

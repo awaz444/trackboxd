@@ -11,6 +11,7 @@ import ReviewForm from "@/components/log/forms/ReviewForm";
 import AnnotationForm from "@/components/log/forms/AnnotationForm";
 import { spotifyToTrack } from "@/utils/trackConverters";
 import MediaCard from "@/components/MediaCard";
+import { SITE_URL } from '@/lib/site';
 
 interface Review {
     id: string;
@@ -824,7 +825,7 @@ const SongDetailClient = ({
                                         {/* Timestamp reference — keeps lyric position and annotation body together for LLM crawlers */}
                                         <blockquote
                                             itemProp="about"
-                                            cite={`https://trackboxd.com/songs/${params.song_id}`}
+                                            cite={`${SITE_URL}/songs/${params.song_id}`}
                                             className="border-l-2 border-[#5C5537]/30 pl-3 mb-3"
                                         >
                                             <div className="flex items-center gap-2">

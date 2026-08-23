@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import React from "react";
 import ClientShell from "./shell";
+import { SITE_URL } from '@/lib/site';
 
 const lora = Lora({
   subsets: ["latin"],
@@ -38,10 +39,10 @@ export const metadata: Metadata = {
   ],
   creator: "Aawaiz Ali",
   publisher: "Trackboxd",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"),
-  alternates: {
-    canonical: "/",
-  },
+  metadataBase: new URL(SITE_URL),
+  // NOTE: deliberately no `alternates.canonical` here. Metadata cascades, so a
+  // canonical set at the root is inherited by every page that does not set its
+  // own — pointing them all at the homepage. Each route declares its own.
   robots: {
     index: true,
     follow: true,
@@ -66,7 +67,7 @@ export const metadata: Metadata = {
     title: "Trackboxd — The Letterboxd for Tracks",
     description:
       "Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary. The music annotation platform built for people who actually care.",
-    url: "https://trackboxd.com",
+    url: SITE_URL,
     siteName: "Trackboxd",
     images: [
       {
@@ -113,14 +114,14 @@ export default function RootLayout({
                   "@type": "WebSite",
                   name: "Trackboxd",
                   alternateName: "The Letterboxd for Tracks",
-                  url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
+                  url: SITE_URL,
                   description:
                     "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary.",
                   potentialAction: {
                     "@type": "SearchAction",
                     target: {
                       "@type": "EntryPoint",
-                      urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com"}/search?q={search_term_string}`,
+                      urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
                     },
                     "query-input": "required name=search_term_string",
                   },
@@ -128,7 +129,7 @@ export default function RootLayout({
                 {
                   "@type": "Organization",
                   name: "Trackboxd",
-                  url: process.env.NEXT_PUBLIC_APP_URL || "https://trackboxd.com",
+                  url: SITE_URL,
                   description:
                     "Trackboxd is a track-first social platform for rating songs, writing reviews, and annotating lyrics.",
                   founder: [

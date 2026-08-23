@@ -1,19 +1,41 @@
 import type { Metadata } from 'next';
 import { getTrackDetails } from '@/lib/spotify';
-import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
+import { createPublicClient } from '@/lib/supabase/public';
 import SongDetailClient from './SongDetailClient';
 import { SongJsonLd } from '@/components/seo/JsonLd';
+import { SITE_URL } from '@/lib/site';
+
+// Public track pages are identical for every visitor, so serve them from the
+// ISR cache and refresh hourly. Keeps TTFB low for crawlers.
+export const revalidate = 3600;
 
 interface Props {
   params: { song_id: string };
 }
 
+// Prerender the tracks that already have activity — these are the pages worth
+// having warm in the cache when a crawler arrives. Every other track ID still
+// renders on demand and is then cached for `revalidate` seconds.
+export async function generateStaticParams() {
+  try {
+    const supabase = createPublicClient();
+    const { data } = await supabase
+      .from('spotify_items')
+      .select('id')
+      .eq('type', 'track')
+      .order('review_count', { ascending: false })
+      .limit(50);
+
+    return (data || []).map((t) => ({ song_id: t.id as string }));
+  } catch {
+    return [];
+  }
+}
+
 async function getTrack(song_id: string) {
   try {
-    const trackDetails = await getTrackDetails(song_id);
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const trackDetails = await getTrackDetails(song_id, { revalidate });
+    const supabase = createPublicClient();
 
     const { data: stats } = await supabase
       .from('spotify_items')
@@ -39,8 +61,7 @@ async function getTrack(song_id: string) {
 
 async function getReviews(song_id: string) {
   try {
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createPublicClient();
     const { data: reviews } = await supabase
       .from('reviews')
       .select(`
@@ -69,8 +90,7 @@ async function getReviews(song_id: string) {
 
 async function getAnnotations(song_id: string) {
   try {
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createPublicClient();
     const { data: annotations } = await supabase
       .from('annotations')
       .select(`
@@ -120,7 +140,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
     },
     alternates: {
-      canonical: `https://trackboxd.com/songs/${song_id}`,
+      canonical: `${SITE_URL}/songs/${song_id}`,
     },
   };
 }

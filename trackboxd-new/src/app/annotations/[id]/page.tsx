@@ -1,5 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { createPublicClient } from '@/lib/supabase/public';
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import Link from 'next/link'
@@ -9,6 +8,28 @@ import { getServerUser } from '@/lib/supabase/get-server-user'
 import LikeButton from '@/components/share/LikeButton'
 import ShareButton from '@/components/share/ShareButton'
 import { VipBadge } from '@/components/VipBadge'
+import { SITE_URL } from '@/lib/site';
+
+// Public annotation pages are the same for every visitor — serve from the ISR cache
+// so crawlers get a fast response instead of a cold render each time.
+export const revalidate = 3600;
+
+// Prerender the most recent public annotations; older ones render on demand.
+export async function generateStaticParams() {
+  try {
+    const supabase = createPublicClient();
+    const { data } = await supabase
+      .from('annotations')
+      .select('id')
+      .eq('is_public', true)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    return (data || []).map((a) => ({ id: a.id as string }));
+  } catch {
+    return [];
+  }
+}
+
 
 interface PageProps {
   params: { id: string }
@@ -35,8 +56,7 @@ function formatTimestamp(seconds: number): string {
 }
 
 async function getAnnotation(id: string) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('annotations')
     .select(`
@@ -62,13 +82,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description = annotation.text
     ? annotation.text.slice(0, 160)
     : `${username} annotated ${trackName} at ${ts} on Trackboxd.`
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://trackboxd.com'
+  const baseUrl = SITE_URL
   const pageUrl = `${baseUrl}/annotations/${params.id}`
   const ogImage = `${baseUrl}/api/share/og?type=annotation&id=${params.id}`
 
   return {
     title,
     description,
+    alternates: { canonical: pageUrl },
     openGraph: {
       title,
       description,
