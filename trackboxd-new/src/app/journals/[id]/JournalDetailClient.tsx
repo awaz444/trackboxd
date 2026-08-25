@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-    Lock, Globe, Trash2, Edit2, Check, X, Music, Plus, Search, Link2, ExternalLink, Upload, Loader2
+    Lock, Globe, Trash2, Edit2, Check, X, Music, Plus, Search, Link2, ExternalLink, Upload, Loader2, RefreshCw
 } from "lucide-react";
 import JournalTrackRow from "@/components/journals/JournalTrackRow";
 import JournalCover from "@/components/journals/JournalCover";
@@ -58,6 +58,7 @@ interface JournalItem {
     review_id: string | null;
     is_native_review: boolean;
     sort_order: number;
+    removed_from_source?: boolean;
     spotify_items: Track;
     reviews: {
         id: string;
@@ -97,6 +98,7 @@ interface JournalDetailClientProps {
         users: JournalUser;
         items: JournalItem[];
         created_at: string;
+        last_synced_at?: string | null;
     };
     currentUserId: string | null;
     annotationsByTrack: Record<string, AnnotationItem[]>;
@@ -142,6 +144,10 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
     const [isSearching, setIsSearching] = useState(false);
     const [isAddingTrack, setIsAddingTrack] = useState(false);
     const [linkCopied, setLinkCopied] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [syncMessage, setSyncMessage] = useState<string | null>(null);
+    const [syncError, setSyncError] = useState<string | null>(null);
+    const [lastSyncedAt, setLastSyncedAt] = useState(journal.last_synced_at ?? null);
 
     const reviewedCount = items.filter((i) => i.review_id !== null).length;
 
@@ -233,6 +239,38 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
         } else {
             setIsDeleting(false);
             setShowDeleteConfirm(false);
+        }
+    };
+
+    const handleResync = async () => {
+        setIsSyncing(true);
+        setSyncError(null);
+        setSyncMessage(null);
+        try {
+            const res = await fetch(`/api/journals/${journal.id}/resync`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to resync");
+
+            setItems(data.items);
+            setLastSyncedAt(new Date().toISOString());
+
+            const parts: string[] = [];
+            if (data.added) parts.push(`${data.added} added`);
+            if (data.restored) parts.push(`${data.restored} restored`);
+            if (data.removed) parts.push(`${data.removed} removed`);
+            setSyncMessage(parts.length > 0 ? parts.join(", ") : "Already up to date");
+        } catch (err) {
+            setSyncError(err instanceof Error ? err.message : "Failed to resync");
+        } finally {
+            setIsSyncing(false);
+            setTimeout(() => {
+                setSyncMessage(null);
+                setSyncError(null);
+            }, 5000);
         }
     };
 
@@ -387,21 +425,28 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                                     </p>
                                 </Link>
                                 {journal.source_type === "spotify_playlist" && (
-                                    journal.spotify_playlist_id ? (
-                                        <a
-                                            href={`https://open.spotify.com/playlist/${journal.spotify_playlist_id}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1 mt-1 text-xs text-[#5C5537]/40 hover:text-[#5C5537]/70 italic transition-colors"
-                                        >
-                                            Imported from Spotify
-                                            <ExternalLink className="w-3 h-3" />
-                                        </a>
-                                    ) : (
-                                        <span className="block mt-1 text-xs text-[#5C5537]/40 italic">
-                                            Imported from Spotify
-                                        </span>
-                                    )
+                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                        {journal.spotify_playlist_id ? (
+                                            <a
+                                                href={`https://open.spotify.com/playlist/${journal.spotify_playlist_id}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 text-xs text-[#5C5537]/40 hover:text-[#5C5537]/70 italic transition-colors"
+                                            >
+                                                Imported from Spotify
+                                                <ExternalLink className="w-3 h-3" />
+                                            </a>
+                                        ) : (
+                                            <span className="text-xs text-[#5C5537]/40 italic">
+                                                Imported from Spotify
+                                            </span>
+                                        )}
+                                        {lastSyncedAt && (
+                                            <span className="text-xs text-[#5C5537]/30">
+                                                · synced {new Date(lastSyncedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                                            </span>
+                                        )}
+                                    </div>
                                 )}
                                 {!isPublic && !isOwner && (
                                     <span className="flex items-center gap-1 mt-1 text-xs text-[#5C5537]/40 italic">
@@ -431,6 +476,16 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                                     {linkCopied ? <Check className="w-3 h-3" /> : <Link2 className="w-3 h-3" />}
                                     {linkCopied ? "Copied!" : "Copy link"}
                                 </button>
+                                {isOwner && journal.source_type === "spotify_playlist" && (
+                                    <button
+                                        onClick={handleResync}
+                                        disabled={isSyncing}
+                                        className="flex items-center gap-1.5 text-xs border border-[#5C5537]/20 rounded-full px-3 py-1 hover:bg-[#5C5537]/5 text-[#5C5537]/70 disabled:opacity-50"
+                                    >
+                                        <RefreshCw className={`w-3 h-3 ${isSyncing ? "animate-spin" : ""}`} />
+                                        {isSyncing ? "Syncing..." : "Resync from Spotify"}
+                                    </button>
+                                )}
                                 {isOwner && (
                                     <>
                                         <button
@@ -450,6 +505,11 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                                     </>
                                 )}
                             </div>
+                        )}
+                        {(syncMessage || syncError) && (
+                            <p className={`mt-2 text-xs ${syncError ? "text-red-500" : "text-[#5C5537]/50"}`}>
+                                {syncError || syncMessage}
+                            </p>
                         )}
                     </div>
                 </div>
@@ -583,6 +643,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                             annotations={annotationsByTrack[item.track_id] || []}
                             isOwner={isOwner}
                             journalIsPublic={isPublic}
+                            removedFromSource={item.removed_from_source ?? false}
                             onReviewSaved={handleReviewSaved}
                         />
                     ))}

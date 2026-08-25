@@ -44,7 +44,7 @@ export default async function JournalDetailPage({ params }: Props) {
             *,
             users(id, name, image_url),
             journal_items(
-                id, track_id, review_id, is_native_review, sort_order, created_at,
+                id, track_id, review_id, is_native_review, sort_order, created_at, removed_from_source,
                 spotify_items(id, name, artist, album, cover_url, spotify_url),
                 reviews(id, rating, text, is_public, created_at)
             )

@@ -41,6 +41,7 @@ interface JournalTrackRowProps {
     annotations?: AnnotationItem[];
     isOwner: boolean;
     journalIsPublic: boolean;
+    removedFromSource?: boolean;
     onReviewSaved?: (itemId: string, review: ReviewData) => void;
 }
 
@@ -86,6 +87,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
     annotations = [],
     isOwner,
     journalIsPublic,
+    removedFromSource = false,
     onReviewSaved,
 }) => {
     const [showForm, setShowForm] = useState(false);
@@ -128,7 +130,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
     };
 
     return (
-        <div className="border border-[#5C5537]/15 rounded-xl bg-[#FFFBEb] overflow-hidden">
+        <div className={`border border-[#5C5537]/15 rounded-xl bg-[#FFFBEb] overflow-hidden ${removedFromSource ? "opacity-60" : ""}`}>
             <div className="flex items-center gap-3 p-3">
                 {/* Cover */}
                 <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#5C5537]/10 flex-shrink-0">
@@ -154,6 +156,9 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                     <p className="text-xs text-[#5C5537]/60 truncate">{track.artist}</p>
                     {track.album && (
                         <p className="text-xs text-[#5C5537]/40 truncate">{track.album}</p>
+                    )}
+                    {removedFromSource && (
+                        <p className="text-xs text-amber-600/80 italic mt-0.5">Removed from Spotify playlist</p>
                     )}
                 </div>
 
