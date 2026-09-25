@@ -4,10 +4,13 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import AuthGuard from '@/components/AuthGuard';
+import { initAnalytics } from '@/lib/analytics';
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   React.useEffect(() => {
+    initAnalytics();
+
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker

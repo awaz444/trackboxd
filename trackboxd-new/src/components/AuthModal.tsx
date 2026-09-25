@@ -5,6 +5,7 @@ import { X, Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
 import { createClient } from "@/lib/supabase/client";
 import { findUserByNameOrEmail } from "@/lib/auth-utils";
 import { useRouter } from "next/navigation";
+import { identify, track } from "@/lib/analytics";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -203,6 +204,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       }
 
       if (data.user) {
+        identify(data.user.id);
+        track('signup_completed', { method: 'email' });
+
         // The trigger should automatically create the user in public.users table
         // But let's also manually insert to ensure it works
         const { error: insertError } = await supabase

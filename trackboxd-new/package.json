@@ -36,6 +36,7 @@
     "next": "14.2.3",
     "next-auth": "^4.24.11",
     "ngrok": "^5.0.0-beta.2",
+    "posthog-js": "^1.434.13",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "resend": "^6.18.0",
