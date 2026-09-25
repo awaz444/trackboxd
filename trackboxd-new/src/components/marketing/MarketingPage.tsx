@@ -29,7 +29,10 @@ export function MarketingPage({
       <main className="flex-1 px-6 py-16">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-4xl font-bold text-[#5C5537] mb-2">{title}</h1>
-          <p className="text-lg text-[#5C5537]/60 mb-10">{tagline}</p>
+          <p className="text-lg text-[#5C5537]/60 mb-6">{tagline}</p>
+          <div className="mb-10">
+            <SignupButton />
+          </div>
           {children}
 
           <section className="mt-12 pt-8 border-t border-[#5C5537]/15">
@@ -40,18 +43,33 @@ export function MarketingPage({
               Trackboxd is free to use. Search any track, give it a rating, and
               write the first thing you actually think about it.
             </p>
-            <Link
-              href="/tracks"
-              className="inline-block bg-[#5C5537] text-white py-2 px-5 rounded-md hover:bg-[#3E3725] transition-colors"
-            >
-              Browse tracks →
-            </Link>
+            <div className="flex flex-wrap items-center gap-4">
+              <SignupButton />
+              <Link
+                href="/tracks"
+                className="text-[#5C5537] underline hover:text-[#3E3725]"
+              >
+                or browse tracks first
+              </Link>
+            </div>
           </section>
         </div>
       </main>
 
       <Footer variant="light" />
     </div>
+  );
+}
+
+/** Opens the signup form on the home page (handled by `?auth=signup`). */
+function SignupButton() {
+  return (
+    <Link
+      href="/?auth=signup"
+      className="inline-block bg-[#5C5537] text-white py-2 px-5 rounded-md hover:bg-[#3E3725] transition-colors"
+    >
+      Create your free account
+    </Link>
   );
 }
 

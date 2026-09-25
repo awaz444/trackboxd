@@ -6,7 +6,7 @@ import { MarketingPage, Section, Faq, faqSchema } from "@/components/marketing/M
 export const metadata: Metadata = {
   title: "Music Tracking Site Alternatives — Trackboxd vs Musicboard, RYM, Last.fm",
   description:
-    "How Trackboxd compares to Musicboard, RateYourMusic, Last.fm, Genius and Album of the Year. An honest look at what each music tracking site is built for, and which one fits how you listen.",
+    "How Trackboxd compares to Musicboard, RateYourMusic, Last.fm, Genius, Album of the Year, Wave and Listnd. An honest look at what each music tracking site is built for, and which one fits how you listen.",
   keywords: [
     "musicboard alternative",
     "rate your music alternative",
@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     "last.fm alternative",
     "album of the year alternative",
     "genius alternative",
+    "rym alternatives",
+    "wave music app alternative",
+    "listnd alternative",
     "music tracking app",
     "music review site",
   ],
@@ -59,6 +62,20 @@ const comparisons = [
     difference:
       "AOTY is a scoreboard, strongest around release day. Trackboxd has no critic aggregation and no release cycle. A track from 1974 gets the same page as one from last week.",
   },
+  {
+    name: "Wave",
+    builtFor:
+      "Rating albums and concerts on a 10-point scale, with a feed built around the friends you already know.",
+    difference:
+      "Wave is a good fit if your music life is mostly albums and live shows shared with a small group of friends. Trackboxd goes one level smaller: you rate and review individual tracks, and you can pin annotations to the exact moment in a song that got you.",
+  },
+  {
+    name: "Listnd",
+    builtFor:
+      "Tracking, rating and reviewing albums, with lists, recommendations and an album-a-day listening habit.",
+    difference:
+      "Listnd is album-first, like Musicboard and RYM, and leans into discovery through recommendations. Trackboxd is for the moment a single song stands out, whether or not you ever finish the album, and gives you timestamped annotations to say exactly where.",
+  },
 ];
 
 const faqs = [
@@ -68,7 +85,7 @@ const faqs = [
   },
   {
     q: "What is a good RateYourMusic alternative?",
-    a: "It depends what you use RYM for. For its catalogue depth and genre taxonomy, nothing really replaces it. For keeping a personal listening diary with ratings and written reviews in a lighter, more social interface, Trackboxd covers that use case.",
+    a: "It depends what you use RYM for. Musicboard, Album of the Year, Wave and Listnd all cover album rating. For its catalogue depth and genre taxonomy, nothing really replaces it. For keeping a personal listening diary with ratings and written reviews in a lighter, more social interface, Trackboxd covers that use case.",
   },
   {
     q: "Is there a Last.fm alternative that is not just scrobbling?",
@@ -84,7 +101,7 @@ export default function AlternativesPage() {
   return (
     <MarketingPage
       title="Music tracking sites, compared"
-      tagline="Where Trackboxd sits next to Musicboard, RateYourMusic, Last.fm and Genius."
+      tagline="Where Trackboxd sits next to Musicboard, RateYourMusic, Last.fm, Genius, Wave and Listnd."
       jsonLd={faqSchema(faqs)}
     >
       <Section>
@@ -145,8 +162,18 @@ export default function AlternativesPage() {
               <td className="py-2 pr-4">Lyric</td>
               <td className="py-2">Yes, crowd-sourced meaning</td>
             </tr>
-            <tr>
+            <tr className="border-b border-[#5C5537]/10">
               <th scope="row" className="py-2 pr-4 font-normal">Album of the Year</th>
+              <td className="py-2 pr-4">Album</td>
+              <td className="py-2">No</td>
+            </tr>
+            <tr className="border-b border-[#5C5537]/10">
+              <th scope="row" className="py-2 pr-4 font-normal">Wave</th>
+              <td className="py-2 pr-4">Album / concert</td>
+              <td className="py-2">No</td>
+            </tr>
+            <tr>
+              <th scope="row" className="py-2 pr-4 font-normal">Listnd</th>
               <td className="py-2 pr-4">Album</td>
               <td className="py-2">No</td>
             </tr>
