@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | Trackboxd",
   },
   description:
-    "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary. The music annotation platform built for people who actually care.",
+    "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, comment on any moment in a song, and build a listening diary. Built for people who actually care about music.",
   keywords: [
     "letterboxd for music",
     "letterboxd for tracks",
@@ -43,16 +43,14 @@ export const metadata: Metadata = {
   // NOTE: deliberately no `alternates.canonical` here. Metadata cascades, so a
   // canonical set at the root is inherited by every page that does not set its
   // own — pointing them all at the homepage. Each route declares its own.
+  // One robots tag only. A separate googleBot block renders a second
+  // <meta name="googlebot"> that pages overriding `robots` would not clear.
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+    "max-video-preview": -1,
+    "max-image-preview": "large",
+    "max-snippet": -1,
   },
 
   // 2. Explicitly define the favicon
@@ -66,7 +64,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Trackboxd — The Letterboxd for Tracks",
     description:
-      "Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary. The music annotation platform built for people who actually care.",
+      "Rate songs, write reviews, comment on any moment in a song, and build a listening diary. Built for people who actually care about music.",
     url: SITE_URL,
     siteName: "Trackboxd",
     images: [
@@ -86,7 +84,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Trackboxd — The Letterboxd for Tracks",
     description:
-      "Rate songs, write reviews, annotate lyrics, and build your listening diary. The music annotation platform built for people who actually care.",
+      "Rate songs, write reviews, comment on any moment in a song, and build your listening diary.",
     images: ["/og-image.png"],
     site: "@trackboxd",
   },
@@ -116,7 +114,7 @@ export default function RootLayout({
                   alternateName: "The Letterboxd for Tracks",
                   url: SITE_URL,
                   description:
-                    "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, annotate lyrics with timestamps, and build a listening diary.",
+                    "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, leave timestamped comments on any moment in a song, and build a listening diary.",
                   potentialAction: {
                     "@type": "SearchAction",
                     target: {
@@ -131,7 +129,7 @@ export default function RootLayout({
                   name: "Trackboxd",
                   url: SITE_URL,
                   description:
-                    "Trackboxd is a track-first social platform for rating songs, writing reviews, and annotating lyrics.",
+                    "Trackboxd is a track-first social platform for rating songs, writing reviews, and commenting on specific moments in a song.",
                   founder: [
                     {
                       "@type": "Person",

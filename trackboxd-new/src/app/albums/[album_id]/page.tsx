@@ -63,9 +63,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!album) return { title: 'Album not found' };
 
   const artistNames = album.artists.map((a: any) => a.name).join(', ');
+  // Empty album pages are only Spotify metadata; keep them out of the index
+  // until someone reviews or annotates. Flips back on the next revalidate.
+  const hasUserContent =
+    (album.stats?.review_count || 0) + ((album.stats as any)?.annotation_count || 0) > 0;
 
   return {
     title: `${album.name} by ${artistNames}`,
+    ...(hasUserContent ? {} : { robots: { index: false, follow: true } }),
     description: `${album.total_tracks} tracks, ${album.stats?.review_count || 0} reviews. Rate and annotate every song on ${album.name} by ${artistNames}.`,
     openGraph: {
       title: `${album.name} — ${artistNames}`,

@@ -9,6 +9,7 @@ import LikeButton from '@/components/share/LikeButton'
 import ShareButton from '@/components/share/ShareButton'
 import { VipBadge } from '@/components/VipBadge'
 import { SITE_URL } from '@/lib/site';
+import SignupPrompt from '@/components/SignupPrompt'
 
 // Public review pages are the same for every visitor — serve from the ISR cache
 // so crawlers get a fast response instead of a cold render each time.
@@ -204,6 +205,13 @@ export default async function ReviewPage({ params }: PageProps) {
               </div>
             </div>
         </div>
+
+        <SignupPrompt
+          className="mt-6"
+          heading={`What did you think of ${trackName}?`}
+          body="Rate it, write your own review, or comment on the exact moment that got you. Free."
+          cta="Rate this — free account"
+        />
 
         {/* Track + Author info cards */}
         <div className="mt-6 grid grid-cols-2 gap-4">

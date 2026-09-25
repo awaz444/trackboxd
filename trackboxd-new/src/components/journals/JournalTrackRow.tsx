@@ -6,6 +6,7 @@ import { Plus, Check, Music, ChevronDown, ChevronUp } from "lucide-react";
 import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
 import { friendlyError } from "@/lib/friendlyError";
+import { track as trackEvent } from "@/lib/analytics";
 
 interface Track {
     id: string;
@@ -118,6 +119,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
             }
 
             const saved = await res.json();
+            if (!localReview) trackEvent("review_created", { item_type: "track", source: "journal" });
             const newReview: ReviewData = { id: saved.id || saved.reviewId, rating, text: text.trim() };
             setLocalReview(newReview);
             setShowForm(false);

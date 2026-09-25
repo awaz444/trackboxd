@@ -6,6 +6,7 @@ import { Search, X, Music, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useUser from "@/hooks/useUser";
+import { track } from "@/lib/analytics";
 
 interface InitialAnnotation {
   id: string;
@@ -204,6 +205,9 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
       }
 
       const annotationData = await response.json();
+      if (!initialAnnotation) {
+        track('annotation_created', { source: 'log_form' });
+      }
 
       if (initialAnnotation && onSave) {
         onSave({

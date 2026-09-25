@@ -6,7 +6,7 @@ import { MarketingPage, Section, Faq, faqSchema } from "@/components/marketing/M
 export const metadata: Metadata = {
   title: "Letterboxd for Music — Rate and Review Songs on Trackboxd",
   description:
-    "Looking for a Letterboxd for music? Trackboxd is the Letterboxd for tracks: rate songs out of five, write reviews, annotate lyrics with timestamps, and keep a listening diary of everything you hear.",
+    "Looking for a Letterboxd for music? Trackboxd is the Letterboxd for tracks: rate songs out of five, write reviews, comment on any moment in a song, and keep a listening diary of everything you hear.",
   keywords: [
     "letterboxd for music",
     "letterboxd for songs",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Letterboxd for Music — Trackboxd",
     description:
-      "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, annotate lyrics, and build a listening diary.",
+      "Trackboxd is the Letterboxd for tracks. Rate songs, write reviews, comment on any moment in a song, and build a listening diary.",
     url: `${SITE_URL}/letterboxd-for-music`,
     type: "article",
   },
@@ -52,7 +52,7 @@ export default function LetterboxdForMusicPage() {
   return (
     <MarketingPage
       title="The Letterboxd for Music"
-      tagline="Rate songs, write reviews, annotate lyrics, keep a listening diary."
+      tagline="Rate songs, write reviews, comment on any moment in a song, keep a listening diary."
       jsonLd={faqSchema(faqs)}
     >
       <Section>
@@ -89,8 +89,8 @@ export default function LetterboxdForMusicPage() {
           <li>— Rate any track out of five stars</li>
           <li>— Write a review and have it appear on the track&apos;s page</li>
           <li>
-            — Annotate a specific timestamp or lyric, so your note is attached to
-            the exact moment it is about
+            — Comment on any moment in a song, so your note is pinned to the
+            exact second it is about
           </li>
           <li>— Keep a listening diary of what you played and when</li>
           <li>— Follow other listeners and read their reviews as they post</li>
@@ -98,10 +98,10 @@ export default function LetterboxdForMusicPage() {
         </ul>
       </Section>
 
-      <Section heading="Annotation is the part nothing else does">
+      <Section heading="Commenting on a moment is the part nothing else does">
         <p>
           Rating and reviewing are table stakes. The thing Trackboxd has that
-          comparable sites do not is inline annotation at the track level. You can
+          comparable sites do not is timestamped comments: notes pinned to a specific moment in a track. You can
           mark the 43-second mark where the bass drops, or the line in the second
           verse that means something different once you know what the record is
           about, and leave your reading of it there for anyone who opens the song.

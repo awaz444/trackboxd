@@ -19,6 +19,17 @@ const engagementPriority = (item: {
   return 0.5
 }
 
+/**
+ * Song and album pages with no reviews or annotations are just Spotify metadata
+ * that thousands of other sites also show. They are noindexed (see
+ * `hasUserContent` in the page routes) and kept out of the sitemap so crawl
+ * attention goes to pages with something only Trackboxd has.
+ */
+const hasUserContent = (item: {
+  review_count?: number | null
+  annotation_count?: number | null
+}) => (item.review_count ?? 0) + (item.annotation_count ?? 0) > 0
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL
 
@@ -90,14 +101,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  const trackRoutes: MetadataRoute.Sitemap = (tracksResult.data || []).map((t) => ({
+  const trackRoutes: MetadataRoute.Sitemap = (tracksResult.data || []).filter(hasUserContent).map((t) => ({
     url: `${baseUrl}/songs/${t.id}`,
     lastModified: t.last_updated ? new Date(t.last_updated) : undefined,
     changeFrequency: 'weekly',
     priority: engagementPriority(t),
   }))
 
-  const albumRoutes: MetadataRoute.Sitemap = (albumsResult.data || []).map((a) => ({
+  const albumRoutes: MetadataRoute.Sitemap = (albumsResult.data || []).filter(hasUserContent).map((a) => ({
     url: `${baseUrl}/albums/${a.id}`,
     lastModified: a.last_updated ? new Date(a.last_updated) : undefined,
     changeFrequency: 'weekly',

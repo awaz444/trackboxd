@@ -123,9 +123,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!track) return { title: 'Track not found' };
 
   const artistNames = track.artists.map((a: any) => a.name).join(', ');
+  // Empty track pages are only Spotify metadata; keep them out of the index
+  // until someone reviews or annotates. Flips back on the next revalidate.
+  const hasUserContent =
+    (track.stats?.review_count || 0) + (track.stats?.annotation_count || 0) > 0;
 
   return {
     title: `${track.name} by ${artistNames}`,
+    ...(hasUserContent ? {} : { robots: { index: false, follow: true } }),
     description: `Ratings, reviews, and annotations for "${track.name}" by ${artistNames}. ${track.stats?.review_count || 0} reviews on Trackboxd.`,
     openGraph: {
       title: `${track.name} — ${artistNames}`,

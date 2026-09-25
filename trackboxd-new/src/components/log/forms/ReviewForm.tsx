@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 // Removed private visibility toggle: no Checkbox needed
 import useUser from "@/hooks/useUser";
+import { track } from "@/lib/analytics";
 import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
 
@@ -281,6 +282,9 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
             }
 
             const reviewData = await response.json();
+            if (!initialReview) {
+                track('review_created', { item_type: selectedItem?.type, source: 'log_form' });
+            }
 
             if (initialReview && onSave) {
                 onSave({

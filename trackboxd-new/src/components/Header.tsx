@@ -362,9 +362,9 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                         className="h-full w-auto"
                                     />
                                 </div>
-                                <h1 className="hidden md:block text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
+                                <span className="hidden md:block text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
                                     Trackboxd
-                                </h1>
+                                </span>
                             </Link>
                         ) : (
                             <div className="flex items-center gap-3">
@@ -377,9 +377,9 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                         className="h-full w-auto"
                                     />
                                 </div>
-                                <h1 className="hidden md:block text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
+                                <span className="hidden md:block text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
                                     Trackboxd
-                                </h1>
+                                </span>
                             </div>
                         )}
                     </div>

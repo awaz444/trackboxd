@@ -100,7 +100,7 @@ const LandingPage = () => {
               The Letterboxd for Tracks
             </h2>
             <p className="text-base text-[#5C5537]/60 mb-10 max-w-md">
-              Rate songs, annotate lyrics, build your listening diary.
+              Rate songs, comment on any moment in a song, build your listening diary.
             </p>
 
             <div className="h-px w-48 bg-[#5C5537]/20 mx-auto mb-10"></div>
@@ -130,9 +130,9 @@ const LandingPage = () => {
           </article>
 
           <article className="text-center space-y-2">
-            <h2 className="text-sm font-bold text-[#5C5537] uppercase tracking-wide">Deep Annotations</h2>
+            <h2 className="text-sm font-bold text-[#5C5537] uppercase tracking-wide">Timestamped Comments</h2>
             <p className="text-xs text-[#5C5537]/70 leading-relaxed">
-              Dive into the lyrics. Annotate specific lines, explain hidden meanings, or decode the artist's intent. Connect with the deeper layers of your favorite songs.
+              Pin a comment to any moment in a song: the 0:43 bass drop, the key change, the line that gets you. Everyone who opens the track sees it right there.
             </p>
           </article>
 

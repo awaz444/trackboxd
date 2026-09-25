@@ -13,7 +13,9 @@ let started = false;
 export function initAnalytics() {
   if (started || !key || typeof window === 'undefined') return;
   posthog.init(key, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+    // Proxied through next.config.mjs rewrites (first-party, survives blockers).
+    api_host: '/ingest',
+    ui_host: 'https://us.posthog.com',
     capture_pageview: 'history_change',
     person_profiles: 'identified_only',
   });

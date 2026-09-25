@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 import useUser from "@/hooks/useUser";
+import SignupPrompt from "@/components/SignupPrompt";
 import ReviewForm from "@/components/log/forms/ReviewForm";
 import AnnotationForm from "@/components/log/forms/AnnotationForm";
 import { spotifyToTrack } from "@/utils/trackConverters";
@@ -648,6 +649,13 @@ const SongDetailClient = ({
                         </div>
                     </div>
                 </div>
+
+                <SignupPrompt
+                    className="mb-8"
+                    heading="Rate this track"
+                    body="Give it a rating, write a review, or pin a comment to the exact moment that gets you. Free."
+                    cta="Rate this track — free account"
+                />
 
                 <div className="mb-8">
                     <div className="grid grid-cols-4 gap-2 border-y border-[#5C5537]/20 py-5">
