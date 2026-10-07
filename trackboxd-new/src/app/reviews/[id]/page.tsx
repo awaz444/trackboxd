@@ -2,7 +2,8 @@ import { createPublicClient } from '@/lib/supabase/public';
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Star, ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
+import RatingStars from '@/components/RatingStars'
 import Footer from '@/components/Footer'
 import { getServerUser } from '@/lib/supabase/get-server-user'
 import LikeButton from '@/components/share/LikeButton'
@@ -145,22 +146,8 @@ export default async function ReviewPage({ params }: PageProps) {
               <h1 className="text-[#5C5537] font-bold text-xl leading-tight">{trackName}</h1>
               <p className="text-[#5C5537]/65 text-sm mt-0.5">{artistName}</p>
               {albumName && <p className="text-[#5C5537]/45 text-xs italic mt-0.5">{albumName}</p>}
-              {/* Half-star rating */}
-              <div className="flex items-center gap-0.5 mt-2">
-                {[1, 2, 3, 4, 5].map(i => {
-                  const fill = Math.max(0, Math.min(1, rating - (i - 1)))
-                  return (
-                    <div key={i} className="relative w-4 h-4">
-                      <Star className="w-4 h-4 text-[#5C5537]/15" />
-                      {fill > 0 && (
-                        <div className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
-                          <Star className="w-4 h-4 text-[#FFBA00] fill-[#FFBA00]" />
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-                <span className="text-[#5C5537]/70 text-sm ml-1.5">{rating}</span>
+              <div className="mt-2">
+                <RatingStars rating={rating} />
               </div>
             </div>
           </div>

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Heart, Star, X, Share2, ExternalLink } from "lucide-react";
+import { Heart, X, Share2, ExternalLink } from "lucide-react";
 import ShareSheet from "@/components/share/ShareSheet";
 import { useAuth } from "@/contexts/AuthContext";
+import RatingStars from "@/components/RatingStars";
 
 interface ProfileReviewCardProps {
   review: {
@@ -97,9 +98,8 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
             <span className="text-[#5C5537]/70"> by {review.track.artist}</span>
           </div>
           {review.rating !== undefined && (
-            <div className="flex-shrink-0 flex items-center text-[#FFBA00] text-sm">
-              <Star className="h-4 w-4 mr-1 fill-current" />
-              <span>{review.rating}</span>
+            <div className="flex-shrink-0">
+              <RatingStars rating={review.rating} />
             </div>
           )}
         </div>
@@ -182,14 +182,8 @@ const ProfileReviewCard: React.FC<ProfileReviewCardProps> = ({ review }) => {
                   <h3 className="font-bold text-[#5C5537] text-lg leading-tight">{review.track.title}</h3>
                   <p className="text-[#5C5537]/70 text-sm mt-0.5">{review.track.artist}</p>
                   {review.rating !== undefined && (
-                    <div className="flex items-center gap-0.5 mt-2">
-                      {[1, 2, 3, 4, 5].map(i => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${i <= review.rating! ? "text-[#FFBA00] fill-[#FFBA00]" : "text-[#5C5537]/20"}`}
-                        />
-                      ))}
-                      <span className="text-[#5C5537] text-sm ml-1.5">{review.rating}</span>
+                    <div className="mt-2">
+                      <RatingStars rating={review.rating} />
                     </div>
                   )}
                 </div>

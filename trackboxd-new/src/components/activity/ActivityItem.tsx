@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Music, Album, Clock, Heart, Share2, Check } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import { VipBadge } from "@/components/VipBadge";
+import RatingStars from "@/components/RatingStars";
 
 export interface ActivityItem {
   id: string;
@@ -211,20 +212,8 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 mb-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <div key={star} className="relative">
-                  <div className="w-4 h-4 text-[#5C5537]/30">★</div>
-                  <div
-                    className="absolute top-0 left-0 w-5 h-5 text-[#FFBA00] overflow-hidden"
-                    style={{
-                      width: `${Math.max(0, Math.min(1, (activity.rating || 0) - star + 1)) * 100}%`,
-                    }}>
-                    ★
-                  </div>
-                </div>
-              ))}
-              <span className="text-sm text-[#5C5537] ml-1 mt-2">{activity.rating}</span>
+            <div className="mb-2">
+              <RatingStars rating={activity.rating || 0} />
             </div>
             {activity.content && (
               <p className="text-sm text-[#5C5537] mt-2 line-clamp-2">

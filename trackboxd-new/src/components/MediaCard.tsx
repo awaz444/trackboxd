@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, Star, Clock, Share2, Check } from "lucide-react";
 import useUser from "@/hooks/useUser";
+import RatingStars from "@/components/RatingStars";
 
 export interface MediaCardProps {
   coverUrl: string;
@@ -26,19 +27,7 @@ export interface MediaCardProps {
 }
 
 const StarRating = ({ rating }: { rating: number }) => (
-  <div className="flex items-center gap-0.5">
-    {[1, 2, 3, 4, 5].map((star) => (
-      <div key={star} className="relative w-3.5 h-3.5 text-sm leading-none">
-        <span className="absolute text-[#5C5537]/30">★</span>
-        <span
-          className="absolute text-[#FFBA00] overflow-hidden"
-          style={{ width: `${Math.max(0, Math.min(1, rating - star + 1)) * 100}%` }}
-        >
-          ★
-        </span>
-      </div>
-    ))}
-  </div>
+  <RatingStars rating={rating} size="xs" showNumber={false} />
 );
 
 const MediaCard: React.FC<MediaCardProps> = ({

@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Heart, Star, X, Share2, ExternalLink } from "lucide-react";
+import { Heart, X, Share2, ExternalLink } from "lucide-react";
 import ShareSheet from "@/components/share/ShareSheet";
 import { Review } from "@/app/tracks/types";
 import useUser from "@/hooks/useUser";
 import { VipBadge } from "@/components/VipBadge";
+import RatingStars from "@/components/RatingStars";
 
 interface ReviewCardProps {
     review: Review;
@@ -114,10 +115,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
                                 </Link>
                                 <VipBadge username={review.users.name} />
                             </div>
-                            <div className="flex items-center text-[#FFBA00] text-sm">
-                                <Star className="h-4 w-4 mr-0.5 fill-current" />
-                                <span>{review.rating}</span>
-                            </div>
+                            <RatingStars rating={review.rating} />
                         </div>
 
                         <div className="mb-2">
@@ -218,14 +216,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
                                     {albumName && (
                                         <p className="text-[#5C5537]/50 text-xs italic mt-0.5">{albumName}</p>
                                     )}
-                                    <div className="flex items-center gap-0.5 mt-2">
-                                        {[1, 2, 3, 4, 5].map(i => (
-                                            <Star
-                                                key={i}
-                                                className={`w-4 h-4 ${i <= review.rating ? "text-[#FFBA00] fill-[#FFBA00]" : "text-[#5C5537]/20"}`}
-                                            />
-                                        ))}
-                                        <span className="text-[#5C5537] text-sm ml-1.5">{review.rating}</span>
+                                    <div className="mt-2">
+                                        <RatingStars rating={review.rating} />
                                     </div>
                                 </div>
                             </div>

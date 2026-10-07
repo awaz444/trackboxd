@@ -1,8 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import { Edit, Trash, Star, Heart } from "lucide-react";
+import { Edit, Trash, Heart } from "lucide-react";
 import { Review } from "@/app/tracks/types";
 import ReviewForm from "@/components/log/forms/ReviewForm";
+import RatingStars from "@/components/RatingStars";
 
 interface EditableReviewCardProps {
   review: Review;
@@ -16,25 +17,6 @@ const EditableReviewCard: React.FC<EditableReviewCardProps> = ({
   onDelete 
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-
-  const renderStars = (rating: number) => (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map(i => {
-        const fill = Math.max(0, Math.min(1, rating - (i - 1)))
-        return (
-          <div key={i} className="relative w-4 h-4">
-            <Star className="w-4 h-4 text-[#5C5537]/20" />
-            {fill > 0 && (
-              <div className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
-                <Star className="w-4 h-4 text-[#FFBA00] fill-[#FFBA00]" />
-              </div>
-            )}
-          </div>
-        )
-      })}
-      <span className="text-sm text-[#5C5537]/70 ml-1.5">{rating}</span>
-    </div>
-  );
 
   const handleSave = (updatedReview: any) => {
     onEdit({
@@ -110,7 +92,7 @@ const EditableReviewCard: React.FC<EditableReviewCardProps> = ({
           </div>
 
           <div className="mb-3">
-            {renderStars(review.rating)}
+            <RatingStars rating={review.rating} />
           </div>
           
           {review.text && (

@@ -83,23 +83,7 @@ const LikeCard = ({
   className?: string;
 }) => <div className={`p-4 ${className}`}>{children}</div>;
 
-const RatingStars = ({ rating }: { rating: number }) => (
-  <div className="flex items-center gap-1">
-    {[1, 2, 3, 4, 5].map((star) => (
-      <div key={star} className="relative mb-1">
-        <div className="w-4 h-4 text-[#D9D9D9]">★</div>
-        <div
-          className="absolute top-0 left-0 w-5 h-5 text-[#FFBA00] overflow-hidden"
-          style={{
-            width: `${Math.max(0, Math.min(1, rating - star + 1)) * 100}%`,
-          }}>
-          ★
-        </div>
-      </div>
-    ))}
-    <span className="text-sm text-[#1F2C24] ml-1">{rating}</span>
-  </div>
-);
+import RatingStars from "@/components/RatingStars";
 
 const UserAvatar = ({
   user,

@@ -28,7 +28,7 @@ const Footer = ({ variant = "dark" }: FooterProps) => {
 
   return (
     <footer className={`px-6 py-8 relative ${bgColor} z-10 border-t ${borderColor}`}>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className={`${textColor} text-sm`}>
             © {new Date().getFullYear()} Trackboxd. Made with love 🤎

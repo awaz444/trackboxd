@@ -6,6 +6,7 @@ import { Heart } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import HomeSectionHeader from "./HomeSectionHeader";
 import { VipBadge } from "@/components/VipBadge";
+import RatingStars from "@/components/RatingStars";
 
 interface PopularReview {
   id: string;
@@ -25,21 +26,6 @@ interface Props {
   data: PopularReview[];
   likes?: Record<string, boolean>;
 }
-
-const StarRow = ({ rating }: { rating: number }) => (
-  <div className="flex gap-0.5">
-    {[1, 2, 3, 4, 5].map((s) => (
-      <span
-        key={s}
-        className={`text-sm ${
-          s <= Math.floor(rating) ? "text-[#FFBA00]" : "text-[#5C5537]/20"
-        }`}
-      >
-        ★
-      </span>
-    ))}
-  </div>
-);
 
 const ReviewRow = ({
   review,
@@ -110,7 +96,7 @@ const ReviewRow = ({
               {review.user.name}
               <VipBadge username={review.user.name} />
             </span>
-            <StarRow rating={review.rating} />
+            <RatingStars rating={review.rating} />
           </div>
           {/* Review text preview */}
           <p className="text-sm text-[#5C5537]/80 line-clamp-2">

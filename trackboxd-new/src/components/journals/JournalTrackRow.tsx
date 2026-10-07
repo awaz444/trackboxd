@@ -7,6 +7,7 @@ import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
 import { friendlyError } from "@/lib/friendlyError";
 import { track as trackEvent } from "@/lib/analytics";
+import RatingStars from "@/components/RatingStars";
 
 interface Track {
     id: string;
@@ -65,20 +66,6 @@ const formatTimestamp = (seconds: number) => {
     const s = total % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
 };
-
-const StarDisplay = ({ rating }: { rating: number }) => (
-    <div className="flex items-center gap-0.5">
-        {[1, 2, 3, 4, 5].map((star) => (
-            <div key={star} className="relative w-4 h-4 text-base leading-none">
-                <span className="absolute text-[#5C5537]/30">★</span>
-                <span
-                    className="absolute text-[#FFBA00] overflow-hidden"
-                    style={{ width: `${Math.max(0, Math.min(1, rating - star + 1)) * 100}%` }}
-                >★</span>
-            </div>
-        ))}
-    </div>
-);
 
 const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
     itemId,
@@ -187,7 +174,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                 <div className="border-t border-[#5C5537]/10 px-3 py-3">
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                            <StarDisplay rating={localReview.rating} />
+                            <RatingStars rating={localReview.rating} showNumber={false} />
                             <span className="text-sm font-bold text-[#5C5537]">{localReview.rating.toFixed(1)}</span>
                         </div>
                         {isOwner && (

@@ -24,31 +24,6 @@ const TrackCard: React.FC<TrackCardProps> = ({
     onAnnotationClick,
 }) => {
 
-    const renderStars = (rating: number) => {
-        return (
-            <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <div key={star} className="relative">
-                        <div className="w-4 h-4 mb-2 text-[#5C5537]/30">★</div>
-                        <div
-                            className="absolute top-0 left-0 w-5 h-5 text-[#FFBA00] overflow-hidden"
-                            style={{
-                                width: `${
-                                    Math.max(
-                                        0,
-                                        Math.min(1, rating - star + 1)
-                                    ) * 100
-                                }%`,
-                            }}>
-                            ★
-                        </div>
-                    </div>
-                ))}
-                <span className="text-sm text-[#5C5537] ml-1">{rating}</span>
-            </div>
-        );
-    };
-
     return (
         <Link href={`/songs/${track.id}`}>
             <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
@@ -113,7 +88,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
                                 </div>
                             </div>
 
-                            {renderStars(track.stats?.avg_rating || 0)}
+                            <RatingStars rating={track.stats?.avg_rating || 0} />
                         </div>
                     </div>
 
