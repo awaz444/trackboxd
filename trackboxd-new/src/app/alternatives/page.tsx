@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/site";
 import { MarketingPage, Section, Faq, faqSchema } from "@/components/marketing/MarketingPage";
 
 export const metadata: Metadata = {
-  title: "Music Tracking Site Alternatives — Trackboxd vs Musicboard, RYM, Last.fm",
+  title: "Musicboard & RYM Alternatives: Trackboxd Compared",
   description:
     "How Trackboxd compares to Musicboard, RateYourMusic, Last.fm, Genius, Album of the Year, Wave and Listnd. An honest look at what each music tracking site is built for, and which one fits how you listen.",
   keywords: [

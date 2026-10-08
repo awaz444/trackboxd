@@ -4,9 +4,9 @@ import { SITE_URL } from "@/lib/site";
 import { MarketingPage, Section, Faq, faqSchema } from "@/components/marketing/MarketingPage";
 
 export const metadata: Metadata = {
-  title: "Letterboxd for Music — Rate and Review Songs on Trackboxd",
+  title: "Letterboxd for Music — Rate & Review Songs, Free",
   description:
-    "Looking for a Letterboxd for music? Trackboxd is the Letterboxd for tracks: rate songs out of five, write reviews, comment on any moment in a song, and keep a listening diary of everything you hear.",
+    "Trackboxd is the Letterboxd for music. Rate songs, write reviews, comment on any moment in a track, and keep a listening diary. Free to join.",
   keywords: [
     "letterboxd for music",
     "letterboxd for songs",
