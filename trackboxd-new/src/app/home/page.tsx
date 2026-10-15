@@ -12,6 +12,9 @@ import RecommendedForYou from "@/components/home/RecommendedForYou";
 import PeopleYouMayKnow from "@/components/home/PeopleYouMayKnow";
 import PopularUsersSection from "@/components/home/PopularUsersSection";
 import JournalsPromoModal from "@/components/home/JournalsPromoModal";
+import HomeSectionHeader from "@/components/home/HomeSectionHeader";
+import GlobalActivityGrid from "@/components/activity/GlobalActivityGrid";
+import type { GlobalActivityItem } from "@/lib/global-activity";
 
 const JOURNALS_PROMO_KEY = "trackboxd_journals_promo_seen";
 
@@ -26,6 +29,7 @@ export default function HomePage() {
   const [recommended, setRecommended] = useState<any[]>([]);
   const [peopleYouMayKnow, setPeopleYouMayKnow] = useState<any[]>([]);
   const [popularUsers, setPopularUsers] = useState<any[]>([]);
+  const [globalActivity, setGlobalActivity] = useState<{ items: GlobalActivityItem[]; countries: Array<{ code: string; name: string }> }>({ items: [], countries: [] });
   const [likes, setLikes] = useState<Record<string, boolean>>({});
   const [reviewLikes, setReviewLikes] = useState<Record<string, boolean>>({});
   const [annotationLikes, setAnnotationLikes] = useState<Record<string, boolean>>({});
@@ -108,6 +112,7 @@ export default function HomePage() {
           recommendedRes,
           peopleRes,
           usersRes,
+          globalRes,
         ] = await Promise.allSettled([
           fetch("/api/home/new-on-trackboxd").then((r) => r.json()),
           fetch("/api/home/popular-on-trackboxd").then((r) => r.json()),
@@ -117,6 +122,7 @@ export default function HomePage() {
           fetch("/api/home/recommended-for-you").then((r) => r.json()),
           fetch("/api/users/people-you-may-know").then((r) => r.json()),
           fetch("/api/users/popular").then((r) => r.json()),
+          fetch("/api/home/global-activity").then((r) => r.json()),
         ]);
 
         let popItems: any[] = [];
@@ -148,6 +154,13 @@ export default function HomePage() {
         }
         if (peopleRes.status === "fulfilled") setPeopleYouMayKnow(peopleRes.value || []);
         if (usersRes.status === "fulfilled") setPopularUsers(usersRes.value || []);
+        if (globalRes.status === "fulfilled") {
+          const g = globalRes.value || { items: [], countries: [] };
+          setGlobalActivity({
+            items: Array.isArray(g.items) ? g.items : [],
+            countries: Array.isArray(g.countries) ? g.countries : [],
+          });
+        }
 
         const allItems = [
           ...popItems,
@@ -183,6 +196,20 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#FFFBEb]">
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Happening on Trackboxd — live global feed */}
+        {globalActivity.items.length >= 4 && (
+          <section className="mb-10">
+            <HomeSectionHeader
+              title="Happening on Trackboxd"
+              subtitle="Live reviews and annotations from around the world"
+            />
+            <GlobalActivityGrid
+              items={globalActivity.items}
+              countries={globalActivity.countries}
+            />
+          </section>
+        )}
+
         {/* New on Trackboxd */}
         <NewOnTrackboxd data={newContent} likes={likes} />
 
@@ -196,7 +223,11 @@ export default function HomePage() {
         <PopularAnnotationsSection data={popularAnnotations} likes={annotationLikes} />
 
         {/* Recent Activity */}
-        <RecentFriendsActivity data={friendsActivity} />
+        <RecentFriendsActivity
+          data={friendsActivity}
+          fallbackGlobalItems={globalActivity.items}
+          fallbackCountries={globalActivity.countries}
+        />
 
         {/* Recommended for You */}
         <RecommendedForYou
