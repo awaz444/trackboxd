@@ -9,13 +9,11 @@ import type { GlobalActivityItem } from "@/lib/global-activity";
 interface Props {
   data: ActivityItemType[];
   fallbackGlobalItems?: GlobalActivityItem[];
-  fallbackCountries?: Array<{ code: string; name: string }>;
 }
 
 export default function RecentFriendsActivity({
   data,
   fallbackGlobalItems = [],
-  fallbackCountries = [],
 }: Props) {
   const hasFriends = data.length > 0;
   const hasFallback = !hasFriends && fallbackGlobalItems.length > 0;
@@ -45,11 +43,7 @@ export default function RecentFriendsActivity({
         </div>
       ) : hasFallback ? (
         <div className="space-y-4">
-          <GlobalActivityGrid
-            items={fallbackGlobalItems}
-            countries={fallbackCountries}
-            maxItems={6}
-          />
+          <GlobalActivityGrid items={fallbackGlobalItems} maxItems={6} />
           <div className="text-center">
             <Link
               href="/activity"

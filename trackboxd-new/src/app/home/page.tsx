@@ -203,10 +203,7 @@ export default function HomePage() {
               title="Happening on Trackboxd"
               subtitle="Live reviews and annotations from around the world"
             />
-            <GlobalActivityGrid
-              items={globalActivity.items}
-              countries={globalActivity.countries}
-            />
+            <GlobalActivityGrid items={globalActivity.items} />
           </section>
         )}
 
@@ -226,7 +223,6 @@ export default function HomePage() {
         <RecentFriendsActivity
           data={friendsActivity}
           fallbackGlobalItems={globalActivity.items}
-          fallbackCountries={globalActivity.countries}
         />
 
         {/* Recommended for You */}

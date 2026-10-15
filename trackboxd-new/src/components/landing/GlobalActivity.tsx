@@ -7,7 +7,7 @@ const MIN_ITEMS = 4;
 // Live feed of real public activity for the logged-out landing page. Renders
 // nothing when there isn't enough recent activity to look honest.
 export default async function GlobalActivity() {
-  const { items, countries } = await getGlobalActivity();
+  const { items } = await getGlobalActivity();
   if (items.length < MIN_ITEMS) return null;
 
   return (
@@ -15,7 +15,7 @@ export default async function GlobalActivity() {
       <h2 id="live-activity" className="text-center text-sm font-bold text-[#5C5537] uppercase tracking-wide mb-2">
         Happening on Trackboxd
       </h2>
-      <GlobalActivityGrid items={items} countries={countries} />
+      <GlobalActivityGrid items={items} />
     </section>
   );
 }

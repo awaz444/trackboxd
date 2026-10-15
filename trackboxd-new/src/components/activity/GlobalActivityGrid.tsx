@@ -4,12 +4,6 @@ import { Clock } from "lucide-react";
 import RatingStars from "@/components/RatingStars";
 import type { GlobalActivityItem } from "@/lib/global-activity";
 
-function flag(code: string) {
-  return code
-    .toUpperCase()
-    .replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0)));
-}
-
 function timeAgo(iso: string) {
   const s = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
   if (s < 3600) return `${Math.max(1, Math.floor(s / 60))}m ago`;
@@ -25,7 +19,7 @@ function mmss(sec: number) {
 
 function ActivityCard({ item }: { item: GlobalActivityItem }) {
   return (
-    <article className="bg-white/60 rounded-xl p-4 text-left flex gap-3 hover:bg-white transition-colors">
+    <article className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4 text-left flex gap-3 hover:shadow-md transition-shadow">
       <Link href={item.href} className="flex-shrink-0">
         {item.track.cover_url ? (
           <img
@@ -62,13 +56,7 @@ function ActivityCard({ item }: { item: GlobalActivityItem }) {
           <Link href={`/profile/${item.user.name}`} className="font-medium hover:underline">
             {item.user.name}
           </Link>
-          {item.country && (
-            <span title={item.country.name}>
-              {" "}
-              · {flag(item.country.code)} {item.country.name}
-            </span>
-          )}{" "}
-          · {timeAgo(item.created_at)}
+          {" "}· {timeAgo(item.created_at)}
         </p>
       </div>
     </article>
@@ -77,37 +65,24 @@ function ActivityCard({ item }: { item: GlobalActivityItem }) {
 
 interface Props {
   items: GlobalActivityItem[];
-  countries?: Array<{ code: string; name: string }>;
   maxItems?: number;
   hiddenBreakpointIndex?: number;
 }
 
 export default function GlobalActivityGrid({
   items,
-  countries = [],
   maxItems,
   hiddenBreakpointIndex = 6,
 }: Props) {
   const visible = typeof maxItems === "number" ? items.slice(0, maxItems) : items;
   if (visible.length === 0) return null;
   return (
-    <>
-      {countries.length >= 2 && (
-        <p className="text-center text-xl mb-5" aria-label="Listening from around the world">
-          {countries.map((c) => (
-            <span key={c.code} title={c.name} className="mx-0.5">
-              {flag(c.code)}
-            </span>
-          ))}
-        </p>
-      )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {visible.map((item, i) => (
-          <div key={`${item.kind}-${item.id}`} className={i >= hiddenBreakpointIndex ? "hidden sm:block" : undefined}>
-            <ActivityCard item={item} />
-          </div>
-        ))}
-      </div>
-    </>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {visible.map((item, i) => (
+        <div key={`${item.kind}-${item.id}`} className={i >= hiddenBreakpointIndex ? "hidden sm:block" : undefined}>
+          <ActivityCard item={item} />
+        </div>
+      ))}
+    </div>
   );
 }
