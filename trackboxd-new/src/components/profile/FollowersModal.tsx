@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Trash2, Loader2 } from "lucide-react";
+import { X, UserMinus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { VipBadge } from "@/components/VipBadge";
@@ -29,6 +29,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
   const [followers, setFollowers] = useState<Follower[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -71,6 +72,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
       console.error("Error removing follower:", error);
     } finally {
       setRemovingId(null);
+      setConfirmingId(null);
     }
   };
 
@@ -135,19 +137,43 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
                   </Link>
 
                   {isOwnProfile && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-[#5C5537]/70 hover:text-red-500 hover:bg-red-50"
-                      onClick={() => handleRemoveFollower(follower.id)}
-                      disabled={removingId === follower.id}
-                    >
-                      {removingId === follower.id ? (
+                    removingId === follower.id ? (
+                      <div className="flex items-center gap-1 text-[#5C5537]/70 text-xs px-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
+                        Removing…
+                      </div>
+                    ) : confirmingId === follower.id ? (
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 text-xs text-[#5C5537]/70 hover:bg-[#5C5537]/10"
+                          onClick={() => setConfirmingId(null)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 font-medium"
+                          onClick={() => handleRemoveFollower(follower.id)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-xs text-[#5C5537]/60 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => setConfirmingId(follower.id)}
+                        aria-label={`Remove ${follower.name} from followers`}
+                        title="Remove from your followers"
+                      >
+                        <UserMinus className="h-4 w-4 mr-1" />
+                        Remove
+                      </Button>
+                    )
                   )}
                 </div>
               ))}
