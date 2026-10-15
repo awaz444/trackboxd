@@ -23,11 +23,20 @@ export async function GET(
     // Query to get count of reviews for each rating (1-5)
     const { data, error } = await supabase
       .from('reviews')
-      .select('rating', { count: 'exact' })
+      .select('user_id, rating')
       .eq('item_id', songId)
       .eq('is_public', true);
 
     if (error) throw error;
+
+    // A person can write several reviews of one item but has one rating:
+    // count each person once.
+    const seenUsers = new Set<string>();
+    const votes = (data || []).filter((row: any) => {
+      if (seenUsers.has(row.user_id)) return false;
+      seenUsers.add(row.user_id);
+      return true;
+    });
 
     // Initialize a distribution object with all possible ratings
     const distribution: Record<number, number> = {
@@ -39,7 +48,7 @@ export async function GET(
     };
 
     // Count ratings — half-star ratings (e.g. 4.5) split 0.5 between floor and ceil
-    data.forEach((item) => {
+    votes.forEach((item) => {
       const rating = item.rating as number;
       if (rating % 1 === 0.5) {
         const lower = Math.floor(rating);
@@ -52,7 +61,7 @@ export async function GET(
     });
 
     // Calculate total reviews and percentages
-    const totalReviews = data.length;
+    const totalReviews = votes.length;
     const percentageDistribution = {
       1: totalReviews > 0 ? Math.round((distribution[1] / totalReviews) * 100) : 0,
       2: totalReviews > 0 ? Math.round((distribution[2] / totalReviews) * 100) : 0,

@@ -52,7 +52,9 @@ export async function GET(req: NextRequest) {
                 .from("reviews")
                 .select("*")
                 .match({ user_id: userId, item_id: itemId })
-                .single();
+                .order("created_at", { ascending: false })
+                .limit(1)
+                .maybeSingle();
 
             return NextResponse.json(review ? review : null);
         } catch (error) {
@@ -205,6 +207,12 @@ async function createReview(body: any, supabase: any, userId: string) {
             .select()
             .single();
         if (reviewError) {
+            if (reviewError.message?.includes("REVIEW_LIMIT")) {
+                return NextResponse.json(
+                    { error: "You can write up to 5 reviews per track or album" },
+                    { status: 400 }
+                );
+            }
             if (reviewError.code === "23505") {
                 // await supabase.rpc('rollback'); // Removed
                 return NextResponse.json(
@@ -224,9 +232,6 @@ async function createReview(body: any, supabase: any, userId: string) {
                 target_id: review.id
             });
         if (activityError) throw activityError;
-
-        // Then update the average rating and review count
-        await updateItemStats(supabase, itemId);
 
         // Commit the transaction - Removed
         // await supabase.rpc('commit');
@@ -266,9 +271,9 @@ async function updateReview(body: any, supabase: any, userId: string) {
 
     const updateData: any = {};
     if (rating !== undefined) {
-        if (rating < 1 || rating > 5) {
+        if (rating < 0.5 || rating > 5 || !Number.isInteger(rating * 2)) {
             return NextResponse.json(
-                { error: "Rating must be between 1 and 5" },
+                { error: "Rating must be between 0.5 and 5 in 0.5 increments" },
                 { status: 400 }
             );
         }
@@ -297,11 +302,6 @@ async function updateReview(body: any, supabase: any, userId: string) {
 
     if (activityError) {
         console.error("Activity creation error:", activityError);
-    }
-
-    if (rating !== undefined) {
-        // Update stats after changing rating
-        await updateItemStats(supabase, existingReview.item_id);
     }
 
     return NextResponse.json(updatedReview);
@@ -348,38 +348,6 @@ async function deleteReview(body: any, supabase: any, userId: string) {
         .eq("id", reviewId);
     if (deleteError) throw deleteError;
 
-    // Update stats after deletion
-    await updateItemStats(supabase, existingReview.item_id);
-
     return NextResponse.json({ success: true });
 }
 
-async function updateItemStats(supabase: any, itemId: string) {
-    const { data: reviews, error } = await supabase
-        .from("reviews")
-        .select("rating")
-        .eq("item_id", itemId);
-
-    if (error) {
-        console.error("Error fetching reviews for stats:", error);
-        return;
-    }
-
-    const totalReviews = reviews.length;
-    const avgRating = totalReviews > 0
-        ? reviews.reduce((acc: number, r: any) => acc + Number(r.rating), 0) / totalReviews
-        : 0;
-
-    const { error: updateError } = await supabase
-        .from("spotify_items")
-        .update({
-            review_count: totalReviews,
-            avg_rating: avgRating,
-            last_updated: new Date().toISOString()
-        })
-        .eq("id", itemId);
-
-    if (updateError) {
-        console.error("Error updating item stats:", updateError);
-    }
-}

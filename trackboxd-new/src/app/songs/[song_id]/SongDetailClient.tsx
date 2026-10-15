@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import SignupPrompt from "@/components/SignupPrompt";
 import ReviewForm from "@/components/log/forms/ReviewForm";
+import ReviewThreads from "@/components/songs/ReviewThreads";
 import AnnotationForm from "@/components/log/forms/AnnotationForm";
 import { spotifyToTrack } from "@/utils/trackConverters";
 import MediaCard from "@/components/MediaCard";
@@ -724,69 +725,82 @@ const SongDetailClient = ({
 
                     {activeTab === "reviews" && (
                         <div className="mt-4 space-y-4">
-                            {reviews.map((review) => (
-                                <article
-                                    key={review.id}
-                                    itemScope
-                                    itemType="https://schema.org/Review"
-                                    className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4"
-                                >
-                                    <header className="flex justify-between items-start min-h-[3.5rem]">
-                                        <div className="flex items-start gap-3">
-                                            <img
-                                                src={review.users.image_url || "/default-avatar.jpg"}
-                                                alt={review.users.name}
-                                                className="w-10 h-10 rounded-full mt-0.5"
-                                                onError={(e) => {
-                                                    e.currentTarget.src = "/default-avatar.jpg";
-                                                }}
-                                            />
-                                            <div>
-                                                <span itemProp="author" itemScope itemType="https://schema.org/Person">
-                                                    <span itemProp="name" className="font-medium text-sm text-[#5C5537]">
-                                                        {review.users.name}
-                                                    </span>
-                                                </span>
-                                                <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
-                                                    <meta itemProp="ratingValue" content={String(review.rating)} />
-                                                    <meta itemProp="bestRating" content="5" />
-                                                    <div className="mt-1"><RatingStars rating={review.rating} /></div>
+                            <ReviewThreads
+                                reviews={reviews}
+                                renderEntry={(review, ctx) => (
+                                    <article
+                                        itemScope={ctx.index === 0}
+                                        itemType={ctx.index === 0 ? "https://schema.org/Review" : undefined}
+                                        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4"
+                                    >
+                                        <header className="flex justify-between items-start min-h-[3.5rem]">
+                                            {ctx.index === 0 ? (
+                                                <div className="flex items-start gap-3">
+                                                    <img
+                                                        src={review.users.image_url || "/default-avatar.jpg"}
+                                                        alt={review.users.name}
+                                                        className="w-10 h-10 rounded-full mt-0.5"
+                                                        onError={(e) => {
+                                                            e.currentTarget.src = "/default-avatar.jpg";
+                                                        }}
+                                                    />
+                                                    <div>
+                                                        <span itemProp="author" itemScope itemType="https://schema.org/Person">
+                                                            <span itemProp="name" className="font-medium text-sm text-[#5C5537]">
+                                                                {review.users.name}
+                                                            </span>
+                                                        </span>
+                                                        <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
+                                                            <meta itemProp="ratingValue" content={String(ctx.rating)} />
+                                                            <meta itemProp="bestRating" content="5" />
+                                                            <div className="mt-1"><RatingStars rating={ctx.rating} /></div>
+                                                        </div>
+                                                        {ctx.isThread && (
+                                                            <p className="mt-1 text-xs text-[#5C5537]/60">
+                                                                {ctx.count} reviews over time
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => handleReviewLikeClick(review.id)}
-                                            disabled={reviewLoading[review.id]}
-                                            className="group flex items-center space-x-1 focus:outline-none cursor-pointer"
-                                        >
-                                            <Heart
-                                                className={`w-4 h-4 transition-all duration-200 ${
-                                                    reviewLikes[review.id]
-                                                        ? "text-[#5C5537] fill-[#5C5537]"
-                                                        : "text-[#5C5537]/50 group-hover:text-[#5C5537]"
-                                                }`}
-                                            />
-                                            <span
-                                                className={`text-sm transition-colors duration-200 ${
-                                                    reviewLikes[review.id]
-                                                        ? "text-[#5C5537] font-medium"
-                                                        : "text-[#5C5537]/70 group-hover:text-[#5C5537]"
-                                                }`}
+                                            ) : (
+                                                <span className="text-xs font-medium text-[#5C5537]/60">
+                                                    Update {ctx.index}
+                                                </span>
+                                            )}
+                                            <button
+                                                onClick={() => handleReviewLikeClick(review.id)}
+                                                disabled={reviewLoading[review.id]}
+                                                className="group flex items-center space-x-1 focus:outline-none cursor-pointer"
                                             >
-                                                {reviewLikeCounts[review.id] ?? review.like_count}
-                                            </span>
-                                        </button>
-                                    </header>
-                                    <p itemProp="reviewBody" className="text-sm text-[#5C5537] mb-3 line-clamp-2">
-                                        {review.text}
-                                    </p>
-                                    <footer className="flex justify-between items-center text-xs">
-                                        <time dateTime={review.created_at} className="text-[#5C5537]/70">
-                                            {formatDate(review.created_at)}
-                                        </time>
-                                    </footer>
-                                </article>
-                            ))}
+                                                <Heart
+                                                    className={`w-4 h-4 transition-all duration-200 ${
+                                                        reviewLikes[review.id]
+                                                            ? "text-[#5C5537] fill-[#5C5537]"
+                                                            : "text-[#5C5537]/50 group-hover:text-[#5C5537]"
+                                                    }`}
+                                                />
+                                                <span
+                                                    className={`text-sm transition-colors duration-200 ${
+                                                        reviewLikes[review.id]
+                                                            ? "text-[#5C5537] font-medium"
+                                                            : "text-[#5C5537]/70 group-hover:text-[#5C5537]"
+                                                    }`}
+                                                >
+                                                    {reviewLikeCounts[review.id] ?? review.like_count}
+                                                </span>
+                                            </button>
+                                        </header>
+                                        <p itemProp={ctx.index === 0 ? "reviewBody" : undefined} className="text-sm text-[#5C5537] mb-3 line-clamp-2">
+                                            {review.text}
+                                        </p>
+                                        <footer className="flex justify-between items-center text-xs">
+                                            <time dateTime={review.created_at} className="text-[#5C5537]/70">
+                                                {formatDate(review.created_at)}
+                                            </time>
+                                        </footer>
+                                    </article>
+                                )}
+                            />
                         </div>
                     )}
 
@@ -882,6 +896,9 @@ const SongDetailClient = ({
                             <div className="bg-[#FFFBEb] rounded-lg p-6 w-full max-w-2xl border border-[#5C5537]/20 shadow-lg relative z-10">
                                 <ReviewForm
                                     onClose={() => setShowReviewForm(false)}
+                                    lockedRating={
+                                        user ? reviews.find((r) => r.users.id === user.id)?.rating : undefined
+                                    }
                                     initialTrack={{
                                         id: track.id,
                                         name: track.name,

@@ -14,23 +14,6 @@ async function getAuthUser(req: NextRequest, supabase: any, body?: any) {
     return user;
 }
 
-async function updateItemStats(supabase: any, itemId: string) {
-    const { data: reviews } = await supabase
-        .from("reviews")
-        .select("rating")
-        .eq("item_id", itemId);
-
-    const totalReviews = reviews?.length || 0;
-    const avgRating = totalReviews > 0
-        ? reviews.reduce((acc: number, r: any) => acc + Number(r.rating), 0) / totalReviews
-        : 0;
-
-    await supabase
-        .from("spotify_items")
-        .update({ review_count: totalReviews, avg_rating: avgRating, last_updated: new Date().toISOString() })
-        .eq("id", itemId);
-}
-
 // POST /api/journals/[id]/items/[item_id]/review
 // Creates a new review for this journal item (native review) or links an existing one
 export async function POST(
@@ -106,31 +89,27 @@ export async function POST(
     }
     const reviewText = text.trim();
 
-    // Check if user already has a review for this track
-    const { data: existingReview } = await supabase
-        .from("reviews")
-        .select("id")
-        .eq("user_id", authUser.id)
-        .eq("item_id", trackId)
-        .single();
-
-    if (existingReview) {
-        // Update existing review and link it (not native since it pre-existed)
-        await supabase
+    // Editing: this journal entry already has its own review, so update that
+    // one (the database keeps the rating shared across the person's reviews).
+    if (journalItem.review_id && journalItem.is_native_review) {
+        const { data: updated, error: updateError } = await supabase
             .from("reviews")
             .update({ rating, text: reviewText })
-            .eq("id", existingReview.id);
+            .eq("id", journalItem.review_id)
+            .eq("user_id", authUser.id)
+            .select()
+            .single();
 
-        await supabase
-            .from("journal_items")
-            .update({ review_id: existingReview.id, is_native_review: false })
-            .eq("id", item_id);
-
-        await updateItemStats(supabase, trackId);
-        return NextResponse.json({ success: true, reviewId: existingReview.id });
+        if (updateError) {
+            console.error("Journal review update error:", updateError);
+            return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        }
+        return NextResponse.json(updated);
     }
 
-    // Insert new review with privacy matching the journal
+    // New journal review. It is ALWAYS a separate review with the journal's
+    // privacy: it never overwrites a review the person already published.
+    // The database gives it the person's existing rating for this item, if any.
     const { data: review, error: reviewError } = await supabase
         .from("reviews")
         .insert({
@@ -144,6 +123,12 @@ export async function POST(
         .single();
 
     if (reviewError) {
+        if (reviewError.message?.includes("REVIEW_LIMIT")) {
+            return NextResponse.json(
+                { error: "You can write up to 5 reviews per track or album" },
+                { status: 400 }
+            );
+        }
         console.error("Review creation error:", reviewError);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
@@ -161,8 +146,6 @@ export async function POST(
         target_table: "review",
         target_id: review.id,
     });
-
-    await updateItemStats(supabase, trackId);
 
     return NextResponse.json(review, { status: 201 });
 }

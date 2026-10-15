@@ -41,6 +41,8 @@ interface ReviewFormProps {
     initialAlbum?: SimplifiedAlbum;
     initialReview?: InitialReview;
     onSave?: (review: InitialReview) => void;
+    /** The person already rated this item: new reviews share that rating. */
+    lockedRating?: number;
 }
 
 interface SpotifyItem {
@@ -90,7 +92,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     initialTrack,
     initialAlbum,
     initialReview,
-    onSave
+    onSave,
+    lockedRating
 }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedItem, setSelectedItem] = useState<SpotifyItem | null>(
@@ -119,7 +122,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                 }
                 : null
     );
-    const [rating, setRating] = useState<number>(0);
+    const [rating, setRating] = useState<number>(lockedRating ?? 0);
     const [reviewText, setReviewText] = useState("");
     const [searchResults, setSearchResults] = useState<SpotifyItem[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -539,10 +542,22 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                             <label className="block text-sm font-medium text-[#5C5537]">
                                 Rating
                             </label>
+                            {lockedRating !== undefined && !initialReview && (
+                                <p className="text-xs text-[#5C5537]/70">
+                                    You&apos;ve already rated this. Your new review is added to your thread
+                                    with the same rating. To change it, edit one of your reviews.
+                                </p>
+                            )}
+                            {initialReview && (
+                                <p className="text-xs text-[#5C5537]/70">
+                                    Changing the rating updates all your reviews of this.
+                                </p>
+                            )}
                             <div className="flex items-center gap-4">
                                 <Rating
                                     name="review-rating"
                                     value={rating}
+                                    readOnly={lockedRating !== undefined && !initialReview}
                                     precision={0.5}
                                     size="large"
                                     onChange={(event, newValue) => {

@@ -40,9 +40,6 @@ export async function DELETE(
 
     if (error) throw error;
 
-    // Update stats after deletion
-    await updateItemStats(supabase, existingReview.item_id);
-
     return NextResponse.json(
       { message: "Review deleted successfully" },
       { status: 200 }
@@ -98,11 +95,6 @@ export async function PUT(
 
     if (error) throw error;
 
-    // Update stats after editing
-    if (updatedReview) {
-        await updateItemStats(supabase, updatedReview.item_id);
-    }
-
     return NextResponse.json(
       { message: "Review updated successfully" },
       { status: 200 }
@@ -117,32 +109,3 @@ export async function PUT(
   }
 }
 
-async function updateItemStats(supabase: any, itemId: string) {
-    const { data: reviews, error } = await supabase
-        .from("reviews")
-        .select("rating")
-        .eq("item_id", itemId);
-
-    if (error) {
-        console.error("Error fetching reviews for stats:", error);
-        return;
-    }
-
-    const totalReviews = reviews.length;
-    const avgRating = totalReviews > 0
-        ? reviews.reduce((acc: number, r: any) => acc + Number(r.rating), 0) / totalReviews
-        : 0;
-
-    const { error: updateError } = await supabase
-        .from("spotify_items")
-        .update({
-            review_count: totalReviews,
-            avg_rating: avgRating,
-            last_updated: new Date().toISOString()
-        })
-        .eq("id", itemId);
-
-    if (updateError) {
-        console.error("Error updating item stats:", updateError);
-    }
-}

@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import ReviewForm from "@/components/log/forms/ReviewForm";
+import ReviewThreads from "@/components/songs/ReviewThreads";
 import { spotifyToTrack } from "@/utils/trackConverters";
 import Link from "next/link";
 import MediaCard from "@/components/MediaCard";
@@ -517,40 +518,52 @@ const AlbumDetailClient = ({
                                 </div>
                             )}
 
-                            {reviews.map((review) => (
-                                <div
-                                    key={review.id}
-                                    className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4">
-                                    <div className="flex justify-between items-start min-h-[3.5rem]">
-                                        <div className="flex items-start gap-3">
-                                            <img
-                                                src={review.users.image_url || "/default-avatar.jpg"}
-                                                alt={review.users.name}
-                                                className="w-10 h-10 rounded-full mt-0.5"
-                                                onError={(e) => {
-                                                    e.currentTarget.src = "/default-avatar.jpg";
-                                                }}
-                                            />
-                                            <div>
-                                                <div className="font-medium text-sm text-[#5C5537]">
-                                                    {review.users.name}
-                                                </div>
-                                                <div className="mt-1">
-                                                    <RatingStars rating={review.rating} />
+                            <ReviewThreads
+                                reviews={reviews}
+                                renderEntry={(review, ctx) => (
+                                    <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4">
+                                        {ctx.index === 0 ? (
+                                            <div className="flex justify-between items-start min-h-[3.5rem]">
+                                                <div className="flex items-start gap-3">
+                                                    <img
+                                                        src={review.users.image_url || "/default-avatar.jpg"}
+                                                        alt={review.users.name}
+                                                        className="w-10 h-10 rounded-full mt-0.5"
+                                                        onError={(e) => {
+                                                            e.currentTarget.src = "/default-avatar.jpg";
+                                                        }}
+                                                    />
+                                                    <div>
+                                                        <div className="font-medium text-sm text-[#5C5537]">
+                                                            {review.users.name}
+                                                        </div>
+                                                        <div className="mt-1">
+                                                            <RatingStars rating={ctx.rating} />
+                                                        </div>
+                                                        {ctx.isThread && (
+                                                            <p className="mt-1 text-xs text-[#5C5537]/60">
+                                                                {ctx.count} reviews over time
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
+                                        ) : (
+                                            <p className="text-xs font-medium text-[#5C5537]/60 mb-2">
+                                                Update {ctx.index}
+                                            </p>
+                                        )}
+                                        <p className="text-sm text-[#5C5537] mb-3 line-clamp-2">
+                                            {review.text}
+                                        </p>
+                                        <div className="flex justify-between items-center text-xs">
+                                            <span className="text-[#5C5537]/70">
+                                                {formatDate(review.created_at)}
+                                            </span>
                                         </div>
                                     </div>
-                                    <p className="text-sm text-[#5C5537] mb-3 line-clamp-2">
-                                        {review.text}
-                                    </p>
-                                    <div className="flex justify-between items-center text-xs">
-                                        <span className="text-[#5C5537]/70">
-                                            {formatDate(review.created_at)}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
+                                )}
+                            />
                         </div>
                     )}
 
@@ -562,6 +575,9 @@ const AlbumDetailClient = ({
                             <div className="bg-[#FFFBEb] rounded-lg p-6 w-full max-w-2xl border border-[#5C5537]/20 shadow-lg relative z-10">
                                 <ReviewForm
                                     onClose={() => setShowReviewForm(false)}
+                                    lockedRating={
+                                        user ? reviews.find((r) => r.users.id === user.id)?.rating : undefined
+                                    }
                                     initialAlbum={{
                                         id: album.id,
                                         name: album.name,
