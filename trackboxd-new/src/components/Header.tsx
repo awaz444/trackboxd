@@ -390,9 +390,9 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                             <a
                                 key={item.label}
                                 href={item.href}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${pathname === item.href
-                                    ? "bg-[#5C5537] text-[#FFFBEb]"
-                                    : "text-[#5C5537] hover:bg-[#5C5537]/10"
+                                className={`px-4 py-2 rounded-lg text-sm transition-colors duration-200 text-[#5C5537] hover:bg-[#5C5537]/5 ${pathname === item.href
+                                    ? "font-semibold underline underline-offset-8 decoration-2"
+                                    : "font-medium"
                                     }`}>
                                 {item.label}
                             </a>
@@ -575,7 +575,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
 
                                 <button
                                     onClick={() => setIsLogModalOpen(true)}
-                                    className="hidden md:flex items-center gap-1.5 bg-[#5C5537] text-[#FFFBEb] py-2 px-4 rounded-lg transition-all duration-200 ease-in-out transform hover:bg-[#5C5537]/90 shadow-sm">
+                                    className="hidden md:flex items-center gap-1.5 border border-[#5C5537]/40 text-[#5C5537] py-2 px-4 rounded-lg transition-colors duration-200 hover:bg-[#5C5537]/5 hover:border-[#5C5537]">
                                     <Plus className="w-4 h-4" />
                                     <span className="font-medium text-sm">Log</span>
                                 </button>
@@ -672,7 +672,8 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                         {/* Log + Button - Mobile (always visible) */}
                         <button
                             onClick={() => setIsLogModalOpen(true)}
-                            className="flex md:hidden ml-2 mr-2 items-center gap-1 bg-[#5C5537] text-[#FFFBEb] p-2 rounded-lg transition-all duration-200 ease-in-out">
+                            aria-label="Log"
+                            className="flex md:hidden ml-2 mr-2 items-center gap-1 border border-[#5C5537]/40 text-[#5C5537] p-2 rounded-lg transition-colors duration-200 hover:bg-[#5C5537]/5 hover:border-[#5C5537]">
                             <Plus className="w-4 h-4" />
                         </button>
 
@@ -862,9 +863,9 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                 <a
                                     key={item.label}
                                     href={item.href}
-                                    className={`px-3 py-3 rounded-lg text-base font-medium transition-colors duration-200 ${pathname === item.href
-                                        ? "bg-[#5C5537] text-[#FFFBEb]"
-                                        : "text-[#5C5537] hover:bg-[#5C5537]/10"
+                                    className={`px-3 py-3 rounded-lg text-base transition-colors duration-200 text-[#5C5537] hover:bg-[#5C5537]/5 ${pathname === item.href
+                                        ? "font-semibold underline underline-offset-8 decoration-2"
+                                        : "font-medium"
                                         }`}>
                                     {item.label}
                                 </a>
