@@ -2,14 +2,18 @@ import React from "react";
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import RatingStars from "@/components/RatingStars";
+import { VipBadge } from "@/components/VipBadge";
 import type { GlobalActivityItem } from "@/lib/global-activity";
 
 function timeAgo(iso: string) {
   const s = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
-  if (s < 3600) return `${Math.max(1, Math.floor(s / 60))}m ago`;
-  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
-  if (s < 86400 * 30) return `${Math.floor(s / 86400)}d ago`;
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  if (s < 60) return s === 1 ? "1 second ago" : `${s} seconds ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return m === 1 ? "1 minute ago" : `${m} minutes ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return h === 1 ? "1 hour ago" : `${h} hours ago`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? "1 day ago" : `${d} days ago`;
 }
 
 function mmss(sec: number) {
@@ -18,48 +22,63 @@ function mmss(sec: number) {
 }
 
 function ActivityCard({ item }: { item: GlobalActivityItem }) {
+  const userImage = item.user.image_url || "/default-avatar.jpg";
   return (
-    <article className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4 text-left flex gap-3 hover:shadow-md transition-shadow">
-      <Link href={item.href} className="flex-shrink-0">
-        {item.track.cover_url ? (
-          <img
-            src={item.track.cover_url}
-            alt={`${item.track.name} by ${item.track.artist}`}
-            loading="lazy"
-            className="w-14 h-14 rounded-lg object-cover"
-          />
-        ) : (
-          <div className="w-14 h-14 rounded-lg bg-[#5C5537]/10" aria-hidden />
-        )}
-      </Link>
-      <div className="min-w-0 flex-1">
-        <Link href={item.href} className="block font-semibold text-sm text-[#5C5537] truncate hover:underline">
-          {item.track.name}
-        </Link>
-        <p className="text-xs text-[#5C5537]/60 truncate">{item.track.artist}</p>
+    <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+      <div className="flex items-start gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <img
+              src={userImage}
+              alt={item.user.name}
+              className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "/default-avatar.jpg";
+              }}
+            />
+            <div className="font-medium text-[#5C5537] flex items-center gap-1 min-w-0">
+              <Link
+                href={`/profile/${encodeURIComponent(item.user.name)}`}
+                className="hover:underline truncate"
+              >
+                {item.user.name}
+              </Link>
+              <VipBadge username={item.user.name} />
+            </div>
+            {item.kind === "review" && item.rating !== null ? (
+              <RatingStars rating={item.rating} />
+            ) : item.timestamp !== null ? (
+              <span className="inline-flex items-center gap-1 text-xs text-[#5C5537]/70">
+                <Clock className="w-3 h-3" /> {mmss(item.timestamp)}
+              </span>
+            ) : null}
+          </div>
 
-        <div className="mt-1 flex items-center gap-2 text-xs text-[#5C5537]/70">
-          {item.kind === "review" && item.rating !== null ? (
-            <RatingStars rating={item.rating} size="xs" showNumber={false} />
-          ) : item.timestamp !== null ? (
-            <span className="inline-flex items-center gap-1">
-              <Clock className="w-3 h-3" /> {mmss(item.timestamp)}
-            </span>
-          ) : null}
+          <div className="mb-2">
+            <h3 className="font-semibold text-[#5C5537] text-sm truncate">
+              {item.track.name}
+            </h3>
+            <p className="text-[#5C5537]/70 text-xs truncate">{item.track.artist}</p>
+          </div>
+
+          {item.text && (
+            <p className="text-[#5C5537] text-sm line-clamp-2 mb-2">
+              &ldquo;{item.text}&rdquo;
+            </p>
+          )}
+
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-[#5C5537]/70">{timeAgo(item.created_at)}</span>
+            <Link
+              href={item.href}
+              className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
+            >
+              {item.kind === "annotation" ? "View annotation" : "View track"}
+            </Link>
+          </div>
         </div>
-
-        {item.text && (
-          <p className="mt-1 text-sm text-[#5C5537] line-clamp-2">&ldquo;{item.text}&rdquo;</p>
-        )}
-
-        <p className="mt-2 text-xs text-[#5C5537]/60 truncate">
-          <Link href={`/profile/${item.user.name}`} className="font-medium hover:underline">
-            {item.user.name}
-          </Link>
-          {" "}· {timeAgo(item.created_at)}
-        </p>
       </div>
-    </article>
+    </div>
   );
 }
 
