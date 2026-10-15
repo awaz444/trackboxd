@@ -596,7 +596,12 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                 <FavoriteTracks tracks={favoriteTracks} isOwnProfile={true} />
 
                 {/* Following Section - Read Only */}
-                <FollowingSection following={following} isOwnProfile={true} />
+                <FollowingSection
+                    following={following}
+                    isOwnProfile={true}
+                    username={params.username}
+                    totalFollowing={stats.following}
+                />
             </div>
 
             <Footer variant="light" />

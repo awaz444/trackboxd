@@ -1,18 +1,46 @@
 // MyAnnotationsPage.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import EditableAnnotationCard from "@/components/songs/EditableAnnotationCard";
 import { Annotation } from "@/app/tracks/types";
+import ListControls from "@/components/ListControls";
+
+const PAGE_SIZE = 20;
 
 const MyAnnotationsPage = () => {
   const { user, loading: userLoading, error: userError } = useUser();
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState("newest");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const list = annotations.filter((a) => {
+      if (!q) return true;
+      return (
+        a.item?.name?.toLowerCase().includes(q) ||
+        a.item?.artist?.toLowerCase().includes(q) ||
+        a.text?.toLowerCase().includes(q)
+      );
+    });
+    const time = (a: Annotation) => new Date(a.created_at).getTime();
+    return [...list].sort((a, b) => {
+      if (sort === "oldest") return time(a) - time(b);
+      if (sort === "likes") return (b.like_count || 0) - (a.like_count || 0) || time(b) - time(a);
+      return time(b) - time(a);
+    });
+  }, [annotations, query, sort]);
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [query, sort]);
 
   useEffect(() => {
     if (user && !userLoading) {
@@ -134,14 +162,40 @@ const MyAnnotationsPage = () => {
           </div>
         ) : (
           <div>
-            {annotations.map(annotation => (
-              <EditableAnnotationCard
-                key={annotation.id}
-                annotation={annotation}
-                onEdit={handleEditAnnotation}
-                onDelete={handleDeleteAnnotation}
-              />
-            ))}
+            <ListControls
+              query={query}
+              onQueryChange={setQuery}
+              placeholder="Search by track, artist or annotation text"
+              sort={sort}
+              onSortChange={setSort}
+              sortOptions={[
+                { value: "newest", label: "Newest first" },
+                { value: "oldest", label: "Oldest first" },
+                { value: "likes", label: "Most liked" },
+              ]}
+            />
+            {filtered.length === 0 ? (
+              <p className="text-center py-8 text-[#5C5537]/70">No annotations match your search.</p>
+            ) : (
+              filtered.slice(0, visibleCount).map(annotation => (
+                <EditableAnnotationCard
+                  key={annotation.id}
+                  annotation={annotation}
+                  onEdit={handleEditAnnotation}
+                  onDelete={handleDeleteAnnotation}
+                />
+              ))
+            )}
+            {filtered.length > visibleCount && (
+              <div className="text-center mt-6">
+                <button
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  className="bg-[#5C5537] text-white px-5 py-2 rounded-full hover:bg-[#3E3725]"
+                >
+                  Show more ({filtered.length - visibleCount} left)
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

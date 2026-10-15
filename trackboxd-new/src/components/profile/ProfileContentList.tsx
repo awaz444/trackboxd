@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import ProfileReviewCard from "@/components/profile/ProfileReviewCard";
 import ProfileAnnotationCard from "@/components/profile/ProfileAnnotationCard";
+import ProfilePagination from "@/components/profile/ProfilePagination";
 import type { ProfileContentPage } from "@/lib/profile-service";
 
 interface Props {
@@ -50,27 +51,7 @@ export default function ProfileContentList({ username, kind, data }: Props) {
               </div>
             )}
 
-            {data.totalPages > 1 && (
-              <nav className="flex items-center justify-between mt-8 text-[#5C5537]">
-                {data.page > 1 ? (
-                  <Link href={`${base}?page=${data.page - 1}`} className="underline">
-                    ← Newer
-                  </Link>
-                ) : (
-                  <span />
-                )}
-                <span className="text-sm text-[#5C5537]/70">
-                  Page {data.page} of {data.totalPages}
-                </span>
-                {data.page < data.totalPages ? (
-                  <Link href={`${base}?page=${data.page + 1}`} className="underline">
-                    Older →
-                  </Link>
-                ) : (
-                  <span />
-                )}
-              </nav>
-            )}
+            <ProfilePagination base={base} page={data.page} totalPages={data.totalPages} />
           </>
         )}
       </div>

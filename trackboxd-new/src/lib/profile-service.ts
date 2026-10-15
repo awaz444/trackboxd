@@ -18,6 +18,7 @@ export interface RecentActivity {
   rating?: number;
   text?: string;
   like_count: number;
+  created_at?: string;
 }
 
 export interface FavoriteTrack {
@@ -76,6 +77,87 @@ export interface ProfileData {
     text?: string | null;
     created_at: string;
   }>;
+}
+
+export type LikeActivityItem = {
+  id: string;
+  timestamp: string;
+  sentence: string;
+  links: { subjectProfile: string; targetProfile?: string; itemHref?: string };
+};
+
+// Turns raw `likes` rows into display sentences with link targets.
+export async function buildLikesActivity(
+  supabase: ReturnType<typeof createClient>,
+  userName: string,
+  likesAll: Array<{ id: string; target_id: string; target_type: string; created_at: string }>
+): Promise<LikeActivityItem[]> {
+  const likesActivity: LikeActivityItem[] = [];
+
+  if (likesAll && likesAll.length > 0) {
+    const trackLikeIds = likesAll.filter(l => ["track", "album", "playlist"].includes(l.target_type)).map(l => l.target_id);
+    const reviewLikeIds = likesAll.filter(l => l.target_type === "review").map(l => l.target_id);
+    const annotationLikeIds = likesAll.filter(l => l.target_type === "annotation").map(l => l.target_id);
+
+    let spotifyMap: Record<string, any> = {};
+    if (trackLikeIds.length > 0) {
+      const { data: spItems } = await supabase.from("spotify_items").select("id, type, name, artist").in("id", trackLikeIds);
+      spItems?.forEach(it => { spotifyMap[it.id] = it; });
+    }
+
+    let reviewMap: Record<string, any> = {};
+    if (reviewLikeIds.length > 0) {
+      const { data: revs } = await supabase.from("reviews").select(`id, item_id, rating, users(name), spotify_items!reviews_item_id_fkey(id, name, artist)`).in("id", reviewLikeIds);
+      revs?.forEach(r => { reviewMap[r.id] = r; });
+    }
+
+    let annotationMap: Record<string, any> = {};
+    if (annotationLikeIds.length > 0) {
+      const { data: ann } = await supabase.from("annotations").select(`id, track_id, users(name), spotify_items!annotations_track_id_fkey(id, name, artist)`).in("id", annotationLikeIds);
+      ann?.forEach(a => { annotationMap[a.id] = a; });
+    }
+
+    likesAll.forEach(like => {
+      const ts = new Date(like.created_at).toLocaleDateString();
+      if (["track", "album", "playlist"].includes(like.target_type)) {
+        const item = spotifyMap[like.target_id];
+        if (item) {
+          likesActivity.push({
+            id: like.id,
+            timestamp: ts,
+            sentence: `${userName} liked ${item.type} ${item.name}${item.artist ? ' by ' + item.artist : ''}`,
+            links: { subjectProfile: `/profile/${userName}`, itemHref: `/${item.type === 'track' ? 'songs' : item.type + 's'}/${item.id}` }
+          });
+        }
+      } else if (like.target_type === "review") {
+        const r = reviewMap[like.target_id];
+        if (r) {
+          const sp = Array.isArray(r.spotify_items) ? r.spotify_items[0] : r.spotify_items;
+          const reviewer = Array.isArray(r.users) ? r.users[0] : r.users;
+          likesActivity.push({
+            id: like.id,
+            timestamp: ts,
+            sentence: `${userName} liked ${reviewer?.name}'s review of ${sp?.name}${sp?.artist ? ' by ' + sp.artist : ''} (${r.rating}★)`,
+            links: { subjectProfile: `/profile/${userName}`, targetProfile: reviewer?.name ? `/profile/${reviewer.name}` : undefined, itemHref: sp?.id ? `/songs/${sp.id}` : undefined }
+          });
+        }
+      } else if (like.target_type === "annotation") {
+        const a = annotationMap[like.target_id];
+        if (a) {
+          const sp = Array.isArray(a.spotify_items) ? a.spotify_items[0] : a.spotify_items;
+          const annotator = Array.isArray(a.users) ? a.users[0] : a.users;
+          likesActivity.push({
+            id: like.id,
+            timestamp: ts,
+            sentence: `${userName} liked ${annotator?.name}'s annotation on ${sp?.name}${sp?.artist ? ' by ' + sp.artist : ''}`,
+            links: { subjectProfile: `/profile/${userName}`, targetProfile: annotator?.name ? `/profile/${annotator.name}` : undefined, itemHref: sp?.id ? `/songs/${sp.id}` : undefined }
+          });
+        }
+      }
+    });
+  }
+
+  return likesActivity;
 }
 
 export async function getProfileByUsername(username: string, currentUserId: string | null = null): Promise<ProfileData | null> {
@@ -203,6 +285,7 @@ export async function getProfileByUsername(username: string, currentUserId: stri
             rating: (review as any).rating ?? undefined,
             text: (review as any).text ?? undefined,
             like_count: 0,
+            created_at: review.created_at,
           });
         }
       });
@@ -276,6 +359,7 @@ export async function getProfileByUsername(username: string, currentUserId: stri
             timestamp: trackTimestamp !== undefined ? formatTrackTimestamp(trackTimestamp) : "0:00",
             text: (annotation as any).text ?? undefined,
             like_count: 0,
+            created_at: annotation.created_at,
           });
         }
       });
@@ -308,75 +392,12 @@ export async function getProfileByUsername(username: string, currentUserId: stri
       .select("id, target_id, target_type, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(20);
+      .limit(10);
 
-    const likesActivity: Array<{ id: string; timestamp: string; sentence: string; links: { subjectProfile: string; targetProfile?: string; itemHref?: string; } }> = [];
-
-    if (likesAll && likesAll.length > 0) {
-      const trackLikeIds = likesAll.filter(l => ["track", "album", "playlist"].includes(l.target_type)).map(l => l.target_id);
-      const reviewLikeIds = likesAll.filter(l => l.target_type === "review").map(l => l.target_id);
-      const annotationLikeIds = likesAll.filter(l => l.target_type === "annotation").map(l => l.target_id);
-
-      let spotifyMap: Record<string, any> = {};
-      if (trackLikeIds.length > 0) {
-        const { data: spItems } = await supabase.from("spotify_items").select("id, type, name, artist").in("id", trackLikeIds);
-        spItems?.forEach(it => { spotifyMap[it.id] = it; });
-      }
-
-      let reviewMap: Record<string, any> = {};
-      if (reviewLikeIds.length > 0) {
-        const { data: revs } = await supabase.from("reviews").select(`id, item_id, rating, users(name), spotify_items!reviews_item_id_fkey(id, name, artist)`).in("id", reviewLikeIds);
-        revs?.forEach(r => { reviewMap[r.id] = r; });
-      }
-
-      let annotationMap: Record<string, any> = {};
-      if (annotationLikeIds.length > 0) {
-        const { data: ann } = await supabase.from("annotations").select(`id, track_id, users(name), spotify_items!annotations_track_id_fkey(id, name, artist)`).in("id", annotationLikeIds);
-        ann?.forEach(a => { annotationMap[a.id] = a; });
-      }
-
-      likesAll.slice(0, 10).forEach(like => {
-        const ts = new Date(like.created_at).toLocaleDateString();
-        if (["track", "album", "playlist"].includes(like.target_type)) {
-          const item = spotifyMap[like.target_id];
-          if (item) {
-            likesActivity.push({
-              id: like.id,
-              timestamp: ts,
-              sentence: `${user.name} liked ${item.type} ${item.name}${item.artist ? ' by ' + item.artist : ''}`,
-              links: { subjectProfile: `/profile/${user.name}`, itemHref: `/${item.type === 'track' ? 'songs' : item.type + 's'}/${item.id}` }
-            });
-          }
-        } else if (like.target_type === "review") {
-          const r = reviewMap[like.target_id];
-          if (r) {
-            const sp = Array.isArray(r.spotify_items) ? r.spotify_items[0] : r.spotify_items;
-            const reviewer = Array.isArray(r.users) ? r.users[0] : r.users;
-            likesActivity.push({
-              id: like.id,
-              timestamp: ts,
-              sentence: `${user.name} liked ${reviewer?.name}'s review of ${sp?.name}${sp?.artist ? ' by ' + sp.artist : ''} (${r.rating}★)`,
-              links: { subjectProfile: `/profile/${user.name}`, targetProfile: reviewer?.name ? `/profile/${reviewer.name}` : undefined, itemHref: sp?.id ? `/songs/${sp.id}` : undefined }
-            });
-          }
-        } else if (like.target_type === "annotation") {
-          const a = annotationMap[like.target_id];
-          if (a) {
-            const sp = Array.isArray(a.spotify_items) ? a.spotify_items[0] : a.spotify_items;
-            const annotator = Array.isArray(a.users) ? a.users[0] : a.users;
-            likesActivity.push({
-              id: like.id,
-              timestamp: ts,
-              sentence: `${user.name} liked ${annotator?.name}'s annotation on ${sp?.name}${sp?.artist ? ' by ' + sp.artist : ''}`,
-              links: { subjectProfile: `/profile/${user.name}`, targetProfile: annotator?.name ? `/profile/${annotator.name}` : undefined, itemHref: sp?.id ? `/songs/${sp.id}` : undefined }
-            });
-          }
-        }
-      });
-    }
+    const likesActivity = await buildLikesActivity(supabase, user.name, (likesAll || []).slice(0, 10));
 
     const sortedRecentActivity = recentActivity
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime())
       .slice(0, 20);
 
     const { data: followingData } = await supabase
@@ -463,6 +484,33 @@ export async function getProfileByUsername(username: string, currentUserId: stri
   }
 }
 
+// Looks up a profile and whether the viewer may see its content
+// (own profile, public profile, or accepted follower of a private one).
+async function resolveProfileAccess(
+  supabase: ReturnType<typeof createClient>,
+  username: string,
+  currentUserId: string | null
+) {
+  const { data: user } = await supabase
+    .from("users")
+    .select("id, name, profile_private")
+    .eq("name", username)
+    .single();
+  if (!user) return null;
+
+  let canView = currentUserId === user.id || !user.profile_private;
+  if (!canView && currentUserId) {
+    const { data: follow } = await supabase
+      .from("follows")
+      .select("accepted")
+      .eq("follower_id", currentUserId)
+      .eq("following_id", user.id)
+      .single();
+    canView = !!follow?.accepted;
+  }
+  return { user, canView };
+}
+
 export const PROFILE_CONTENT_PAGE_SIZE = 20;
 
 export interface ProfileContentPage {
@@ -484,25 +532,10 @@ export async function getProfileContentPage(
   try {
     const supabase = createClient(cookies());
 
-    const { data: user } = await supabase
-      .from("users")
-      .select("id, name, profile_private")
-      .eq("name", username)
-      .single();
-    if (!user) return null;
-
-    const isOwn = currentUserId === user.id;
-    let canView = isOwn || !user.profile_private;
-    if (!canView && currentUserId) {
-      const { data: follow } = await supabase
-        .from("follows")
-        .select("accepted")
-        .eq("follower_id", currentUserId)
-        .eq("following_id", user.id)
-        .single();
-      canView = !!follow?.accepted;
-    }
-    if (!canView) {
+    const access = await resolveProfileAccess(supabase, username, currentUserId);
+    if (!access) return null;
+    const { user } = access;
+    if (!access.canView) {
       return { user: { id: user.id, name: user.name }, hidden: true, items: [], total: 0, page: 1, totalPages: 1 };
     }
 
@@ -570,6 +603,117 @@ export async function getProfileContentPage(
     return { user: { id: user.id, name: user.name }, hidden: false, items, total, page: safePage, totalPages };
   } catch (error) {
     console.error("Error fetching profile content page:", error);
+    return null;
+  }
+}
+
+export interface ProfileLikesPage {
+  user: { id: string; name: string };
+  hidden: boolean;
+  items: LikeActivityItem[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+// Full, paginated list of everything a user has liked.
+export async function getProfileLikesPage(
+  username: string,
+  page: number,
+  currentUserId: string | null = null
+): Promise<ProfileLikesPage | null> {
+  try {
+    const supabase = createClient(cookies());
+    const access = await resolveProfileAccess(supabase, username, currentUserId);
+    if (!access) return null;
+    const { user } = access;
+    if (!access.canView) {
+      return { user: { id: user.id, name: user.name }, hidden: true, items: [], total: 0, page: 1, totalPages: 1 };
+    }
+
+    const { count } = await supabase
+      .from("likes")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    const total = count || 0;
+    const totalPages = Math.max(1, Math.ceil(total / PROFILE_CONTENT_PAGE_SIZE));
+    const safePage = Math.min(Math.max(1, page), totalPages);
+    const from = (safePage - 1) * PROFILE_CONTENT_PAGE_SIZE;
+
+    const { data: rows } = await supabase
+      .from("likes")
+      .select("id, target_id, target_type, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .range(from, from + PROFILE_CONTENT_PAGE_SIZE - 1);
+
+    const items = await buildLikesActivity(supabase, user.name, rows || []);
+    return { user: { id: user.id, name: user.name }, hidden: false, items, total, page: safePage, totalPages };
+  } catch (error) {
+    console.error("Error fetching profile likes page:", error);
+    return null;
+  }
+}
+
+export interface ProfileFollowingPage {
+  user: { id: string; name: string };
+  hidden: boolean;
+  items: FollowingUser[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+// Full, paginated list of the people a user follows.
+export async function getProfileFollowingPage(
+  username: string,
+  page: number,
+  currentUserId: string | null = null
+): Promise<ProfileFollowingPage | null> {
+  try {
+    const supabase = createClient(cookies());
+    const access = await resolveProfileAccess(supabase, username, currentUserId);
+    if (!access) return null;
+    const { user } = access;
+    if (!access.canView) {
+      return { user: { id: user.id, name: user.name }, hidden: true, items: [], total: 0, page: 1, totalPages: 1 };
+    }
+
+    const { count } = await supabase
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("follower_id", user.id)
+      .eq("accepted", true);
+
+    const total = count || 0;
+    const totalPages = Math.max(1, Math.ceil(total / PROFILE_CONTENT_PAGE_SIZE));
+    const safePage = Math.min(Math.max(1, page), totalPages);
+    const from = (safePage - 1) * PROFILE_CONTENT_PAGE_SIZE;
+
+    const { data: rows } = await supabase
+      .from("follows")
+      .select(`
+        following_id,
+        users!follows_following_id_fkey (id, name, image_url, spotify_url, instagram_url)
+      `)
+      .eq("follower_id", user.id)
+      .eq("accepted", true)
+      .order("created_at", { ascending: false })
+      .range(from, from + PROFILE_CONTENT_PAGE_SIZE - 1);
+
+    const items = (rows || [])
+      .map((f: any) => {
+        const u = Array.isArray(f.users) ? f.users[0] : f.users;
+        return u
+          ? { id: u.id, name: u.name, username: u.name, image_url: u.image_url, spotify_url: u.spotify_url || undefined, instagram_url: u.instagram_url || undefined }
+          : null;
+      })
+      .filter(Boolean) as FollowingUser[];
+
+    return { user: { id: user.id, name: user.name }, hidden: false, items, total, page: safePage, totalPages };
+  } catch (error) {
+    console.error("Error fetching profile following page:", error);
     return null;
   }
 }

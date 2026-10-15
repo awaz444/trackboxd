@@ -1,18 +1,49 @@
 // MyReviewsPage.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import EditableReviewCard from "@/components/songs/EditableReviewCard";
 import { Review } from "@/app/tracks/types";
+import ListControls from "@/components/ListControls";
+
+const PAGE_SIZE = 20;
 
 const MyReviewsPage = () => {
   const { user, loading: userLoading, error: userError } = useUser();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState("newest");
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const list = reviews.filter((r) => {
+      if (ratingFilter !== "all" && Math.round(r.rating) !== Number(ratingFilter)) return false;
+      if (!q) return true;
+      return (
+        r.item?.name?.toLowerCase().includes(q) ||
+        r.item?.artist?.toLowerCase().includes(q) ||
+        r.text?.toLowerCase().includes(q)
+      );
+    });
+    const time = (r: Review) => new Date(r.created_at).getTime();
+    return [...list].sort((a, b) => {
+      if (sort === "oldest") return time(a) - time(b);
+      if (sort === "rating") return b.rating - a.rating || time(b) - time(a);
+      if (sort === "likes") return (b.like_count || 0) - (a.like_count || 0) || time(b) - time(a);
+      return time(b) - time(a);
+    });
+  }, [reviews, query, sort, ratingFilter]);
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [query, sort, ratingFilter]);
 
   useEffect(() => {
     if (user && !userLoading) {
@@ -130,14 +161,47 @@ const MyReviewsPage = () => {
           </div>
         ) : (
           <div>
-            {reviews.map(review => (
-              <EditableReviewCard
-                key={review.id}
-                review={review}
-                onEdit={handleEditReview}
-                onDelete={handleDeleteReview}
-              />
-            ))}
+            <ListControls
+              query={query}
+              onQueryChange={setQuery}
+              placeholder="Search by track, artist or review text"
+              sort={sort}
+              onSortChange={setSort}
+              sortOptions={[
+                { value: "newest", label: "Newest first" },
+                { value: "oldest", label: "Oldest first" },
+                { value: "rating", label: "Highest rated" },
+                { value: "likes", label: "Most liked" },
+              ]}
+              filter={ratingFilter}
+              onFilterChange={setRatingFilter}
+              filterOptions={[
+                { value: "all", label: "All ratings" },
+                ...[5, 4, 3, 2, 1].map((n) => ({ value: String(n), label: `${n} star${n > 1 ? "s" : ""}` })),
+              ]}
+            />
+            {filtered.length === 0 ? (
+              <p className="text-center py-8 text-[#5C5537]/70">No reviews match your search.</p>
+            ) : (
+              filtered.slice(0, visibleCount).map(review => (
+                <EditableReviewCard
+                  key={review.id}
+                  review={review}
+                  onEdit={handleEditReview}
+                  onDelete={handleDeleteReview}
+                />
+              ))
+            )}
+            {filtered.length > visibleCount && (
+              <div className="text-center mt-6">
+                <button
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  className="bg-[#5C5537] text-white px-5 py-2 rounded-full hover:bg-[#3E3725]"
+                >
+                  Show more ({filtered.length - visibleCount} left)
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

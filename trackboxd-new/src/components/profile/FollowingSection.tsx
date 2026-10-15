@@ -1,6 +1,5 @@
 // FollowingSection.tsx
 import React from "react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 interface FollowingUser {
@@ -13,11 +12,14 @@ interface FollowingUser {
 interface FollowingSectionProps {
   following: FollowingUser[];
   isOwnProfile?: boolean;
+  username: string;
+  totalFollowing: number;
 }
 
 const FollowingSection: React.FC<FollowingSectionProps> = ({
   following,
-  isOwnProfile = false,
+  username,
+  totalFollowing,
 }) => {
   // Don't render the section if there are no following users
   if (!following || following.length === 0) {
@@ -28,10 +30,13 @@ const FollowingSection: React.FC<FollowingSectionProps> = ({
     <div className="mb-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-[#5C5537]">People i follow...</h2>
-        {isOwnProfile && (
-          <Button variant="link" className="text-[#5C5537] hover:text-[#3E3725] p-0">
-            View All
-          </Button>
+        {totalFollowing > following.length && (
+          <Link
+            href={`/profile/${username}/following`}
+            className="text-sm font-semibold text-[#5C5537] underline hover:text-[#3E3725]"
+          >
+            View all {totalFollowing} →
+          </Link>
         )}
       </div>
       
