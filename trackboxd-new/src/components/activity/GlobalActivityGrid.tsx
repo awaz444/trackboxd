@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Clock } from "lucide-react";
 import RatingStars from "@/components/RatingStars";
 import { VipBadge } from "@/components/VipBadge";
+import ActivityAvatar from "@/components/activity/ActivityAvatar";
 import type { GlobalActivityItem } from "@/lib/global-activity";
 
 function timeAgo(iso: string) {
@@ -24,18 +25,11 @@ function mmss(sec: number) {
 function ActivityCard({ item }: { item: GlobalActivityItem }) {
   const userImage = item.user.image_url || "/default-avatar.jpg";
   return (
-    <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
-      <div className="flex items-start gap-2">
-        <div className="flex-1 min-w-0">
+    <div className="h-full flex flex-col bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+      <div className="flex flex-1 items-start gap-2">
+        <div className="flex-1 min-w-0 h-full flex flex-col">
           <div className="flex items-center gap-2 mb-2">
-            <img
-              src={userImage}
-              alt={item.user.name}
-              className="w-6 h-6 rounded-full object-cover flex-shrink-0"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = "/default-avatar.jpg";
-              }}
-            />
+            <ActivityAvatar src={userImage} alt={item.user.name} />
             <div className="font-medium text-[#5C5537] flex items-center gap-1 min-w-0">
               <Link
                 href={`/profile/${encodeURIComponent(item.user.name)}`}
@@ -61,13 +55,12 @@ function ActivityCard({ item }: { item: GlobalActivityItem }) {
             <p className="text-[#5C5537]/70 text-xs truncate">{item.track.artist}</p>
           </div>
 
-          {item.text && (
-            <p className="text-[#5C5537] text-sm line-clamp-2 mb-2">
-              &ldquo;{item.text}&rdquo;
-            </p>
-          )}
+          {/* Always reserve two lines so cards with and without text match in height */}
+          <p className="text-[#5C5537] text-sm line-clamp-2 mb-2 min-h-[2.5rem]">
+            {item.text ? <>&ldquo;{item.text}&rdquo;</> : null}
+          </p>
 
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mt-auto">
             <span className="text-xs text-[#5C5537]/70">{timeAgo(item.created_at)}</span>
             <Link
               href={item.href}
@@ -98,7 +91,7 @@ export default function GlobalActivityGrid({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {visible.map((item, i) => (
-        <div key={`${item.kind}-${item.id}`} className={i >= hiddenBreakpointIndex ? "hidden sm:block" : undefined}>
+        <div key={`${item.kind}-${item.id}`} className={i >= hiddenBreakpointIndex ? "hidden sm:block h-full" : "h-full"}>
           <ActivityCard item={item} />
         </div>
       ))}
