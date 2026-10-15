@@ -462,3 +462,114 @@ export async function getProfileByUsername(username: string, currentUserId: stri
     return null;
   }
 }
+
+export const PROFILE_CONTENT_PAGE_SIZE = 20;
+
+export interface ProfileContentPage {
+  user: { id: string; name: string };
+  hidden: boolean;
+  items: RecentActivity[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+// Full, paginated catalogue of a user's public reviews or annotations.
+export async function getProfileContentPage(
+  username: string,
+  kind: "review" | "annotation",
+  page: number,
+  currentUserId: string | null = null
+): Promise<ProfileContentPage | null> {
+  try {
+    const supabase = createClient(cookies());
+
+    const { data: user } = await supabase
+      .from("users")
+      .select("id, name, profile_private")
+      .eq("name", username)
+      .single();
+    if (!user) return null;
+
+    const isOwn = currentUserId === user.id;
+    let canView = isOwn || !user.profile_private;
+    if (!canView && currentUserId) {
+      const { data: follow } = await supabase
+        .from("follows")
+        .select("accepted")
+        .eq("follower_id", currentUserId)
+        .eq("following_id", user.id)
+        .single();
+      canView = !!follow?.accepted;
+    }
+    if (!canView) {
+      return { user: { id: user.id, name: user.name }, hidden: true, items: [], total: 0, page: 1, totalPages: 1 };
+    }
+
+    const table = kind === "review" ? "reviews" : "annotations";
+    const select =
+      kind === "review"
+        ? `id, rating, text, created_at, spotify_items!reviews_item_id_fkey (id, name, artist, cover_url, type)`
+        : `id, text, created_at, timestamp, spotify_items!annotations_track_id_fkey (id, name, artist, cover_url)`;
+
+    const { count } = await supabase
+      .from(table)
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("is_public", true);
+
+    const total = count || 0;
+    const totalPages = Math.max(1, Math.ceil(total / PROFILE_CONTENT_PAGE_SIZE));
+    const safePage = Math.min(Math.max(1, page), totalPages);
+    const from = (safePage - 1) * PROFILE_CONTENT_PAGE_SIZE;
+
+    const { data: rows } = await supabase
+      .from(table)
+      .select(select)
+      .eq("user_id", user.id)
+      .eq("is_public", true)
+      .order("created_at", { ascending: false })
+      .range(from, from + PROFILE_CONTENT_PAGE_SIZE - 1);
+
+    const ids = (rows || []).map((r: any) => r.id);
+    const likeCounts: Record<string, number> = {};
+    if (ids.length > 0) {
+      const { data: likeData } = await supabase
+        .from("likes")
+        .select("target_id")
+        .eq("target_type", kind)
+        .in("target_id", ids);
+      likeData?.forEach((l) => {
+        likeCounts[l.target_id] = (likeCounts[l.target_id] || 0) + 1;
+      });
+    }
+
+    const fmt = (s: number) => {
+      const t = Math.floor(s);
+      return `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, "0")}`;
+    };
+
+    const items: RecentActivity[] = [];
+    (rows || []).forEach((r: any) => {
+      const track = Array.isArray(r.spotify_items) ? r.spotify_items[0] : r.spotify_items;
+      if (!track) return;
+      items.push({
+        id: r.id,
+        type: kind,
+        track: { id: track.id, title: track.name, artist: track.artist, cover_url: track.cover_url, type: track.type },
+        timestamp:
+          kind === "review"
+            ? new Date(r.created_at).toLocaleDateString()
+            : r.timestamp !== undefined && r.timestamp !== null ? fmt(r.timestamp) : "0:00",
+        rating: kind === "review" ? r.rating ?? undefined : undefined,
+        text: r.text ?? undefined,
+        like_count: likeCounts[r.id] || 0,
+      });
+    });
+
+    return { user: { id: user.id, name: user.name }, hidden: false, items, total, page: safePage, totalPages };
+  } catch (error) {
+    console.error("Error fetching profile content page:", error);
+    return null;
+  }
+}

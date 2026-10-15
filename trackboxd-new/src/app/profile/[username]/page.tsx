@@ -237,6 +237,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                                     />
                                                 ))}
                                             </div>
+                                            {stats.reviews > reviews.length && (
+                                                <Link
+                                                    href={`/profile/${username}/reviews`}
+                                                    className="inline-block mt-4 text-sm font-semibold text-[#5C5537] underline hover:text-[#3E3725]"
+                                                >
+                                                    View all {stats.reviews} reviews →
+                                                </Link>
+                                            )}
                                         </div>
                                     )}
 
@@ -257,6 +265,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                                     />
                                                 ))}
                                             </div>
+                                            {stats.annotations > annotations.length && (
+                                                <Link
+                                                    href={`/profile/${username}/annotations`}
+                                                    className="inline-block mt-4 text-sm font-semibold text-[#5C5537] underline hover:text-[#3E3725]"
+                                                >
+                                                    View all {stats.annotations} annotations →
+                                                </Link>
+                                            )}
                                         </div>
                                     )}
                                 </div>
