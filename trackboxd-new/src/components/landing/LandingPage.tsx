@@ -79,7 +79,7 @@ const LandingPage = ({ children }: { children?: React.ReactNode }) => {
       </div> */}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative z-10">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative z-10">
         {/* Logo Section - Updated to center logo above text */}
         <div className="flex flex-col items-center mb-2">
           <div className="relative w-32 h-32 mb-6">
@@ -91,14 +91,14 @@ const LandingPage = ({ children }: { children?: React.ReactNode }) => {
             />
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold text-[#5C5537] mb-3">
+          <div className="text-5xl md:text-6xl font-bold text-[#5C5537] mb-3" aria-hidden="true">
             Trackboxd
-          </h1>
+          </div>
 
           <div className="text-center">
-            <h2 className="text-lg md:text-xl font-medium text-[#5C5537] mb-1">
+            <h1 className="text-lg md:text-xl font-medium text-[#5C5537] mb-1">
               The Letterboxd for Tracks
-            </h2>
+            </h1>
             <p className="text-base text-[#5C5537]/60 mb-10 max-w-md">
               Rate songs, comment on any moment in a song, build your listening diary.
             </p>
@@ -146,7 +146,7 @@ const LandingPage = ({ children }: { children?: React.ReactNode }) => {
             </p>
           </article>
         </section>
-      </div>
+      </main>
 
       {/* Auth Modal */}
       <AuthModal

@@ -128,6 +128,11 @@ export default function RootLayout({
                   "@type": "Organization",
                   name: "Trackboxd",
                   url: SITE_URL,
+                  logo: `${SITE_URL}/trackboxd-logo.png`,
+                  sameAs: [
+                    "https://x.com/trackboxd",
+                    "https://github.com/awaz444/trackboxd",
+                  ],
                   description:
                     "Trackboxd is a track-first social platform for rating songs, writing reviews, and commenting on specific moments in a song.",
                   founder: [

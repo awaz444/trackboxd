@@ -183,11 +183,11 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FFFBEb]">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <main className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]" />
           </div>
-        </div>
+        </main>
         <Footer variant="light" />
       </div>
     );
@@ -195,7 +195,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#FFFBEb]">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Happening on Trackboxd — live global feed */}
         {globalActivity.items.length >= 4 && (
           <section className="mb-10">
@@ -237,7 +237,7 @@ export default function HomePage() {
 
         {/* Popular Users */}
         <PopularUsersSection data={popularUsers} />
-      </div>
+      </main>
       <Footer variant="light" />
 
       {showJournalsPromo && (
