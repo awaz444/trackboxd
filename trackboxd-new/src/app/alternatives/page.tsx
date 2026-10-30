@@ -17,14 +17,17 @@ export const metadata: Metadata = {
     "rym alternatives",
     "wave music app alternative",
     "listnd alternative",
+    "rate.fm alternative",
+    "rate fm vs trackboxd",
+    "ratings music alternative",
     "music tracking app",
     "music review site",
   ],
   alternates: { canonical: `${SITE_URL}/alternatives` },
   openGraph: {
-    title: "Trackboxd vs Musicboard, RateYourMusic and Last.fm",
+    title: "Trackboxd vs Musicboard, Rate.fm, RateYourMusic and Last.fm",
     description:
-      "How Trackboxd compares to the other music tracking and review sites.",
+      "How Trackboxd compares to Rate.fm, Musicboard, RateYourMusic, Last.fm and the other music tracking and review sites.",
     url: `${SITE_URL}/alternatives`,
     type: "article",
   },
@@ -76,12 +79,34 @@ const comparisons = [
     difference:
       "Listnd is album-first, like Musicboard and RYM, and leans into discovery through recommendations. Trackboxd is for the moment a single song stands out, whether or not you ever finish the album, and gives you timestamped annotations to say exactly where.",
   },
+  {
+    name: "Rate.fm",
+    builtFor:
+      "A Letterboxd-style app for rating individual songs and albums, writing reviews, keeping a listening diary and following friends.",
+    difference:
+      "Rate.fm is the closest live comparison and the one most often named next to Trackboxd. Both let you rate and review individual tracks and albums, both have lists and a diary. The real split is annotation: Trackboxd lets you comment at any moment inside a song — the beat change, the vocal run, the production detail — and that is a feature nothing else in this list has. If you want the same track-first Letterboxd model, either works. If you also want timestamped annotations tied to the audio itself, use Trackboxd.",
+  },
+  {
+    name: "Ratings",
+    builtFor:
+      "A newer entrant for rating music, writing short-form takes and building a public music identity around what you listen to.",
+    difference:
+      "Ratings leans into the identity layer: your taste as a profile, short takes, following. Trackboxd leans into the writing: longer reviews, timestamped annotations tied to specific moments in a song, and a diary of what you actually thought. Both are small communities right now; the day-to-day difference is whether you want to post a one-line take or write what you actually heard.",
+  },
 ];
 
 const faqs = [
   {
     q: "What is the best Musicboard alternative?",
     a: "Trackboxd is the closest alternative if you want the Letterboxd-style rating and reviewing model. The main difference is that Trackboxd is track-first rather than album-first, and supports timestamped annotations on individual songs.",
+  },
+  {
+    q: "How is Trackboxd different from Rate.fm?",
+    a: "Both are Letterboxd-style apps for rating individual tracks and albums with reviews, lists and a listening diary — the two are the closest conceptual overlap in this space. The one feature Rate.fm does not have is timestamped annotation: Trackboxd lets you comment at any moment inside a song, pinned to the exact second you want to talk about.",
+  },
+  {
+    q: "How is Trackboxd different from Musicboard?",
+    a: "Musicboard rates and reviews at the album and artist level. Trackboxd rates and reviews at the track level, and adds timestamped comments on specific moments inside a song. If you think about music one track at a time, Trackboxd fits; if you think album by album, Musicboard does.",
   },
   {
     q: "What is a good RateYourMusic alternative?",
@@ -101,7 +126,7 @@ export default function AlternativesPage() {
   return (
     <MarketingPage
       title="Music tracking sites, compared"
-      tagline="Where Trackboxd sits next to Musicboard, RateYourMusic, Last.fm, Genius, Wave and Listnd."
+      tagline="Where Trackboxd sits next to Musicboard, Rate.fm, RateYourMusic, Last.fm, Genius, Wave, Listnd and Ratings."
       jsonLd={faqSchema(faqs)}
     >
       <Section>
@@ -119,8 +144,11 @@ export default function AlternativesPage() {
           <Link href="/letterboxd-for-music" className="underline hover:text-[#5C5537]">
             Letterboxd for music
           </Link>
-          , built around individual tracks, with timestamped annotation as the
-          feature nothing else in this list has.
+          , built around individual tracks, and the one site in this list that
+          lets you comment on any moment in a song — the beat change, the vocal
+          run, the production detail — pinned to the exact second it happens.
+          Rate.fm comes closest on the Letterboxd-style part; nothing else does
+          the timestamped annotation.
         </p>
       </Section>
 
@@ -172,9 +200,19 @@ export default function AlternativesPage() {
               <td className="py-2 pr-4">Album / concert</td>
               <td className="py-2">No</td>
             </tr>
-            <tr>
+            <tr className="border-b border-[#5C5537]/10">
               <th scope="row" className="py-2 pr-4 font-normal">Listnd</th>
               <td className="py-2 pr-4">Album</td>
+              <td className="py-2">No</td>
+            </tr>
+            <tr className="border-b border-[#5C5537]/10">
+              <th scope="row" className="py-2 pr-4 font-normal">Rate.fm</th>
+              <td className="py-2 pr-4">Track / album</td>
+              <td className="py-2">No</td>
+            </tr>
+            <tr>
+              <th scope="row" className="py-2 pr-4 font-normal">Ratings</th>
+              <td className="py-2 pr-4">Track / album</td>
               <td className="py-2">No</td>
             </tr>
           </tbody>
