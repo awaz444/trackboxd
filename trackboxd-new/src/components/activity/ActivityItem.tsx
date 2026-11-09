@@ -197,8 +197,8 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                   className="w-12 h-12 rounded-md"
                 />
               ) : (
-                <div className="bg-[#5C5537]/10 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
-                  <Music className="w-6 h-6 text-[#5C5537]/50" />
+                <div className="bg-[#5C5537]/10 rounded-md w-12 h-12 flex items-center justify-center">
+                  <Music className="w-6 h-6 text-[#6B6547]" />
                 </div>
               )}
               <div>
@@ -248,8 +248,8 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                   className="w-12 h-12 rounded-md"
                 />
               ) : (
-                <div className="bg-[#5C5537]/10 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
-                  <Music className="w-6 h-6 text-[#5C5537]/50" />
+                <div className="bg-[#5C5537]/10 rounded-md w-12 h-12 flex items-center justify-center">
+                  <Music className="w-6 h-6 text-[#6B6547]" />
                 </div>
               )}
               <div>
@@ -366,11 +366,11 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                   className="w-12 h-12 rounded-md"
                 />
               ) : (
-                <div className="bg-[#5C5537]/10 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
+                <div className="bg-[#5C5537]/10 rounded-md w-12 h-12 flex items-center justify-center">
                   {isLikeAlbum ? (
-                    <Album className="w-6 h-6 text-[#5C5537]/50" />
+                    <Album className="w-6 h-6 text-[#6B6547]" />
                   ) : (
-                    <Music className="w-6 h-6 text-[#5C5537]/50" />
+                    <Music className="w-6 h-6 text-[#6B6547]" />
                   )}
                 </div>
               )}

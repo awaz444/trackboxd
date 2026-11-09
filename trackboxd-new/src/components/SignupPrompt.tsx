@@ -23,7 +23,7 @@ export default function SignupPrompt({
 
   return (
     <div
-      className={`rounded-2xl bg-[#5C5537]/[0.07] p-5 flex flex-col sm:flex-row sm:items-center gap-4 ${className}`}
+      className={`py-2 flex flex-col sm:flex-row sm:items-center gap-4 ${className}`}
     >
       <div className="flex-1 min-w-0">
         <p className="font-bold text-[#5C5537]">{heading}</p>

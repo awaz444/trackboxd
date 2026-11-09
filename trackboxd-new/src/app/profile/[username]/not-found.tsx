@@ -25,7 +25,7 @@ export default function ProfileNotFound() {
             </Button>
           </Link>
           <Link href="/tracks">
-            <Button variant="outline" className="border-[#5C5537] bg-[#FFFBEb] text-[#5C5537] hover:bg-[#FFFBEb]">
+            <Button variant="outline" className="bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15">
               Browse Tracks
             </Button>
           </Link>

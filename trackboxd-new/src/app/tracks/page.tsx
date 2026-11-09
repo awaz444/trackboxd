@@ -189,7 +189,7 @@ const Tracks = () => {
               </h2>
               <button
                 onClick={() => setShowSearchResults(false)}
-                className="text-sm text-[#5C5537]/70 hover:text-[#5C5537]"
+                className="text-sm text-[#6B6547] hover:text-[#5C5537]"
               >
                 Clear results
               </button>
@@ -213,7 +213,7 @@ const Tracks = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-[#5C5537]/70">No results found</p>
+              <p className="text-[#6B6547]">No results found</p>
             )}
           </div>
         )}
@@ -321,7 +321,7 @@ const Tracks = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-[#5C5537]/70">No popular reviews yet</p>
+                <p className="text-[#6B6547]">No popular reviews yet</p>
               )}
             </div>
 
@@ -339,7 +339,7 @@ const Tracks = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-[#5C5537]/70">No popular annotations yet</p>
+                <p className="text-[#6B6547]">No popular annotations yet</p>
               )}
             </div>
           </>

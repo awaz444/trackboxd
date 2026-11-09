@@ -97,14 +97,14 @@ export default async function SearchPage({
                     />
                     <div>
                       <div className="font-medium text-[#5C5537]">{t.name}</div>
-                      <div className="text-sm text-[#5C5537]/70">
+                      <div className="text-sm text-[#6B6547]">
                         {t.artists?.map(a => a.name).join(", ")}
                       </div>
                     </div>
                   </a>
                 ))}
                 {(!results.tracks || results.tracks.length === 0) && (
-                  <div className="text-[#5C5537]/60">No tracks found.</div>
+                  <div className="text-[#6B6547]">No tracks found.</div>
                 )}
               </div>
             </section>
@@ -121,13 +121,13 @@ export default async function SearchPage({
                       className="w-full rounded object-cover" 
                     />
                     <div className="mt-2 font-medium text-[#5C5537] truncate">{a.name}</div>
-                    <div className="text-sm text-[#5C5537]/70 truncate">
+                    <div className="text-sm text-[#6B6547] truncate">
                       {a.artists?.map(x => x.name).join(", ")}
                     </div>
                   </a>
                 ))}
                 {(!results.albums || results.albums.length === 0) && (
-                  <div className="text-[#5C5537]/60">No albums found.</div>
+                  <div className="text-[#6B6547]">No albums found.</div>
                 )}
               </div>
             </section>
@@ -145,14 +145,14 @@ export default async function SearchPage({
                     />
                     <div>
                       <div className="font-medium text-[#5C5537]">{p.name}</div>
-                      <div className="text-sm text-[#5C5537]/70">
+                      <div className="text-sm text-[#6B6547]">
                         By {p.owner?.display_name || "Unknown"}
                       </div>
                     </div>
                   </a>
                 ))}
                 {(!results.playlists || results.playlists.length === 0) && (
-                  <div className="text-[#5C5537]/60">No playlists found.</div>
+                  <div className="text-[#6B6547]">No playlists found.</div>
                 )}
               </div>
             </section>
@@ -171,13 +171,13 @@ export default async function SearchPage({
                     <div>
                       <div className="font-medium text-[#5C5537]">{u.name}</div>
                       {u.country && (
-                        <div className="text-sm text-[#5C5537]/70">{u.country}</div>
+                        <div className="text-sm text-[#6B6547]">{u.country}</div>
                       )}
                     </div>
                   </a>
                 ))}
                 {(!results.users || results.users.length === 0) && (
-                  <div className="text-[#5C5537]/60">No users found.</div>
+                  <div className="text-[#6B6547]">No users found.</div>
                 )}
               </div>
             </section>

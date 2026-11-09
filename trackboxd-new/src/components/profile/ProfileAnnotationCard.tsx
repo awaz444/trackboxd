@@ -138,7 +138,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsModalOpen(false)} />
           <div className="relative bg-[#FFFBEb] rounded-xl w-full max-w-lg shadow-xl max-h-[85vh] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#5C5537]/10 flex-shrink-0">
+            <div className="flex items-center justify-between px-5 py-4 flex-shrink-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-semibold text-[#5C5537]">Annotation</span>
                 <Link
@@ -181,13 +181,13 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
               </div>
 
               {/* Annotation text */}
-              <div className="border-t border-[#5C5537]/10 pt-4 text-[#5C5537] text-sm leading-relaxed whitespace-pre-wrap">
+              <div className="pt-1 text-[#5C5537] text-sm leading-relaxed whitespace-pre-wrap">
                 {annotation.text || <span className="italic text-[#6B6547]">No annotation text.</span>}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex-shrink-0 border-t border-[#5C5537]/10 px-5 py-4 flex items-center justify-between">
+            <div className="flex-shrink-0 px-5 py-4 flex items-center justify-between">
               <span className="text-sm text-[#6B6547]">at {annotation.timestamp} in the track</span>
               <div className="flex items-center gap-3">
                 <button

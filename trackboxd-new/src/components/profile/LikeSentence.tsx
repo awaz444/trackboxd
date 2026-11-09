@@ -25,7 +25,7 @@ export default function LikeSentence({ like: l }: { like: LikeActivityItem }) {
     );
     result.push(" ");
     result.push(
-        <span className="font-medium text-[#5C5537]/70">
+        <span className="font-medium text-[#6B6547]">
             {verb}
         </span>
     );
@@ -62,7 +62,7 @@ export default function LikeSentence({ like: l }: { like: LikeActivityItem }) {
     // Add the type (playlist, album, annotation, review, etc.) with medium weight
     if (remainingParts.length > 0) {
         result.push(
-            <span className="font-medium text-[#5C5537]/70">
+            <span className="font-medium text-[#6B6547]">
                 {remainingParts[0]}
             </span>
         );
@@ -77,7 +77,7 @@ export default function LikeSentence({ like: l }: { like: LikeActivityItem }) {
             remainingParts[0] === "of")
     ) {
         result.push(
-            <span className="font-medium text-[#5C5537]/70">
+            <span className="font-medium text-[#6B6547]">
                 {remainingParts[0]}
             </span>
         );
@@ -102,7 +102,7 @@ export default function LikeSentence({ like: l }: { like: LikeActivityItem }) {
     } else if (remainingParts.length > 0) {
         // If no item link, just add the text with medium weight
         result.push(
-            <span className="font-medium text-[#5C5537]/70">
+            <span className="font-medium text-[#6B6547]">
                 {remainingParts.join(" ")}
             </span>
         );

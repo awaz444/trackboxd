@@ -28,7 +28,7 @@ const EditableReviewCard: React.FC<EditableReviewCardProps> = ({
 
   if (isEditMode) {
     return (
-      <div className="rounded-xl bg-[#5C5537]/5 p-4 mb-4">
+      <div className="py-3 mb-4">
         <ReviewForm 
           onClose={() => setIsEditMode(false)}
           onSave={handleSave}

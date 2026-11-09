@@ -18,12 +18,12 @@ const AuthErrorMessage: React.FC = () => {
 const AuthCodeErrorPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FFFBEb] flex items-center justify-center px-5">
-      <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-lg text-center">
+      <div className="w-full max-w-md text-center">
         {/* Back Button */}
         <div className="mb-6 text-left">
           <Link
             href="/"
-            className="inline-flex items-center text-[#5C5537]/70 hover:text-[#5C5537] transition-colors"
+            className="inline-flex items-center text-[#6B6547] hover:text-[#5C5537] transition-colors"
           >
             <ArrowLeft size={16} className="mr-2" />
             Back to Home
@@ -32,7 +32,7 @@ const AuthCodeErrorPage: React.FC = () => {
 
         {/* Error Icon */}
         <div className="mb-6">
-          <AlertCircle className="mx-auto text-[#5C5537]/70" size={64} />
+          <AlertCircle className="mx-auto text-[#6B6547]" size={64} />
         </div>
 
         {/* Header */}
@@ -40,7 +40,7 @@ const AuthCodeErrorPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-[#5C5537] mb-2">
             Authentication Error
           </h1>
-          <p className="text-[#5C5537]/70">
+          <p className="text-[#6B6547]">
             <Suspense fallback="The authentication link you clicked is invalid or has expired.">
               <AuthErrorMessage />
             </Suspense>
@@ -48,7 +48,7 @@ const AuthCodeErrorPage: React.FC = () => {
         </div>
 
         {/* Error Message */}
-        <div className="mb-6 p-4 bg-[#5C5537]/10 border border-[#5C5537]/20 text-[#5C5537] rounded-lg">
+        <div className="mb-6 text-[#5C5537]">
           <p className="text-sm">
             This could happen if:
           </p>
@@ -70,7 +70,7 @@ const AuthCodeErrorPage: React.FC = () => {
 
           <Link
             href="/"
-            className="block w-full border border-[#5C5537]/20 text-[#5C5537] py-2 px-4 rounded-md hover:bg-[#5C5537]/5 transition-colors text-center"
+            className="block w-full bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15 py-2.5 px-4 rounded-full transition-colors text-center"
           >
             Back to Sign In
           </Link>

@@ -29,11 +29,11 @@ const ContentModal: React.FC<ContentModalProps> = ({
       {/* Modal */}
       <div className="relative bg-[#FFFBEb] rounded-lg w-full max-w-2xl mx-4 z-50 shadow-xl max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-[#5C5537]/10 flex-shrink-0">
+        <div className="flex justify-between items-center p-4 flex-shrink-0">
           <h2 className="text-lg font-semibold text-[#5C5537]">{title}</h2>
           <button
             onClick={onClose}
-            className="text-[#5C5537]/70 hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1 rounded-full transition-colors"
+            className="text-[#6B6547] hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1 rounded-full transition-colors"
           >
             <X className="h-5 w-5" />
           </button>

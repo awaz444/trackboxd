@@ -128,11 +128,11 @@ export default function ShareSheet({
       <div className="relative bg-[#FFFBEb] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm mx-0 sm:mx-4 z-50 shadow-xl max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#5C5537]/10 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 flex-shrink-0">
           {view === 'story' ? (
             <button
               onClick={() => { setView('options'); setFetchError(null) }}
-              className="flex items-center gap-1.5 text-sm text-[#5C5537]/60 hover:text-[#5C5537] transition-colors"
+              className="flex items-center gap-1.5 text-sm text-[#6B6547] hover:text-[#5C5537] transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
@@ -142,7 +142,7 @@ export default function ShareSheet({
           )}
           <button
             onClick={() => onOpenChange(false)}
-            className="text-[#5C5537]/50 hover:text-[#5C5537] hover:bg-[#5C5537]/8 p-1.5 rounded-full transition-colors"
+            className="text-[#6B6547] hover:text-[#5C5537] hover:bg-[#5C5537]/8 p-1.5 rounded-full transition-colors"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
@@ -163,7 +163,7 @@ export default function ShareSheet({
                 <Camera className="w-5 h-5 text-[#5C5537]/55 flex-shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-[#5C5537]">Instagram Story</p>
-                  <p className="text-xs text-[#5C5537]/50 mt-0.5">Download a 9:16 card to share</p>
+                  <p className="text-xs text-[#6B6547] mt-0.5">Download a 9:16 card to share</p>
                 </div>
               </button>
 
@@ -177,7 +177,7 @@ export default function ShareSheet({
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-[#5C5537]">X</p>
-                  <p className="text-xs text-[#5C5537]/50 mt-0.5">
+                  <p className="text-xs text-[#6B6547] mt-0.5">
                     Post this {type === 'review' ? 'review' : 'annotation'} with a link preview
                   </p>
                 </div>
@@ -196,7 +196,7 @@ export default function ShareSheet({
                   <p className="text-sm font-semibold text-[#5C5537]">
                     {copied ? 'Copied!' : 'Copy Link'}
                   </p>
-                  <p className="text-xs text-[#5C5537]/50 mt-0.5">
+                  <p className="text-xs text-[#6B6547] mt-0.5">
                     {copied ? 'Link copied to clipboard' : 'Share a link to this page'}
                   </p>
                 </div>
@@ -214,8 +214,8 @@ export default function ShareSheet({
             <div className="flex flex-col items-center gap-4">
               {loading && (
                 <div className="flex flex-col items-center gap-3 py-10">
-                  <Loader2 className="w-6 h-6 text-[#5C5537]/60 animate-spin" />
-                  <span className="text-sm text-[#5C5537]/50">Generating story card…</span>
+                  <Loader2 className="w-6 h-6 text-[#6B6547] animate-spin" />
+                  <span className="text-sm text-[#6B6547]">Generating story card…</span>
                 </div>
               )}
 
@@ -224,7 +224,7 @@ export default function ShareSheet({
                   <p className="text-sm text-red-500 mb-3">{fetchError}</p>
                   <button
                     onClick={handleStoryClick}
-                    className="text-sm text-[#5C5537]/60 hover:text-[#5C5537] underline underline-offset-2"
+                    className="text-sm text-[#6B6547] hover:text-[#5C5537] underline underline-offset-2"
                   >
                     Try again
                   </button>

@@ -452,7 +452,7 @@ const AlbumDetailClient = ({
 
                 {/* Tracks & Reviews Tabs */}
                 <div className="mb-6">
-                    <div className="flex border-b border-[#5C5537]/20">
+                    <div className="flex gap-2">
                         <button
                             className={`py-2 px-4 text-sm font-medium ${
                                 activeTab === "tracks"
@@ -475,7 +475,7 @@ const AlbumDetailClient = ({
 
                     {activeTab === "tracks" && album.tracks?.items && (
                         <div className="mt-4">
-                            <div className="grid grid-cols-[50px_1fr_80px] gap-4 px-4 py-2 text-sm text-[#6B6547] border-b border-[#5C5537]/20">
+                            <div className="grid grid-cols-[50px_1fr_80px] gap-4 px-4 py-2 text-sm text-[#6B6547]">
                                 <div>#</div>
                                 <div>Title</div>
                                 <div className="text-right">Duration</div>

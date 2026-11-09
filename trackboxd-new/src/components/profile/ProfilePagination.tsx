@@ -18,7 +18,7 @@ export default function ProfilePagination({ base, page, totalPages }: Props) {
       ) : (
         <span />
       )}
-      <span className="text-sm text-[#5C5537]/70">
+      <span className="text-sm text-[#6B6547]">
         Page {page} of {totalPages}
       </span>
       {page < totalPages ? (

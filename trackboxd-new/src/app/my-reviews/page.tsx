@@ -131,7 +131,7 @@ const MyReviewsPage = () => {
       
       <div className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-[#5C5537] mb-2">My Reviews</h1>
-        <p className="text-[#5C5537]/70 mb-8">
+        <p className="text-[#6B6547] mb-8">
           {reviews.length} review{reviews.length !== 1 ? 's' : ''}
         </p>
 
@@ -140,7 +140,7 @@ const MyReviewsPage = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+          <div className="py-4 text-center text-red-600">
             <p className="text-red-600">{error}</p>
             <button 
               onClick={fetchUserReviews}
@@ -151,7 +151,7 @@ const MyReviewsPage = () => {
           </div>
         ) : reviews.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[#5C5537]/70 mb-4">You haven't written any reviews yet</p>
+            <p className="text-[#6B6547] mb-4">You haven't written any reviews yet</p>
             <a 
               href="/tracks"
               className="bg-[#5C5537] text-white px-4 py-2 rounded-full hover:bg-[#3E3725]"
@@ -181,7 +181,7 @@ const MyReviewsPage = () => {
               ]}
             />
             {filtered.length === 0 ? (
-              <p className="text-center py-8 text-[#5C5537]/70">No reviews match your search.</p>
+              <p className="text-center py-8 text-[#6B6547]">No reviews match your search.</p>
             ) : (
               filtered.slice(0, visibleCount).map(review => (
                 <EditableReviewCard

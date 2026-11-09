@@ -499,7 +499,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                                         </button>
                                         <button
                                             onClick={() => setShowDeleteConfirm(true)}
-                                            className="flex items-center gap-1.5 text-xs border border-red-200 rounded-full px-3 py-1 hover:bg-red-50 text-red-400"
+                                            className="flex items-center gap-1.5 text-xs rounded-full px-3.5 h-9 bg-red-50 hover:bg-red-100 text-red-600"
                                         >
                                             <Trash2 className="w-3 h-3" />
                                             Delete
@@ -557,7 +557,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
             {isOwner && journal.source_type === "manual" && (
                 <div className="mb-6">
                     {showAddTrack ? (
-                        <div className="rounded-xl p-4 space-y-3 bg-[#5C5537]/5">
+                        <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-[#5C5537]">Add a track</p>
                                 <button onClick={() => { setShowAddTrack(false); setTrackSearch(""); setTrackResults([]); }}>
@@ -574,11 +574,11 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                                     className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-[#5C5537]/20 bg-[#FFFBEb] text-[#5C5537] focus:outline-none focus:ring-1 focus:ring-[#5C5537]/40"
                                 />
                                 {trackSearch.trim() && (
-                                    <div className="absolute left-0 right-0 top-full mt-1 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg shadow-lg z-20 overflow-hidden">
+                                    <div className="absolute left-0 right-0 top-full mt-1 bg-[#FFFBEb] rounded-xl shadow-xl z-20 overflow-hidden">
                                         {isSearching ? (
                                             <p className="text-xs text-[#6B6547] text-center py-3">Searching...</p>
                                         ) : trackResults.length > 0 ? (
-                                            <div className="divide-y divide-[#5C5537]/10">
+                                            <div>
                                                 {trackResults.slice(0, 3).map((track: any) => (
                                                     <button
                                                         key={track.id}

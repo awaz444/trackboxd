@@ -89,11 +89,11 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
       {/* Modal */}
       <div className="relative bg-[#FFFBEb] rounded-lg w-full max-w-md mx-4 z-50 shadow-xl">
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-[#5C5537]/10">
+        <div className="flex justify-between items-center p-4">
           <h2 className="text-lg font-semibold text-[#5C5537]">Followers</h2>
           <button
             onClick={onClose}
-            className="text-[#5C5537]/70 hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1 rounded-full"
+            className="text-[#6B6547] hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1 rounded-full"
           >
             <X className="h-4 w-4" />
           </button>
@@ -106,7 +106,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
               <Loader2 className="h-6 w-6 animate-spin text-[#5C5537]" />
             </div>
           ) : followers.length === 0 ? (
-            <div className="text-center py-8 text-[#5C5537]/70">
+            <div className="text-center py-8 text-[#6B6547]">
               No followers yet
             </div>
           ) : (
@@ -130,7 +130,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
                         {follower.name}
                         <VipBadge username={follower.name} />
                       </div>
-                      {/* <div className="text-sm text-[#5C5537]/70">
+                      {/* <div className="text-sm text-[#6B6547]">
                         @{follower.username}
                       </div> */}
                     </div>
@@ -138,7 +138,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
 
                   {isOwnProfile && (
                     removingId === follower.id ? (
-                      <div className="flex items-center gap-1 text-[#5C5537]/70 text-xs px-2">
+                      <div className="flex items-center gap-1 text-[#6B6547] text-xs px-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Removing…
                       </div>
@@ -147,7 +147,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 px-2 text-xs text-[#5C5537]/70 hover:bg-[#5C5537]/10"
+                          className="h-8 px-2 text-xs text-[#6B6547] hover:bg-[#5C5537]/10"
                           onClick={() => setConfirmingId(null)}
                         >
                           Cancel
@@ -165,7 +165,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 px-2 text-xs text-[#5C5537]/60 hover:text-red-600 hover:bg-red-50"
+                        className="h-8 px-2 text-xs text-[#6B6547] hover:text-red-600 hover:bg-red-50"
                         onClick={() => setConfirmingId(follower.id)}
                         aria-label={`Remove ${follower.name} from followers`}
                         title="Remove from your followers"

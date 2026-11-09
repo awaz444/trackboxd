@@ -702,7 +702,7 @@ const SongDetailClient = ({
 
                 {/* Reviews & Annotations Tabs */}
                 <div className="mb-6">
-                    <div className="flex border-b border-[#5C5537]/20">
+                    <div className="flex gap-2">
                         <button
                             className={`py-2 px-4 text-sm font-medium ${
                                 activeTab === "reviews"

@@ -71,7 +71,7 @@ export default function LikeButton({ type, id, initialLikeCount, userId, variant
           ? dark ? 'text-[#FFFBeb]/30 cursor-not-allowed' : 'text-[#5C5537]/30 cursor-not-allowed'
           : isLiked
           ? dark ? 'bg-[#FFFBeb]/15 text-[#FFFBeb]' : 'text-[#5C5537]'
-          : dark ? 'text-[#FFFBeb]/55 hover:text-[#FFFBeb] hover:bg-[#FFFBeb]/10' : 'text-[#5C5537]/50 hover:text-[#5C5537]'
+          : dark ? 'text-[#FFFBeb]/55 hover:text-[#FFFBeb] hover:bg-[#FFFBeb]/10' : 'text-[#6B6547] hover:text-[#5C5537]'
       }`}
     >
       <Heart className={`w-4 h-4 ${isLiked ? (dark ? 'fill-[#FFFBeb]' : 'fill-[#5C5537]') : ''}`} />

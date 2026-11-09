@@ -145,12 +145,12 @@ const NotificationsPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFBEb]">
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-[#5C5537]">Notifications</h1>
+      <div className="max-w-2xl mx-auto px-4 pt-5 pb-8 md:py-8">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="text-[28px] md:text-3xl font-bold text-[#5C5537]">Notifications</h1>
             {unreadCount > 0 && (
-              <span className="bg-[#5C5537] text-white text-xs px-2 py-1 rounded-full">
+              <span className="bg-[#5C5537] text-white text-xs px-2 py-1 rounded-full whitespace-nowrap">
                 {unreadCount} new
               </span>
             )}
@@ -159,7 +159,7 @@ const NotificationsPage = () => {
           {unreadCount > 0 && (
             <button 
               onClick={markAllAsRead}
-              className="text-sm text-[#6B6547] hover:text-[#5C5537] flex items-center gap-1"
+              className="text-sm text-[#6B6547] hover:text-[#5C5537] flex items-center gap-1 whitespace-nowrap min-h-[44px] shrink-0"
             >
               <Check className="w-4 h-4" />
               Mark all read
@@ -172,7 +172,7 @@ const NotificationsPage = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+          <div className="py-4 text-center text-red-600">
             <p className="text-red-600">{error}</p>
             <button 
               onClick={fetchNotifications}
@@ -182,26 +182,20 @@ const NotificationsPage = () => {
             </button>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="text-center py-12 bg-[#5C5537]/5 rounded-2xl">
+          <div className="text-center py-12">
             <Bell className="w-12 h-12 text-[#5C5537]/30 mx-auto mb-3" />
             <p className="text-[#6B6547]">No notifications yet</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-1">
             {notifications.map((notification) => (
               <div
                 key={notification.id}
                 onClick={() => handleNotificationClick(notification)}
-                className={`
-                  relative p-4 rounded-lg border transition-all cursor-pointer flex items-start gap-4
-                  ${notification.is_read 
-                    ? "bg-[#FFFBEb] border-[#5C5537]/10 hover:border-[#5C5537]/30" 
-                    : "bg-[#5C5537] border-[#5C5537] shadow-md"
-                  }
-                `}
+                className="relative py-3 pr-6 transition-opacity cursor-pointer flex items-start gap-4 active:opacity-80"
               >
                 {!notification.is_read && (
-                  <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-[#FFFBEb]" />
+                  <div aria-label="Unread" className="absolute top-5 right-1 w-2.5 h-2.5 rounded-full bg-[#5C5537]" />
                 )}
 
                 {/* Icon based on type */}
@@ -211,7 +205,9 @@ const NotificationsPage = () => {
                     ? (notification.type === 'like' ? 'bg-red-100 text-red-500' : 
                        notification.type === 'follow' ? 'bg-blue-100 text-blue-500' : 
                        'bg-[#5C5537]/10 text-[#5C5537]')
-                    : 'bg-[#FFFBEb]/20 text-[#FFFBEb]'
+                    : (notification.type === 'like' ? 'bg-red-100 text-red-500' :
+                       notification.type === 'follow' ? 'bg-blue-100 text-blue-500' :
+                       'bg-[#5C5537]/10 text-[#5C5537]')
                   }
                 `}>
                   {notification.type === 'like' ? <Heart className="w-5 h-5 fill-current" /> :
@@ -224,17 +220,17 @@ const NotificationsPage = () => {
                     <img 
                       src={notification.source_user?.image_url || "/default-avatar.jpg"} 
                       alt="" 
-                      className="w-6 h-6 rounded-full object-cover border border-white/20"
+                      className="w-6 h-6 rounded-full object-cover"
                     />
-                    <span className={`font-semibold ${notification.is_read ? "text-[#5C5537]" : "text-[#FFFBEb]"}`}>
+                    <span className={`font-semibold text-[#5C5537]`}>
                       {notification.source_user?.name || "Someone"}
                     </span>
-                    <span className={`text-sm ${notification.is_read ? "text-[#6B6547]" : "text-[#FFFBEb]/70"}`}>
+                    <span className={"text-sm text-[#6B6547]"}>
                       {formatTimeAgo(notification.created_at)}
                     </span>
                   </div>
                   
-                  <p className={`text-sm ${notification.is_read ? "text-[#5C5537]" : "text-[#FFFBEb]"}`}>
+                  <p className={`text-sm text-[#5C5537] ${notification.is_read ? "" : "font-semibold"}`}>
                     {notification.type === 'like' && notification.details ? (
                       <>
                         liked your {notification.details.type}, "{notification.details.text.substring(0, 30)}{notification.details.text.length > 30 ? '...' : ''}" of {notification.details.itemName}

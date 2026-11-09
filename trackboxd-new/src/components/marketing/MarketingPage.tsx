@@ -29,13 +29,13 @@ export function MarketingPage({
       <main className="flex-1 px-6 py-16">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-4xl font-bold text-[#5C5537] mb-2">{title}</h1>
-          <p className="text-lg text-[#5C5537]/60 mb-6">{tagline}</p>
+          <p className="text-lg text-[#6B6547] mb-6">{tagline}</p>
           <div className="mb-10">
             <SignupButton />
           </div>
           {children}
 
-          <section className="mt-12 pt-8 border-t border-[#5C5537]/15">
+          <section className="mt-12 pt-8">
             <h2 className="text-xl font-bold text-[#5C5537] mb-3">
               Start your listening diary
             </h2>

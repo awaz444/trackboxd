@@ -59,7 +59,7 @@ const LandingPage = ({ children }: { children?: React.ReactNode }) => {
       {/* Header with Auth buttons */}
       {/* <div className="absolute top-6 right-6 z-20 flex gap-3">
         <button
-          className="text-sm text-[#5C5537]/70 hover:text-[#5C5537] transition-colors"
+          className="text-sm text-[#6B6547] hover:text-[#5C5537] transition-colors"
           onClick={() => {
             setAuthMode('login');
             setShowAuthModal(true);
@@ -99,7 +99,7 @@ const LandingPage = ({ children }: { children?: React.ReactNode }) => {
             <h1 className="text-lg md:text-xl font-medium text-[#5C5537] mb-1">
               The Letterboxd for Tracks
             </h1>
-            <p className="text-base text-[#5C5537]/60 mb-10 max-w-md">
+            <p className="text-base text-[#6B6547] mb-10 max-w-md">
               Rate songs, comment on any moment in a song, build your listening diary.
             </p>
 
@@ -127,21 +127,21 @@ const LandingPage = ({ children }: { children?: React.ReactNode }) => {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto px-4 pb-6 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
           <article className="text-center space-y-2">
             <h2 className="text-sm font-bold text-[#5C5537] uppercase tracking-wide">Track Reviews</h2>
-            <p className="text-xs text-[#5C5537]/70 leading-relaxed">
+            <p className="text-xs text-[#6B6547] leading-relaxed">
               Share your thoughts on the latest albums and singles. Expressive ratings, detailed critiques, or just a simple vibe check. Build your music profile with every list.
             </p>
           </article>
 
           <article className="text-center space-y-2">
             <h2 className="text-sm font-bold text-[#5C5537] uppercase tracking-wide">Timestamped Comments</h2>
-            <p className="text-xs text-[#5C5537]/70 leading-relaxed">
+            <p className="text-xs text-[#6B6547] leading-relaxed">
               Pin a comment to any moment in a song: the 0:43 bass drop, the key change, the line that gets you. Everyone who opens the track sees it right there.
             </p>
           </article>
 
           <article className="text-center space-y-2">
             <h2 className="text-sm font-bold text-[#5C5537] uppercase tracking-wide">Social Discovery</h2>
-            <p className="text-xs text-[#5C5537]/70 leading-relaxed">
+            <p className="text-xs text-[#6B6547] leading-relaxed">
               Follow friends and tastemakers. See what they're listening to, liking, and reviewing in real-time. Discover your next obsession through your community.
             </p>
           </article>

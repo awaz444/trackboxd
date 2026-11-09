@@ -54,8 +54,8 @@ export default function RecentFriendsActivity({
           </div>
         </div>
       ) : (
-        <div className="bg-[#5C5537]/5 rounded-xl p-8 text-center">
-          <p className="text-[#5C5537]/70 text-sm mb-3">
+        <div className="py-8 text-center">
+          <p className="text-[#6B6547] text-sm mb-3">
             No recent activity from people you follow.
           </p>
           <Link

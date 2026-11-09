@@ -145,7 +145,7 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
                 </div>
                 <div className="p-2">
                   <div className="font-bold text-[#5C5537] truncate text-sm">{track.name}</div>
-                  <div className="text-xs text-[#5C5537]/70 truncate">{track.artist}</div>
+                  <div className="text-xs text-[#6B6547] truncate">{track.artist}</div>
                 </div>
               </div>
             ))}
@@ -207,7 +207,7 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
 
               <div className="space-y-3 max-h-80 overflow-y-auto">
                 {searchResults.length === 0 && !isSearching && (
-                  <div className="text-center py-8 text-[#5C5537]/50">
+                  <div className="text-center py-8 text-[#6B6547]">
                     <Music className="w-12 h-12 mx-auto mb-2" />
                     <p>{searchQuery ? `No results for "${searchQuery}"` : 'Search for tracks to add'}</p>
                   </div>
@@ -223,8 +223,8 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
                     </div>
                     <div className="min-w-0">
                       <h4 className="font-medium text-[#5C5537] truncate">{t.name}</h4>
-                      <p className="text-sm text-[#5C5537]/70 truncate">{t.artists}</p>
-                      <p className="text-xs text-[#5C5537]/50 truncate">{t.album}</p>
+                      <p className="text-sm text-[#6B6547] truncate">{t.artists}</p>
+                      <p className="text-xs text-[#6B6547] truncate">{t.album}</p>
                     </div>
                   </div>
                 ))}

@@ -152,7 +152,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
             <div>
               <h2 className="text-xl md:text-2xl font-bold text-[#5C5537]">Edit Profile Prompts</h2>
               {hasReachedLimit && (
-                <p className="text-sm text-[#5C5537]/60 mt-1">
+                <p className="text-sm text-[#6B6547] mt-1">
                   You've reached the maximum of 5 prompts. Delete one to add another.
                 </p>
               )}
@@ -172,7 +172,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
             {availablePrompts.map((p) => {
               const existing = responses.find(r => r.promptKey === p.key);
               return (
-                <div key={p.id} className="bg-[#5C5537]/5 rounded-xl p-3 md:p-4 flex flex-col justify-between">
+                <div key={p.id} className="py-3 flex flex-col justify-between">
                   <div className="text-sm md:text-base text-[#5C5537] mb-2 md:mb-3">{p.question}</div>
                   {existing ? (
                     <div className="flex items-center justify-between mt-auto pt-3 md:pt-4">
@@ -212,7 +212,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
             );
           })}
             {availablePrompts.length === 0 && (
-              <div className="text-[#5C5537]/50 text-sm md:text-base">No prompts available.</div>
+              <div className="text-[#6B6547] text-sm md:text-base">No prompts available.</div>
             )}
           </div>
 
@@ -246,7 +246,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
                   </div>
                   <div className="space-y-2 md:space-y-3 max-h-60 md:max-h-80 overflow-y-auto">
                     {searchResults.length === 0 && !isSearching && (
-                      <div className="text-center py-6 md:py-8 text-[#5C5537]/50">
+                      <div className="text-center py-6 md:py-8 text-[#6B6547]">
                         {activePrompt.type === 'track' && <Music className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-2" />}
                         {activePrompt.type === 'album' && <Album className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-2" />}
                         {activePrompt.type === 'playlist' && <ListMusic className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-2" />}
@@ -260,7 +260,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
                         </div>
                         <div className="min-w-0">
                           <h4 className="font-medium text-[#5C5537] truncate text-sm md:text-base">{t.name}</h4>
-                          {t.artist && <p className="text-xs md:text-sm text-[#5C5537]/70 truncate">{t.artist}</p>}
+                          {t.artist && <p className="text-xs md:text-sm text-[#6B6547] truncate">{t.artist}</p>}
                         </div>
                       </div>
                     ))}

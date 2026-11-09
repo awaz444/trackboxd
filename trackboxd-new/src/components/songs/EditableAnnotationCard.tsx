@@ -33,7 +33,7 @@ const EditableAnnotationCard: React.FC<EditableAnnotationCardProps> = ({
 
   if (isEditMode) {
     return (
-      <div className="rounded-xl bg-[#5C5537]/5 p-4 mb-4">
+      <div className="py-3 mb-4">
         <AnnotationForm 
           onClose={() => setIsEditMode(false)}
           onSave={handleSave}
@@ -102,7 +102,7 @@ const EditableAnnotationCard: React.FC<EditableAnnotationCardProps> = ({
           </div>
           
           {annotation.text && (
-            <p className="text-[#5C5537] text-sm mb-3 rounded-lg p-3 bg-[#5C5537]/5">
+            <p className="text-[#5C5537] text-sm mb-3">
               {annotation.text}
             </p>
           )}

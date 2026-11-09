@@ -104,11 +104,11 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
       {/* Modal */}
       <div className="relative bg-[#FFFBEb] rounded-lg w-full max-w-md mx-4 z-50 shadow-xl">
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-[#5C5537]/10">
+        <div className="flex justify-between items-center p-4">
           <h2 className="text-lg font-semibold text-[#5C5537]">Follow Requests</h2>
           <button
             onClick={onClose}
-            className="text-[#5C5537]/70 hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1 rounded-full"
+            className="text-[#6B6547] hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1 rounded-full"
           >
             <X className="h-4 w-4" />
           </button>
@@ -121,7 +121,7 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#5C5537] border-t-transparent" />
             </div>
           ) : requests.length === 0 ? (
-            <div className="text-center py-8 text-[#5C5537]/70">
+            <div className="text-center py-8 text-[#6B6547]">
               No pending follow requests
             </div>
           ) : (
@@ -145,7 +145,7 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
                         {request.follower.name}
                         <VipBadge username={request.follower.name} />
                       </div>
-                      <div className="text-sm text-[#5C5537]/70">
+                      <div className="text-sm text-[#6B6547]">
                         {/* @{request.follower.name} */}
                       </div>
                     </div>
@@ -168,7 +168,7 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-[#5C5537]/70"
+                      className="text-[#6B6547]"
                       onClick={() => handleReject(request.follower_id)}
                       disabled={!!loadingActions[request.follower_id]}
                     >

@@ -88,7 +88,7 @@ export default function NewJournalPage() {
                 {/* Back link */}
                 <Link
                     href="/my-journals"
-                    className="inline-flex items-center gap-1.5 text-sm text-[#5C5537]/60 hover:text-[#5C5537] mb-6"
+                    className="inline-flex items-center gap-1.5 text-sm text-[#6B6547] hover:text-[#5C5537] mb-6"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     My Journals
@@ -96,43 +96,43 @@ export default function NewJournalPage() {
 
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-[#5C5537]">Create a new journal</h1>
-                    <p className="text-[#5C5537]/60 mt-1">
+                    <p className="text-[#6B6547] mt-1">
                         Review a set of songs together, tell the story of what you heard.
                     </p>
                 </div>
 
                 {step === "choose_source" && (
                     <div className="space-y-4">
-                        <p className="text-sm font-medium text-[#5C5537]/70 uppercase tracking-wider">
+                        <p className="text-sm font-medium text-[#6B6547] uppercase tracking-wider">
                             How would you like to start?
                         </p>
-                        <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="flex flex-col gap-1">
                             {/* Spotify import */}
                             <button
                                 onClick={() => handleSourceChoice("spotify_playlist")}
-                                className="text-left p-5 border-2 border-[#5C5537]/20 hover:border-[#5C5537]/50 rounded-xl bg-[#FFFBEb] hover:bg-[#5C5537]/5 transition-all group"
+                                className="text-left flex items-start gap-4 py-4 -mx-3 px-3 rounded-xl hover:bg-[#5C5537]/5 active:bg-[#5C5537]/10 transition-colors group"
                             >
-                                <div className="w-10 h-10 rounded-full bg-[#1DB954]/10 flex items-center justify-center mb-3">
+                                <div className="w-10 h-10 rounded-full bg-[#1DB954]/10 flex items-center justify-center shrink-0">
                                     <Music className="w-5 h-5 text-[#1DB954]" />
                                 </div>
-                                <h3 className="font-semibold text-[#5C5537]">Import from Spotify</h3>
-                                <p className="text-sm text-[#5C5537]/60 mt-1">
+                                <div><h3 className="font-semibold text-[#5C5537]">Import from Spotify</h3>
+                                <p className="text-sm text-[#6B6547] mt-1">
                                     Paste a public Spotify playlist URL. We'll pull in the tracks and fill in the title for you.
-                                </p>
+                                </p></div>
                             </button>
 
                             {/* Manual */}
                             <button
                                 onClick={() => handleSourceChoice("manual")}
-                                className="text-left p-5 border-2 border-[#5C5537]/20 hover:border-[#5C5537]/50 rounded-xl bg-[#FFFBEb] hover:bg-[#5C5537]/5 transition-all group"
+                                className="text-left flex items-start gap-4 py-4 -mx-3 px-3 rounded-xl hover:bg-[#5C5537]/5 active:bg-[#5C5537]/10 transition-colors group"
                             >
-                                <div className="w-10 h-10 rounded-full bg-[#5C5537]/10 flex items-center justify-center mb-3">
+                                <div className="w-10 h-10 rounded-full bg-[#5C5537]/10 flex items-center justify-center shrink-0">
                                     <BookOpen className="w-5 h-5 text-[#5C5537]" />
                                 </div>
-                                <h3 className="font-semibold text-[#5C5537]">Build from scratch</h3>
-                                <p className="text-sm text-[#5C5537]/60 mt-1">
+                                <div><h3 className="font-semibold text-[#5C5537]">Build from scratch</h3>
+                                <p className="text-sm text-[#6B6547] mt-1">
                                     Name your journal yourself and add tracks one by one — or pull in reviews you've already written.
-                                </p>
+                                </p></div>
                             </button>
                         </div>
                     </div>
@@ -142,7 +142,7 @@ export default function NewJournalPage() {
                     <div className="space-y-6">
                         <button
                             onClick={() => { setStep("choose_source"); setError(null); }}
-                            className="inline-flex items-center gap-1.5 text-sm text-[#5C5537]/60 hover:text-[#5C5537]"
+                            className="inline-flex items-center gap-1.5 text-sm text-[#6B6547] hover:text-[#5C5537]"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Back

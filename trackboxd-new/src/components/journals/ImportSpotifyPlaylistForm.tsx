@@ -82,7 +82,7 @@ const ImportSpotifyPlaylistForm: React.FC<ImportSpotifyPlaylistFormProps> = ({
             )}
 
             {preview && (
-                <div className="rounded-xl overflow-hidden bg-[#5C5537]/5">
+                <div className="overflow-hidden">
                     {/* Playlist header */}
                     <div className="flex items-center gap-3 p-4 bg-[#5C5537]/5">
                         {preview.cover_url ? (
@@ -111,7 +111,7 @@ const ImportSpotifyPlaylistForm: React.FC<ImportSpotifyPlaylistFormProps> = ({
                     </div>
 
                     {/* Track preview list */}
-                    <div className="max-h-52 overflow-y-auto divide-y divide-[#5C5537]/10">
+                    <div className="max-h-52 overflow-y-auto space-y-1">
                         {preview.tracks.slice(0, 10).map((track) => (
                             <div key={track.id} className="flex items-center gap-2.5 px-4 py-2.5">
                                 {track.cover_url ? (
@@ -136,7 +136,7 @@ const ImportSpotifyPlaylistForm: React.FC<ImportSpotifyPlaylistFormProps> = ({
                         )}
                     </div>
 
-                    <div className="p-4 border-t border-[#5C5537]/10">
+                    <div className="pt-4">
                         <button
                             onClick={() => onConfirm(preview)}
                             disabled={isSubmitting}

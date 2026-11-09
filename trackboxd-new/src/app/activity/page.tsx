@@ -110,7 +110,7 @@ export default function ActivityPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#5C5537] mb-2">Activity</h1>
-          <p className="text-[#5C5537]/70">
+          <p className="text-[#6B6547]">
             See what you and your friends have been listening to
           </p>
         </div>
@@ -145,16 +145,16 @@ export default function ActivityPage() {
                 {hasMore && (
                   <div ref={sentinelRef} className="pt-4 flex justify-center h-12">
                     {loadingMore && (
-                      <Loader2 className="w-5 h-5 animate-spin text-[#5C5537]/50" />
+                      <Loader2 className="w-5 h-5 animate-spin text-[#6B6547]" />
                     )}
                   </div>
                 )}
               </>
             ) : (
               <div className="text-center py-8 text-[#5C5537]">
-                <Music className="w-12 h-12 mx-auto mb-2 text-[#5C5537]/70" />
+                <Music className="w-12 h-12 mx-auto mb-2 text-[#6B6547]" />
                 <p className="mb-3">No activity yet</p>
-                <p className="text-sm text-[#5C5537]/60">
+                <p className="text-sm text-[#6B6547]">
                   Follow people to see their reviews and annotations here
                 </p>
               </div>

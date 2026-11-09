@@ -246,7 +246,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
 
             {/* Inline review form */}
             {showForm && isOwner && (
-                <div className="mt-2 rounded-xl p-3 bg-[#5C5537]/5 space-y-3">
+                <div className="mt-2 space-y-3">
                     <div className="flex items-center gap-3">
                         <Rating
                             name={`rating-${itemId}`}

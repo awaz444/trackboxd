@@ -301,8 +301,8 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                             className="w-12 h-12 rounded-lg object-cover"
                         />
                     ) : (
-                        <div className="bg-[#5C5537]/10 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
-                            <Music className="text-[#5C5537]/50 w-5 h-5" />
+                        <div className="bg-[#5C5537]/10 rounded-lg w-12 h-12 flex items-center justify-center">
+                            <Music className="text-[#6B6547] w-5 h-5" />
                         </div>
                     )}
                     <div className="absolute bottom-1 right-1 bg-[#5C5537]/70 rounded-full p-1">
@@ -325,7 +325,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                             {item.type.toUpperCase()}
                         </span>
                     </div>
-                    <p className="text-sm text-[#5C5537]/70 truncate">
+                    <p className="text-sm text-[#6B6547] truncate">
                         {subtitle}
                     </p>
                 </div>
@@ -444,9 +444,9 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                 {/* Search Results Dropdown */}
                                 {showResults &&
                                     (isSearching || searchQuery) && (
-                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg shadow-lg z-50 max-h-[700px] overflow-y-auto min-w-[400px] max-w-[600px]">
+                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-[#FFFBEb] rounded-xl shadow-xl z-50 max-h-[700px] overflow-y-auto min-w-[400px] max-w-[600px]">
                                             {isSearching ? (
-                                                <div className="p-4 text-center text-[#5C5537]/70">
+                                                <div className="p-4 text-center text-[#6B6547]">
                                                     Searching...
                                                 </div>
                                             ) : searchResults ? (
@@ -455,7 +455,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                         Boolean
                                                     ).length > 0 && (
                                                             <>
-                                                                <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                <div className="px-4 py-2 text-xs font-semibold text-[#6B6547] uppercase tracking-wider">
                                                                     Tracks
                                                                 </div>
                                                                 <div className="mb-2">
@@ -478,7 +478,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                     {searchResults.users?.filter(Boolean).length > 0 && (
                                                         <>
                                                             <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                            <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                            <div className="px-4 py-2 text-xs font-semibold text-[#6B6547] uppercase tracking-wider">
                                                                 Users
                                                             </div>
                                                             <div className="mb-2">
@@ -496,7 +496,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                                                     <h4 className="font-medium text-[#5C5537] truncate">{u.name}</h4>
                                                                                     <span className="text-xs px-2 py-1 rounded-full bg-[#5C5537]/10 text-[#5C5537]">USER</span>
                                                                                 </div>
-                                                                                {u.country && <p className="text-xs text-[#5C5537]/70 truncate">{u.country}</p>}
+                                                                                {u.country && <p className="text-xs text-[#6B6547] truncate">{u.country}</p>}
                                                                             </div>
                                                                         </div>
                                                                     ))}
@@ -509,7 +509,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                     ).length > 0 && (
                                                             <>
                                                                 <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                                <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                <div className="px-4 py-2 text-xs font-semibold text-[#6B6547] uppercase tracking-wider">
                                                                     Albums
                                                                 </div>
                                                                 <div className="mb-2">
@@ -536,13 +536,13 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                         searchResults.albums.filter(
                                                             Boolean
                                                         ).length === 0 && (
-                                                            <div className="px-4 py-8 text-center text-[#5C5537]/70">
+                                                            <div className="px-4 py-8 text-center text-[#6B6547]">
                                                                 No results found
                                                             </div>
                                                         )}
                                                 </div>
                                             ) : searchQuery ? (
-                                                <div className="px-4 py-8 text-center text-[#5C5537]/70">
+                                                <div className="px-4 py-8 text-center text-[#6B6547]">
                                                     No results found
                                                 </div>
                                             ) : null}
@@ -611,7 +611,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                         </span>
 
                                         <ChevronDown
-                                            className={`w-4 h-4 text-[#5C5537]/70 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
+                                            className={`w-4 h-4 text-[#6B6547] transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
                                                 }`}
                                         />
                                     </button>
@@ -639,7 +639,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                                 setIsDropdownOpen(false)
                                                             }>
                                                             {item.icon && (
-                                                                <item.icon className="w-4 h-4 text-[#5C5537]/70" />
+                                                                <item.icon className="w-4 h-4 text-[#6B6547]" />
                                                             )}
                                                             {item.label}
                                                         </Link>
@@ -655,7 +655,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                                 : ""
                                                                 }`}>
                                                             {item.icon && (
-                                                                <item.icon className="w-4 h-4 text-[#5C5537]/70" />
+                                                                <item.icon className="w-4 h-4 text-[#6B6547]" />
                                                             )}
                                                             {item.label}
                                                         </button>
@@ -697,9 +697,9 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                         {/* Mobile search results dropdown */}
                                         {showResults &&
                                             (isSearching || searchQuery) && (
-                                                <div className="fixed top-16 left-0 right-0 mx-auto bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg shadow-lg z-50 max-h-[70vh] overflow-y-auto w-[90vw]">
+                                                <div className="fixed top-16 left-0 right-0 mx-auto bg-[#FFFBEb] rounded-xl shadow-xl z-50 max-h-[70vh] overflow-y-auto w-[90vw]">
                                                     {isSearching ? (
-                                                        <div className="p-4 text-center text-[#5C5537]/70">
+                                                        <div className="p-4 text-center text-[#6B6547]">
                                                             Searching...
                                                         </div>
                                                     ) : searchResults ? (
@@ -708,7 +708,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                                 Boolean
                                                             ).length > 0 && (
                                                                     <>
-                                                                        <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                        <div className="px-4 py-2 text-xs font-semibold text-[#6B6547] uppercase tracking-wider">
                                                                             Tracks
                                                                         </div>
                                                                         <div className="mb-2">
@@ -731,7 +731,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                             {searchResults.users?.filter(Boolean).length > 0 && (
                                                                 <>
                                                                     <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                                    <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                    <div className="px-4 py-2 text-xs font-semibold text-[#6B6547] uppercase tracking-wider">
                                                                         Users
                                                                     </div>
                                                                     <div className="mb-2">
@@ -749,7 +749,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                                                             <h4 className="font-medium text-[#5C5537] truncate">{u.name}</h4>
                                                                                             <span className="text-xs px-2 py-1 rounded-full bg-[#5C5537]/10 text-[#5C5537]">USER</span>
                                                                                         </div>
-                                                                                        {u.country && <p className="text-xs text-[#5C5537]/70 truncate">{u.country}</p>}
+                                                                                        {u.country && <p className="text-xs text-[#6B6547] truncate">{u.country}</p>}
                                                                                     </div>
                                                                                 </div>
                                                                             ))}
@@ -762,7 +762,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                             ).length > 0 && (
                                                                     <>
                                                                         <div className="h-px bg-[#5C5537]/20 mx-4 my-1" />
-                                                                        <div className="px-4 py-2 text-xs font-semibold text-[#5C5537]/70 uppercase tracking-wider">
+                                                                        <div className="px-4 py-2 text-xs font-semibold text-[#6B6547] uppercase tracking-wider">
                                                                             Albums
                                                                         </div>
                                                                         <div className="mb-2">
@@ -790,7 +790,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                                     Boolean
                                                                 ).length ===
                                                                 0 && (
-                                                                    <div className="px-4 py-8 text-center text-[#5C5537]/70">
+                                                                    <div className="px-4 py-8 text-center text-[#6B6547]">
                                                                         No
                                                                         results
                                                                         found
@@ -798,7 +798,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                                 )}
                                                         </div>
                                                     ) : searchQuery ? (
-                                                        <div className="px-4 py-8 text-center text-[#5C5537]/70">
+                                                        <div className="px-4 py-8 text-center text-[#6B6547]">
                                                             No results found
                                                         </div>
                                                     ) : null}
@@ -877,7 +877,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                 <div className="font-medium text-[#5C5537]">
                                     {authUser?.name || "Guest User"}
                                 </div>
-                                <div className="text-sm text-[#5C5537]/70">
+                                <div className="text-sm text-[#6B6547]">
                                     {authUser?.email || "guest@example.com"}
                                 </div>
                             </div>
@@ -900,7 +900,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                             setIsMobileMenuOpen(false)
                                         }>
                                         {item.icon && (
-                                            <item.icon className="w-5 h-5 text-[#5C5537]/70" />
+                                            <item.icon className="w-5 h-5 text-[#6B6547]" />
                                         )}
                                         {item.label}
                                     </Link>
@@ -911,7 +911,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                         className={`flex items-center gap-3 px-3 py-3 text-base text-left text-[#5C5537] hover:bg-[#5C5537]/10 transition-colors duration-200 rounded-lg ${item.onClick ? "cursor-pointer" : ""
                                             }`}>
                                         {item.icon && (
-                                            <item.icon className="w-5 h-5 text-[#5C5537]/70" />
+                                            <item.icon className="w-5 h-5 text-[#6B6547]" />
                                         )}
                                         {item.label}
                                     </button>

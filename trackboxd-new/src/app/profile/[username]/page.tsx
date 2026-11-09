@@ -184,7 +184,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 {shouldHideContent ? (
                     // Private profile message
                     <div className="text-center py-16">
-                        <div className="bg-white/50 rounded-lg p-8 max-w-md mx-auto">
+                        <div className="py-8 max-w-md mx-auto">
                             <div className="text-6xl mb-4">🔒</div>
                             <h3 className="text-xl font-bold text-[#5C5537] mb-2">
                                 This account is private
