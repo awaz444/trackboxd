@@ -5,6 +5,7 @@ import { Search, X } from "lucide-react";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import MediaCard from "@/components/MediaCard";
+import TileRail from "@/components/TileRail";
 import CompactReviewCard from "@/components/songs/CompactReviewCard";
 import ReviewCard from "@/components/songs/ReviewCard";
 
@@ -163,15 +164,19 @@ const AlbumsPage = () => {
       ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"
       : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4";
 
+    // Five-up rows leave a lone tile in a 2-col phone grid; swipe them instead.
+    const Wrap = ({ children }: { children: React.ReactNode }) =>
+      cols === 5 ? <TileRail>{children}</TileRail> : <div className={gridClass}>{children}</div>;
+
     if (loading) {
       return (
-        <div className={gridClass}>
+        <Wrap>
           {[...Array(cols)].map((_, i) => <SkeletonCard key={i} />)}
-        </div>
+        </Wrap>
       );
     }
     return (
-      <div className={gridClass}>
+      <Wrap>
         {albums.map((album) => (
           <MediaCard
             key={album.id}
@@ -187,7 +192,7 @@ const AlbumsPage = () => {
             showPopularStats={!!(album.review_count || album.like_count)}
           />
         ))}
-      </div>
+      </Wrap>
     );
   };
 

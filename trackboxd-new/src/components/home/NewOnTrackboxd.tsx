@@ -1,6 +1,7 @@
 "use client";
 
 import MediaCard from "@/components/MediaCard";
+import TileRail from "@/components/TileRail";
 import HomeSectionHeader from "./HomeSectionHeader";
 
 interface NewReview {
@@ -27,10 +28,10 @@ export default function NewOnTrackboxd({ data, likes = {} }: Props) {
   return (
     <section className="mb-10">
       <HomeSectionHeader title="New on Trackboxd" />
-      <div className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-1 sm:mx-0 sm:px-0 sm:overflow-visible sm:grid sm:gap-4 sm:grid-cols-4">
+      <TileRail cols="sm:grid-cols-4" itemWidth="w-[42%]">
         {data.map((review) => (
-          <div key={review.review_id} className="w-[42%] shrink-0 snap-start sm:w-auto">
           <MediaCard
+            key={review.review_id}
             variant="poster"
             coverUrl={review.cover_url || "/default-album.jpg"}
             name={review.name}
@@ -43,9 +44,8 @@ export default function NewOnTrackboxd({ data, likes = {} }: Props) {
             user={review.user}
             isLiked={likes[review.item_id] || false}
           />
-          </div>
         ))}
-      </div>
+      </TileRail>
     </section>
   );
 }
