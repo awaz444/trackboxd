@@ -20,9 +20,7 @@ export const PlaylistListItem = ({
   return (
     <Link href={`/playlists/${playlist.id}`} className="group">
     <div
-      className={`p-4 hover:bg-[#5C5537]/5 transition-colors ${
-        !isLastItem ? "border-b border-[#5C5537]/20" : ""
-      }`}
+      className="-mx-3 px-3 py-3 rounded-xl hover:bg-[#5C5537]/5 transition-colors"
     >
       <div className="flex gap-3">
         <div className="flex-shrink-0">
@@ -38,7 +36,7 @@ export const PlaylistListItem = ({
 
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start">
-            <div>
+            <div className="min-w-0">
               <h3 className="font-bold text-[#5C5537] truncate text-sm md:text-base">
                 {playlist.name}
               </h3>

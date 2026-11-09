@@ -257,7 +257,7 @@ const AlbumsPage = () => {
           <>
             {/* 1. Cards — Popular This Week */}
             <div className="mb-12">
-              <h2 className="text-2xl font-bold text-[#5C5537] mb-6">Popular This Week</h2>
+              <h2 className="text-2xl font-bold text-[#5C5537] mb-6">Popular Albums</h2>
               <AlbumGrid albums={popularAlbums} loading={loadingPopular} />
             </div>
 

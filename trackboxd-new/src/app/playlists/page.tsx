@@ -43,7 +43,7 @@ const SkeletonPlaylistCard = () => (
 );
 
 const SkeletonPlaylistListItem = () => (
-    <div className="flex items-center p-4">
+    <div className="flex items-center py-3">
         <div className="animate-pulse flex items-center w-full">
             <div className="bg-[#5C5537]/10 rounded-lg w-16 h-16"></div>
             <div className="ml-4 flex-1">
@@ -386,10 +386,7 @@ const Playlists = () => {
                         <div className="mb-12">
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-2xl font-bold text-[#5C5537]">
-                                    <span className="text-[#5C5537]">
-                                        Popular
-                                    </span>{" "}
-                                    This Week
+                                    Popular Playlists
                                 </h2>
                             </div>
 
@@ -430,7 +427,7 @@ const Playlists = () => {
                             </div>
 
                             {loadingRecent ? (
-                                <div className="rounded-xl overflow-hidden">
+                                <div className="space-y-1">
                                     {[...Array(3)].map((_, i) => (
                                         <SkeletonPlaylistListItem
                                             key={`skeleton-recent-${i}`}
@@ -438,7 +435,7 @@ const Playlists = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="rounded-xl overflow-hidden">
+                                <div className="space-y-1">
                                     {recentlyLikedPlaylists.map(
                                         (playlist, index) => (
                                             <PlaylistListItem
