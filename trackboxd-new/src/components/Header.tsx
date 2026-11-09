@@ -342,7 +342,8 @@ const Header: React.FC<HeaderProps> = ({ }) => {
     );
 
     return (
-        <header className="bg-[#FFFBEb]/95 backdrop-blur sticky top-0 z-50">
+        <>
+        <header className="bg-[#FFFBEb] sticky top-0 z-50">
             {/* Safe-area filler to cover iOS PWA status bar space on mobile */}
             <div
                 className="md:hidden bg-[#FFFBEb]"
@@ -920,13 +921,6 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                     </div>
                 </div>
             )}
-            {authUser && (
-                <BottomTabBar
-                    profileHref={`/profile/${encodeURIComponent(user.name)}`}
-                    avatarUrl={user.avatar}
-                    onLog={() => setIsLogModalOpen(true)}
-                />
-            )}
             <LogModal
                 isOpen={isLogModalOpen}
                 onClose={() => setIsLogModalOpen(false)}
@@ -937,6 +931,16 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                 defaultMode="login"
             />
         </header>
+        {/* Kept outside <header> so header styles (a filter, transform or
+            backdrop blur) can never pin this fixed bar to the header. */}
+        {authUser && (
+            <BottomTabBar
+                profileHref={`/profile/${encodeURIComponent(user.name)}`}
+                avatarUrl={user.avatar}
+                onLog={() => setIsLogModalOpen(true)}
+            />
+        )}
+        </>
     );
 };
 
