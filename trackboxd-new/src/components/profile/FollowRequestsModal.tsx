@@ -102,7 +102,7 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
       />
       
       {/* Modal */}
-      <div className="relative bg-[#FFFBEb] rounded-lg w-full max-w-md mx-4 z-50 border border-[#5C5537]/20">
+      <div className="relative bg-[#FFFBEb] rounded-lg w-full max-w-md mx-4 z-50 shadow-xl">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-[#5C5537]/10">
           <h2 className="text-lg font-semibold text-[#5C5537]">Follow Requests</h2>
@@ -129,7 +129,7 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
               {requests.map((request) => (
                 <div
                   key={request.follower_id}
-                  className="flex items-center justify-between p-3 hover:bg-[#5C5537]/5 rounded-md border border-[#5C5537]/10"
+                  className="flex items-center justify-between p-3 hover:bg-[#5C5537]/5 rounded-md"
                 >
                   <Link
                     href={`/profile/${request.follower.name}`}

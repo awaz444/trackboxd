@@ -25,7 +25,7 @@ function mmss(sec: number) {
 function ActivityCard({ item }: { item: GlobalActivityItem }) {
   const userImage = item.user.image_url || "/default-avatar.jpg";
   return (
-    <div className="h-full flex flex-col bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+    <div className="h-full flex flex-col py-3">
       <div className="flex flex-1 items-start gap-2">
         <div className="flex-1 min-w-0 h-full flex flex-col">
           <div className="flex items-center gap-2 mb-2">
@@ -42,7 +42,7 @@ function ActivityCard({ item }: { item: GlobalActivityItem }) {
             {item.kind === "review" && item.rating !== null ? (
               <RatingStars rating={item.rating} />
             ) : item.timestamp !== null ? (
-              <span className="inline-flex items-center gap-1 text-xs text-[#5C5537]/70">
+              <span className="inline-flex items-center gap-1 text-xs text-[#6B6547]">
                 <Clock className="w-3 h-3" /> {mmss(item.timestamp)}
               </span>
             ) : null}
@@ -52,7 +52,7 @@ function ActivityCard({ item }: { item: GlobalActivityItem }) {
             <h3 className="font-semibold text-[#5C5537] text-sm truncate">
               {item.track.name}
             </h3>
-            <p className="text-[#5C5537]/70 text-xs truncate">{item.track.artist}</p>
+            <p className="text-[#6B6547] text-xs truncate">{item.track.artist}</p>
           </div>
 
           {/* Always reserve two lines so cards with and without text match in height */}
@@ -61,10 +61,10 @@ function ActivityCard({ item }: { item: GlobalActivityItem }) {
           </p>
 
           <div className="flex justify-between items-center mt-auto">
-            <span className="text-xs text-[#5C5537]/70">{timeAgo(item.created_at)}</span>
+            <span className="text-xs text-[#6B6547]">{timeAgo(item.created_at)}</span>
             <Link
               href={item.href}
-              className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
+              className="text-xs text-[#6B6547] hover:text-[#5C5537]"
             >
               {item.kind === "annotation" ? "View annotation" : "View track"}
             </Link>

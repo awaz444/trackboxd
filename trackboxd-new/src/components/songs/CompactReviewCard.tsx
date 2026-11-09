@@ -89,7 +89,7 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
       {/* Card */}
       <div
         onClick={() => setIsModalOpen(true)}
-        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+        className="py-3 cursor-pointer"
       >
         <div className="flex items-start gap-2">
           <div className="flex-1 min-w-0">
@@ -111,7 +111,7 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
 
             <div className="mb-2">
               <h3 className="font-semibold text-[#5C5537] text-sm">{trackName}</h3>
-              <p className="text-[#5C5537]/70 text-xs">{artistNames}</p>
+              <p className="text-[#6B6547] text-xs">{artistNames}</p>
             </div>
 
             {review.text && (
@@ -119,7 +119,7 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
             )}
 
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#5C5537]/70">{timeAgo}</span>
+              <span className="text-xs text-[#6B6547]">{timeAgo}</span>
               <div className="flex items-center gap-3">
                 <button
                   onClick={(e) => { e.stopPropagation(); handleLikeClick(); }}
@@ -127,7 +127,7 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
                   className={`flex items-center gap-1 text-xs focus:outline-none ${
                     isLoading || initialLoad || !user
                       ? "cursor-not-allowed text-[#5C5537]/40"
-                      : "cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]"
+                      : "cursor-pointer text-[#6B6547] hover:text-[#5C5537]"
                   }`}
                 >
                   {initialLoad ? (
@@ -142,7 +142,7 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
                 <Link
                   href={review.item?.type === "album" ? `/albums/${review.item_id}` : `/songs/${review.item_id}`}
                   onClick={(e) => e.stopPropagation()}
-                  className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
+                  className="text-xs text-[#6B6547] hover:text-[#5C5537]"
                 >
                   {review.item?.type === "album" ? "View album" : "View track"}
                 </Link>
@@ -156,12 +156,12 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-[#FFFBEb] rounded-xl w-full max-w-lg border border-[#5C5537]/20 shadow-xl max-h-[85vh] flex flex-col">
+          <div className="relative bg-[#FFFBEb] rounded-xl w-full max-w-lg shadow-xl max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#5C5537]/10 flex-shrink-0">
               <span className="text-sm font-semibold text-[#5C5537]">Review</span>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-[#5C5537]/60 hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1.5 rounded-full transition-colors"
+                className="text-[#6B6547] hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1.5 rounded-full transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -178,8 +178,8 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
                 )}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-[#5C5537] text-lg leading-tight">{trackName}</h3>
-                  <p className="text-[#5C5537]/70 text-sm mt-0.5">{artistNames}</p>
-                  {albumName && <p className="text-[#5C5537]/50 text-xs italic mt-0.5">{albumName}</p>}
+                  <p className="text-[#6B6547] text-sm mt-0.5">{artistNames}</p>
+                  {albumName && <p className="text-[#6B6547] text-xs italic mt-0.5">{albumName}</p>}
                   <div className="mt-2">
                     <RatingStars rating={review.rating} />
                   </div>
@@ -187,7 +187,7 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
               </div>
 
               <div className="border-t border-[#5C5537]/10 pt-4 text-[#5C5537] text-sm leading-relaxed whitespace-pre-wrap">
-                {review.text || <span className="italic text-[#5C5537]/50">No written review.</span>}
+                {review.text || <span className="italic text-[#6B6547]">No written review.</span>}
               </div>
             </div>
 
@@ -201,20 +201,20 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
                 />
                 <Link
                   href={`/profile/${encodeURIComponent(review.users.name)}`}
-                  className="text-sm text-[#5C5537]/70 hover:text-[#5C5537] truncate"
+                  className="text-sm text-[#6B6547] hover:text-[#5C5537] truncate"
                 >
                   @{review.users.name}
                 </Link>
                 <VipBadge username={review.users.name} />
                 <span className="text-[#5C5537]/30 text-xs">·</span>
-                <span className="text-xs text-[#5C5537]/50 flex-shrink-0">{timeAgo}</span>
+                <span className="text-xs text-[#6B6547] flex-shrink-0">{timeAgo}</span>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0 ml-3">
                 <button
                   onClick={handleLikeClick}
                   disabled={isLoading || !user}
                   className={`flex items-center gap-1.5 text-sm transition-colors ${
-                    isLiked ? "text-[#5C5537]" : "text-[#5C5537]/50 hover:text-[#5C5537]"
+                    isLiked ? "text-[#5C5537]" : "text-[#6B6547] hover:text-[#5C5537]"
                   }`}
                 >
                   <Heart className={`w-4 h-4 ${isLiked ? "fill-[#5C5537]" : ""}`} />
@@ -222,7 +222,7 @@ const CompactReviewCard: React.FC<CompactReviewCardProps> = ({ review }) => {
                 </button>
                 <Link
                   href={review.item?.type === "album" ? `/albums/${review.item_id}` : `/songs/${review.item_id}`}
-                  className="text-xs text-[#5C5537]/70 hover:text-[#5C5537] hover:underline"
+                  className="text-xs text-[#6B6547] hover:text-[#5C5537] hover:underline"
                 >
                   {review.item?.type === "album" ? "View album" : "View track"}
                 </Link>

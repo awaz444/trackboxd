@@ -111,9 +111,9 @@ const MediaCard: React.FC<MediaCardProps> = ({
     const posterHref = reviewId ? `/reviews/${reviewId}` : cardHref;
     return (
       <Link href={posterHref} className="group block h-full">
-        <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-200 flex flex-col h-full">
+        <div className="flex flex-col h-full">
           {/* Cover — tall, fills ~80% */}
-          <div className="relative" style={{ paddingBottom: "140%" }}>
+          <div className="relative rounded-xl overflow-hidden bg-[#5C5537]/10 transition-opacity group-hover:opacity-90" style={{ paddingBottom: "140%" }}>
             <img
               src={coverUrl}
               alt={name}
@@ -132,7 +132,7 @@ const MediaCard: React.FC<MediaCardProps> = ({
               >
                 <Heart
                   className={`w-3.5 h-3.5 transition-colors ${
-                    isLiked ? "text-[#5C5537] fill-[#5C5537]" : "text-[#5C5537]/60"
+                    isLiked ? "text-[#5C5537] fill-[#5C5537]" : "text-[#6B6547]"
                   }`}
                 />
               </button>
@@ -156,11 +156,11 @@ const MediaCard: React.FC<MediaCardProps> = ({
             )}
           </div>
           {/* Bottom info: name, artist, then stars on next line on mobile */}
-          <div className="p-3 flex flex-col gap-1">
+          <div className="pt-2.5 flex flex-col gap-1">
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-[#5C5537] truncate">{name}</p>
+              <p className="text-sm font-semibold text-[#5C5537] truncate">{name}</p>
               {artist && (
-                <p className="text-xs text-[#5C5537]/60 truncate">{artist}</p>
+                <p className="text-xs text-[#6B6547] truncate">{artist}</p>
               )}
             </div>
             {((reviewRating !== undefined && reviewRating > 0) || hasReviewText) && (
@@ -169,7 +169,7 @@ const MediaCard: React.FC<MediaCardProps> = ({
                   <StarRating rating={reviewRating} />
                 )}
                 {hasReviewText && (
-                  <Star className="w-3 h-3 text-[#5C5537]/60" />
+                  <Star className="w-3 h-3 text-[#6B6547]" />
                 )}
               </div>
             )}
@@ -182,9 +182,9 @@ const MediaCard: React.FC<MediaCardProps> = ({
   // Default variant
   return (
     <Link href={cardHref} className="group block">
-      <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-200 flex flex-col">
+      <div className="flex flex-col">
         {/* Cover with hoverable actions */}
-        <div className="relative aspect-square">
+        <div className="relative aspect-square rounded-xl overflow-hidden bg-[#5C5537]/10 transition-opacity group-hover:opacity-90">
           <img
             src={coverUrl}
             alt={name}
@@ -204,7 +204,7 @@ const MediaCard: React.FC<MediaCardProps> = ({
               >
                 <Heart
                   className={`w-4 h-4 transition-colors ${
-                    isLiked ? "text-[#5C5537] fill-[#5C5537]" : "text-[#5C5537]/60"
+                    isLiked ? "text-[#5C5537] fill-[#5C5537]" : "text-[#6B6547]"
                   }`}
                 />
               </button>
@@ -212,23 +212,23 @@ const MediaCard: React.FC<MediaCardProps> = ({
             <button
               onClick={handleShare}
               aria-label="Share"
-              className="p-1.5 rounded-full bg-[#FFFBEb]/85 hover:bg-[#FFFBEb] shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              className="p-1.5 rounded-full bg-[#FFFBEb]/85 hover:bg-[#FFFBEb] shadow-sm md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
             >
               {copied ? (
                 <Check className="w-3.5 h-3.5 text-[#5C5537]" />
               ) : (
-                <Share2 className="w-3.5 h-3.5 text-[#5C5537]/70" />
+                <Share2 className="w-3.5 h-3.5 text-[#6B6547]" />
               )}
             </button>
           </div>
         </div>
         {/* Info */}
-        <div className="p-3 flex flex-col gap-1">
+        <div className="pt-2.5 flex flex-col gap-1">
           <p className="text-sm font-semibold text-[#5C5537] truncate leading-snug">
             {name}
           </p>
           {artist && (
-            <p className="text-xs text-[#5C5537]/70 truncate">{artist}</p>
+            <p className="text-xs text-[#6B6547] truncate">{artist}</p>
           )}
           {avgRating !== undefined && avgRating > 0 && (
             <StarRating rating={avgRating} />
@@ -237,20 +237,20 @@ const MediaCard: React.FC<MediaCardProps> = ({
             <div className="flex items-center gap-3 mt-1">
               <span
                 className={`flex items-center gap-1 text-xs ${
-                  isLiked ? "text-[#5C5537]" : "text-[#5C5537]/60"
+                  isLiked ? "text-[#5C5537]" : "text-[#6B6547]"
                 }`}
               >
                 <Heart className={`w-3 h-3 ${isLiked ? "fill-[#5C5537]" : ""}`} />
                 {likeCount}
               </span>
               {reviewCount !== undefined && (
-                <span className="flex items-center gap-1 text-xs text-[#5C5537]/60">
+                <span className="flex items-center gap-1 text-xs text-[#6B6547]">
                   <Star className="w-3 h-3" />
                   {reviewCount}
                 </span>
               )}
               {annotationCount !== undefined && itemType === "track" && (
-                <span className="flex items-center gap-1 text-xs text-[#5C5537]/60">
+                <span className="flex items-center gap-1 text-xs text-[#6B6547]">
                   <Clock className="w-3 h-3" />
                   {annotationCount}
                 </span>

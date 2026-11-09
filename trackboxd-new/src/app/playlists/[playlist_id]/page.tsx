@@ -183,9 +183,9 @@ const PlaylistDetailsPage = () => {
 
             <div className="max-w-5xl mx-auto px-4 py-6">
                 {/* Playlist Header */}
-                <div className="flex flex-col md:flex-row gap-6 mb-8">
-                    <div className="w-full md:w-1/3 flex justify-center">
-                        <div className="w-56 h-56 relative overflow-hidden rounded-xl shadow border border-[#5C5537]/20">
+                <div className="flex flex-col md:flex-row gap-5 md:gap-6 mb-8">
+                    <div className="w-full md:w-1/3 flex md:justify-center">
+                        <div className="w-full aspect-square sm:max-w-md sm:mx-auto md:mx-0 md:w-56 md:h-56 relative overflow-hidden rounded-2xl md:rounded-xl bg-[#5C5537]/10">
                             <img
                                 src={
                                     playlist.cover_url ||
@@ -201,10 +201,10 @@ const PlaylistDetailsPage = () => {
                     </div>
 
                     <div className="w-full md:w-2/3">
-                        <h1 className="text-2xl md:text-3xl font-bold text-[#5C5537] mb-1">
+                        <h1 className="text-3xl leading-tight font-bold text-[#5C5537] mb-1">
                             {playlist.name}
                         </h1>
-                        <p className="text-lg text-[#5C5537]/70 mb-4">
+                        <p className="text-lg text-[#6B6547] mb-4">
                             By {playlist.creator}
                         </p>
 
@@ -229,10 +229,10 @@ const PlaylistDetailsPage = () => {
                             <button
                                 onClick={handleLikeClick}
                                 disabled={likeLoading}
-                                className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors cursor-pointer ${
+                                className={`flex items-center space-x-1.5 px-4 h-11 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                                     isLiked
-                                        ? "bg-[#5C5537] text-[#FFFBEb] border border-[#5C5537]"
-                                        : "bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/30 hover:bg-[#5C5537]/10 hover:border-[#5C5537]/50"
+                                        ? "bg-[#5C5537] text-[#FFFBEb]"
+                                        : "bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15"
                                 }`}>
                                 {likeLoading ? (
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
@@ -255,7 +255,7 @@ const PlaylistDetailsPage = () => {
                             Tracks ({items.length})
                         </h2>
 
-                        <div className="flex items-center space-x-2 bg-[#FFFBEb] rounded-lg p-1 border border-[#5C5537]/20">
+                        <div className="flex items-center space-x-2 bg-[#5C5537]/10 rounded-full p-1">
                             <button
                                 onClick={() => setViewMode("grid")}
                                 className={`p-2 rounded-md ${
@@ -285,7 +285,7 @@ const PlaylistDetailsPage = () => {
                                     href={`/songs/${track.id}`}
                                     className="group"
                                 >
-                                    <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4 hover:shadow-lg transition-shadow duration-200">
+                                    <div className="py-3">
                                         <div className="flex items-start gap-3">
                                             <img
                                                 src={
@@ -303,12 +303,12 @@ const PlaylistDetailsPage = () => {
                                                 <p className="font-medium text-sm text-[#5C5537] line-clamp-1 group-hover:text-[#5C5537]/80 transition-colors">
                                                     {track.name}
                                                 </p>
-                                                <p className="text-xs text-[#5C5537]/70 mt-1">
+                                                <p className="text-xs text-[#6B6547] mt-1">
                                                     {track.artists
                                                         .map((a) => a.name)
                                                         .join(", ")}
                                                 </p>
-                                                <p className="text-xs text-[#5C5537]/50 mt-1">
+                                                <p className="text-xs text-[#6B6547] mt-1">
                                                     {formatDuration(
                                                         track.duration_ms
                                                     )}
@@ -320,7 +320,7 @@ const PlaylistDetailsPage = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl overflow-hidden">
+                        <div className="overflow-hidden">
                             {items.map((track, index) => (
                                 <Link 
                                     key={track.id} 
@@ -333,7 +333,7 @@ const PlaylistDetailsPage = () => {
                                                 ? "border-b border-[#5C5537]/20"
                                                 : ""
                                         }`}>
-                                        <span className="text-sm text-[#5C5537]/50 w-8">
+                                        <span className="text-sm text-[#6B6547] w-8">
                                             {index + 1}
                                         </span>
                                         <img
@@ -351,13 +351,13 @@ const PlaylistDetailsPage = () => {
                                             <p className="font-medium text-sm text-[#5C5537] truncate group-hover:text-[#5C5537]/80 transition-colors">
                                                 {track.name}
                                             </p>
-                                            <p className="text-xs text-[#5C5537]/70 truncate">
+                                            <p className="text-xs text-[#6B6547] truncate">
                                                 {track.artists
                                                     .map((a) => a.name)
                                                     .join(", ")}
                                             </p>
                                         </div>
-                                        <p className="text-xs text-[#5C5537]/50 ml-2">
+                                        <p className="text-xs text-[#6B6547] ml-2">
                                             {formatDuration(track.duration_ms)}
                                         </p>
                                     </div>

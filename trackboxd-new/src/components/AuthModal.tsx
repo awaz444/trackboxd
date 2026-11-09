@@ -404,7 +404,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       ></div>
 
       {/* Modal Content */}
-      <div className="bg-[#FFFBEb] rounded-lg p-8 w-full max-w-md border border-[#5C5537]/20 shadow-lg relative z-10 max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#FFFBEb] rounded-lg p-8 w-full max-w-md shadow-lg relative z-10 max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           className="absolute top-4 right-4 text-[#5C5537]/50 hover:text-[#5C5537] transition-colors"

@@ -23,11 +23,11 @@ export default function SignupPrompt({
 
   return (
     <div
-      className={`rounded-xl border border-[#5C5537]/20 bg-[#5C5537]/5 p-5 flex flex-col sm:flex-row sm:items-center gap-4 ${className}`}
+      className={`rounded-2xl bg-[#5C5537]/[0.07] p-5 flex flex-col sm:flex-row sm:items-center gap-4 ${className}`}
     >
       <div className="flex-1 min-w-0">
         <p className="font-bold text-[#5C5537]">{heading}</p>
-        <p className="text-sm text-[#5C5537]/70 mt-1">{body}</p>
+        <p className="text-sm text-[#6B6547] mt-1">{body}</p>
       </div>
       <Link
         href="/?auth=signup"

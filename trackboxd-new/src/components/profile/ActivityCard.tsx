@@ -33,16 +33,16 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
   };
 
   return (
-    <div className="flex items-center gap-4 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-3 hover:shadow-md transition-shadow">
+    <div className="flex items-center gap-4 py-2">
       <div className="text-[#5C5537]">
         {getActivityIcon(activity.type)}
       </div>
       <div className="flex-1 min-w-0">
         <div className="font-medium text-[#5C5537] capitalize">{activity.type}</div>
         <div className="text-[#5C5537] truncate">{activity.track.title}</div>
-        <div className="text-sm text-[#5C5537]/70 truncate">{activity.track.artist}</div>
+        <div className="text-sm text-[#6B6547] truncate">{activity.track.artist}</div>
       </div>
-      <div className="text-xs text-[#5C5537]/70 whitespace-nowrap">
+      <div className="text-xs text-[#6B6547] whitespace-nowrap">
         {activity.timestamp}
       </div>
     </div>

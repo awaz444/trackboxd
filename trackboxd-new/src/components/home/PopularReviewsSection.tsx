@@ -68,7 +68,7 @@ const ReviewRow = ({
   return (
     <Link
       href={`/reviews/${review.id}`}
-      className="block bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4 hover:shadow-md transition-shadow"
+      className="block py-3 group"
     >
       <div className="flex gap-4">
         {/* Cover */}
@@ -82,7 +82,7 @@ const ReviewRow = ({
         />
         <div className="min-w-0 flex-1">
           {/* Item info */}
-          <p className="text-xs text-[#5C5537]/60 truncate">
+          <p className="text-xs text-[#6B6547] truncate">
             {review.artist} — {review.item_name}
           </p>
           {/* User + stars */}
@@ -110,7 +110,7 @@ const ReviewRow = ({
           className={`flex items-center gap-1 text-xs flex-shrink-0 self-start focus:outline-none ${
             isLoading || !user
               ? "cursor-not-allowed text-[#5C5537]/40"
-              : "cursor-pointer text-[#5C5537]/60 hover:text-[#5C5537]"
+              : "cursor-pointer text-[#6B6547] hover:text-[#5C5537]"
           }`}
         >
           <Heart className={`w-3.5 h-3.5 ${isLiked ? "fill-[#5C5537] text-[#5C5537]" : ""}`} />

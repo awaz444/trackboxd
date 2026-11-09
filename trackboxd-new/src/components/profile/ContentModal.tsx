@@ -27,7 +27,7 @@ const ContentModal: React.FC<ContentModalProps> = ({
       />
       
       {/* Modal */}
-      <div className="relative bg-[#FFFBEb] rounded-lg w-full max-w-2xl mx-4 z-50 border border-[#5C5537]/20 max-h-[80vh] flex flex-col">
+      <div className="relative bg-[#FFFBEb] rounded-lg w-full max-w-2xl mx-4 z-50 shadow-xl max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-[#5C5537]/10 flex-shrink-0">
           <h2 className="text-lg font-semibold text-[#5C5537]">{title}</h2>

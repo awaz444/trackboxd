@@ -21,10 +21,10 @@ const SpotifyTrackCard: React.FC<SpotifyTrackCardProps> = ({
     onAnnotationClick,
 }) => {
     return (
-        <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
+        <div className="group">
             <Link href={`/songs/${track.id}`}>
                 <div className="cursor-pointer">
-                    <div className="w-full h-48 relative overflow-hidden rounded-lg bg-[#5C5537]/10">
+                    <div className="w-full aspect-square relative overflow-hidden rounded-xl bg-[#5C5537]/10 transition-opacity group-hover:opacity-90">
                         <img
                             src={
                                 track.album.images[0]?.url ||
@@ -38,15 +38,15 @@ const SpotifyTrackCard: React.FC<SpotifyTrackCardProps> = ({
                         />
                     </div>
 
-                    <div className="mt-3 p-4">
+                    <div className="pt-3 pb-2">
                         <div>
                             <h3 className="font-semibold text-[#5C5537] hover:text-[#5C5537]/80 transition-colors">
                                 {track.name}
                             </h3>
-                            <p className="text-[#5C5537]/70 text-sm truncate">
+                            <p className="text-[#6B6547] text-sm truncate">
                                 {track.artists.map((a) => a.name).join(", ")}
                             </p>
-                            <p className="text-[#5C5537]/70 text-xs truncate">
+                            <p className="text-[#6B6547] text-xs truncate">
                                 {track.album.name}
                             </p>
                         </div>
@@ -54,7 +54,7 @@ const SpotifyTrackCard: React.FC<SpotifyTrackCardProps> = ({
                 </div>
             </Link>
 
-            <div className="px-4 pb-4">
+            <div className="pb-2">
                 <div className="flex flex-wrap gap-2">
                     <button
                         onClick={(e) => {
@@ -65,7 +65,7 @@ const SpotifyTrackCard: React.FC<SpotifyTrackCardProps> = ({
                         className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors ${
                             isLiked
                                 ? "bg-[#FFBA00] text-[#5C5537] border border-[#FFBA00]"
-                                : "bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/30 hover:bg-[#5C5537]/10 hover:border-[#5C5537]/50"
+                                : "bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15"
                         }`}>
                         {isLoading ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
@@ -81,7 +81,7 @@ const SpotifyTrackCard: React.FC<SpotifyTrackCardProps> = ({
                             e.preventDefault();
                             onReviewClick(track);
                         }}
-                        className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/30 hover:bg-[#5C5537]/10 hover:border-[#5C5537]/50 transition-colors">
+                        className="flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15 transition-colors">
                         <Star className="w-3 h-3" />
                         <span>Review</span>
                     </button>
@@ -90,7 +90,7 @@ const SpotifyTrackCard: React.FC<SpotifyTrackCardProps> = ({
                             e.preventDefault();
                             onAnnotationClick(track);
                         }}
-                        className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/30 hover:bg-[#5C5537]/10 hover:border-[#5C5537]/50 transition-colors">
+                        className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15 transition-colors">
                         <MessageCircle className="w-3 h-3" />
                         <span>Annotate</span>
                     </button>

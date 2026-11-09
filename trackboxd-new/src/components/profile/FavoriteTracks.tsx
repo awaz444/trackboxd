@@ -64,17 +64,17 @@ const FavoriteTracks: React.FC<FavoriteTracksProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {currentTracks.map((track) => (
           <Link key={track.id} href={`/songs/${track.id}`}>
-            <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg overflow-hidden group cursor-pointer">
-              <div className="relative aspect-square">
+            <div className="group cursor-pointer">
+              <div className="relative aspect-square rounded-xl overflow-hidden bg-[#5C5537]/10 transition-opacity group-hover:opacity-90">
                 <img
                   src={track.cover_url || "/default-avatar.jpg"}
                   alt={`${track.name} cover`}
                   className="w-full h-full object-cover transition-transform duration-300 "
                 />
               </div>
-              <div className="p-2 bg-[#FFFBEb]">
+              <div className="pt-2">
                 <div className="font-bold text-[#5C5537] truncate text-sm">{track.name}</div>
-                <div className="text-xs text-[#5C5537]/70 truncate">{track.artist}</div>
+                <div className="text-xs text-[#6B6547] truncate">{track.artist}</div>
               </div>
             </div>
           </Link>

@@ -497,7 +497,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-4 p-4 bg-[#FFFBEb] rounded-lg border border-[#5C5537]/20">
+                    <div className="flex items-center gap-4 p-4 bg-[#5C5537]/5 rounded-xl">
                         <div className="relative">
                             {getImageUrl(selectedItem) ? (
                                 <img

@@ -533,9 +533,9 @@ const SongDetailClient = ({
 
             <div className="max-w-5xl mx-auto px-4 py-6">
                 {/* Compact Track Header */}
-                <div className="flex flex-col md:flex-row gap-6 mb-8">
-                    <div className="w-full md:w-1/3 flex justify-center">
-                        <div className="w-56 h-56 relative overflow-hidden rounded-xl shadow border border-[#5C5537]/20">
+                <div className="flex flex-col md:flex-row gap-5 md:gap-6 mb-8">
+                    <div className="w-full md:w-1/3 flex md:justify-center">
+                        <div className="w-full aspect-square sm:max-w-md sm:mx-auto md:mx-0 md:w-56 md:h-56 relative overflow-hidden rounded-2xl md:rounded-xl bg-[#5C5537]/10">
                             <img
                                 src={
                                     track.album.images[0]?.url ||
@@ -551,22 +551,22 @@ const SongDetailClient = ({
                     </div>
 
                     <div className="w-full md:w-2/3">
-                        <h1 className="text-2xl md:text-3xl font-bold text-[#5C5537] mb-1">
+                        <h1 className="text-3xl leading-tight font-bold text-[#5C5537] mb-1">
                             {track.name}
                         </h1>
-                        <p className="text-lg text-[#5C5537]/70 mb-4">
+                        <p className="text-lg text-[#6B6547] mb-4">
                             {track.artists.map((a) => a.name).join(", ")}
                         </p>
 
                         <div className="grid grid-cols-2 gap-3 mb-6">
                             <div>
-                                <p className="text-xs text-[#5C5537]/70">Album</p>
+                                <p className="text-xs text-[#6B6547]">Album</p>
                                 <p className="text-sm font-medium text-[#5C5537]">
                                     {track.album.name}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-xs text-[#5C5537]/70">
+                                <p className="text-xs text-[#6B6547]">
                                     Release Date
                                 </p>
                                 <p className="text-sm font-medium text-[#5C5537]">
@@ -578,7 +578,7 @@ const SongDetailClient = ({
                                 </p>
                             </div>
                             <div>
-                                <p className="text-xs text-[#5C5537]/70">
+                                <p className="text-xs text-[#6B6547]">
                                     Duration
                                 </p>
                                 <p className="text-sm font-medium text-[#5C5537]">
@@ -591,10 +591,10 @@ const SongDetailClient = ({
                             <button
                                 onClick={handleLikeClick}
                                 disabled={likeLoading}
-                                className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors cursor-pointer ${
+                                className={`flex items-center space-x-1.5 px-4 h-11 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                                     isLiked
-                                        ? "bg-[#5C5537] text-[#FFFBEb] border border-[#5C5537]"
-                                        : "bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/30 hover:bg-[#5C5537]/10 hover:border-[#5C5537]/50"
+                                        ? "bg-[#5C5537] text-[#FFFBEb]"
+                                        : "bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15"
                                 }`}>
                                 {likeLoading ? (
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
@@ -610,7 +610,7 @@ const SongDetailClient = ({
 
                             <button
                                 onClick={() => track && setShowReviewForm(true)}
-                                className="flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/30 hover:bg-[#5C5537]/10 hover:border-[#5C5537]/50 cursor-pointer">
+                                className="flex items-center space-x-1.5 px-4 h-11 rounded-full text-sm font-medium bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15 cursor-pointer">
                                 <span>Review</span>
                             </button>
 
@@ -618,7 +618,7 @@ const SongDetailClient = ({
                                 onClick={() =>
                                     track && setShowAnnotationForm(true)
                                 }
-                                className="flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/30 hover:bg-[#5C5537]/10 hover:border-[#5C5537]/50 cursor-pointer">
+                                className="flex items-center space-x-1.5 px-4 h-11 rounded-full text-sm font-medium bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15 cursor-pointer">
                                 <span>Annotate</span>
                             </button>
                         </div>
@@ -633,12 +633,12 @@ const SongDetailClient = ({
                 />
 
                 <div className="mb-8">
-                    <div className="grid grid-cols-4 gap-2 border-y border-[#5C5537]/20 py-5">
+                    <div className="grid grid-cols-4 gap-2 py-2">
                         <div className="text-center">
                             <div className="text-xl font-bold text-[#5C5537]">
                                 {trackStats.likes}
                             </div>
-                            <div className="text-xs text-[#5C5537]/70 flex items-center justify-center">
+                            <div className="text-xs text-[#6B6547] flex items-center justify-center">
                                 <Heart className="w-3 h-3 mr-1" /> Likes
                             </div>
                         </div>
@@ -646,7 +646,7 @@ const SongDetailClient = ({
                             <div className="text-xl font-bold text-[#5C5537]">
                                 {trackStats.reviews}
                             </div>
-                            <div className="text-xs text-[#5C5537]/70 flex items-center justify-center">
+                            <div className="text-xs text-[#6B6547] flex items-center justify-center">
                                 <Star className="w-3 h-3 mr-1" /> Reviews
                             </div>
                         </div>
@@ -654,7 +654,7 @@ const SongDetailClient = ({
                             <div className="text-xl font-bold text-[#5C5537]">
                                 {trackStats.annotations}
                             </div>
-                            <div className="text-xs text-[#5C5537]/70 flex items-center justify-center">
+                            <div className="text-xs text-[#6B6547] flex items-center justify-center">
                                 <MessageCircle className="w-3 h-3 mr-1" />{" "}
                                 Annotations
                             </div>
@@ -663,7 +663,7 @@ const SongDetailClient = ({
                             <div className="text-xl font-bold text-[#5C5537]">
                                 {trackStats.avgRating.toFixed(1)}
                             </div>
-                            <div className="text-xs text-[#5C5537]/70">
+                            <div className="text-xs text-[#6B6547]">
                                 Avg Rating
                             </div>
                         </div>
@@ -692,7 +692,7 @@ const SongDetailClient = ({
                                             }}></div>
                                     </div>
                                 </div>
-                                <div className="w-10 text-right text-xs text-[#5C5537]/70">
+                                <div className="w-10 text-right text-xs text-[#6B6547]">
                                     {ratingDistribution[stars - 1]}%
                                 </div>
                             </div>
@@ -707,7 +707,7 @@ const SongDetailClient = ({
                             className={`py-2 px-4 text-sm font-medium ${
                                 activeTab === "reviews"
                                     ? "text-[#5C5537] border-b-2 border-[#5C5537]"
-                                    : "text-[#5C5537]/70"
+                                    : "text-[#6B6547]"
                             } cursor-pointer`}
                             onClick={() => setActiveTab("reviews")}>
                             Reviews ({reviews.length})
@@ -716,7 +716,7 @@ const SongDetailClient = ({
                             className={`py-2 px-4 text-sm font-medium ${
                                 activeTab === "annotations"
                                     ? "text-[#5C5537] border-b-2 border-[#5C5537]"
-                                    : "text-[#5C5537]/70"
+                                    : "text-[#6B6547]"
                             } cursor-pointer`}
                             onClick={() => setActiveTab("annotations")}>
                             Annotations ({annotations.length})
@@ -731,7 +731,7 @@ const SongDetailClient = ({
                                     <article
                                         itemScope={ctx.index === 0}
                                         itemType={ctx.index === 0 ? "https://schema.org/Review" : undefined}
-                                        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4"
+                                        className="py-3"
                                     >
                                         <header className="flex justify-between items-start min-h-[3.5rem]">
                                             {ctx.index === 0 ? (
@@ -756,14 +756,14 @@ const SongDetailClient = ({
                                                             <div className="mt-1"><RatingStars rating={ctx.rating} /></div>
                                                         </div>
                                                         {ctx.isThread && (
-                                                            <p className="mt-1 text-xs text-[#5C5537]/60">
+                                                            <p className="mt-1 text-xs text-[#6B6547]">
                                                                 {ctx.count} reviews over time
                                                             </p>
                                                         )}
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <span className="text-xs font-medium text-[#5C5537]/60">
+                                                <span className="text-xs font-medium text-[#6B6547]">
                                                     Update {ctx.index}
                                                 </span>
                                             )}
@@ -776,14 +776,14 @@ const SongDetailClient = ({
                                                     className={`w-4 h-4 transition-all duration-200 ${
                                                         reviewLikes[review.id]
                                                             ? "text-[#5C5537] fill-[#5C5537]"
-                                                            : "text-[#5C5537]/50 group-hover:text-[#5C5537]"
+                                                            : "text-[#6B6547] group-hover:text-[#5C5537]"
                                                     }`}
                                                 />
                                                 <span
                                                     className={`text-sm transition-colors duration-200 ${
                                                         reviewLikes[review.id]
                                                             ? "text-[#5C5537] font-medium"
-                                                            : "text-[#5C5537]/70 group-hover:text-[#5C5537]"
+                                                            : "text-[#6B6547] group-hover:text-[#5C5537]"
                                                     }`}
                                                 >
                                                     {reviewLikeCounts[review.id] ?? review.like_count}
@@ -794,7 +794,7 @@ const SongDetailClient = ({
                                             {review.text}
                                         </p>
                                         <footer className="flex justify-between items-center text-xs">
-                                            <time dateTime={review.created_at} className="text-[#5C5537]/70">
+                                            <time dateTime={review.created_at} className="text-[#6B6547]">
                                                 {formatDate(review.created_at)}
                                             </time>
                                         </footer>
@@ -816,7 +816,7 @@ const SongDetailClient = ({
                                         key={annotation.id}
                                         itemScope
                                         itemType="https://schema.org/Comment"
-                                        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4"
+                                        className="py-3"
                                     >
                                         {/* Timestamp reference — keeps lyric position and annotation body together for LLM crawlers */}
                                         <blockquote
@@ -842,7 +842,7 @@ const SongDetailClient = ({
                                                 </span>
                                                 <time
                                                     dateTime={`PT${Math.floor(annotation.timestamp)}S`}
-                                                    className="text-xs text-[#5C5537]/70"
+                                                    className="text-xs text-[#6B6547]"
                                                 >
                                                     at {timestampStr}
                                                 </time>
@@ -856,7 +856,7 @@ const SongDetailClient = ({
                                         </aside>
 
                                         <footer className="flex justify-between items-center text-xs">
-                                            <time dateTime={annotation.created_at} className="text-[#5C5537]/70">
+                                            <time dateTime={annotation.created_at} className="text-[#6B6547]">
                                                 {formatDate(annotation.created_at)}
                                             </time>
                                             <button
@@ -868,14 +868,14 @@ const SongDetailClient = ({
                                                     className={`w-4 h-4 transition-all duration-200 ${
                                                         annotationLikes[annotation.id]
                                                             ? "text-[#5C5537] fill-[#5C5537]"
-                                                            : "text-[#5C5537]/50 group-hover:text-[#5C5537]"
+                                                            : "text-[#6B6547] group-hover:text-[#5C5537]"
                                                     }`}
                                                 />
                                                 <span
                                                     className={`text-sm transition-colors duration-200 ${
                                                         annotationLikes[annotation.id]
                                                             ? "text-[#5C5537] font-medium"
-                                                            : "text-[#5C5537]/70 group-hover:text-[#5C5537]"
+                                                            : "text-[#6B6547] group-hover:text-[#5C5537]"
                                                     }`}
                                                 >
                                                     {annotationLikeCounts[annotation.id] ?? annotation.like_count}
@@ -893,7 +893,7 @@ const SongDetailClient = ({
                             <div
                                 className="absolute inset-0 bg-[#5C5537]/20"
                                 onClick={() => setShowReviewForm(false)}></div>
-                            <div className="bg-[#FFFBEb] rounded-lg p-6 w-full max-w-2xl border border-[#5C5537]/20 shadow-lg relative z-10">
+                            <div className="bg-[#FFFBEb] rounded-lg p-6 w-full max-w-2xl shadow-lg relative z-10">
                                 <ReviewForm
                                     onClose={() => setShowReviewForm(false)}
                                     lockedRating={
@@ -920,7 +920,7 @@ const SongDetailClient = ({
                                 onClick={() =>
                                     setShowAnnotationForm(false)
                                 }></div>
-                            <div className="bg-[#FFFBEb] rounded-lg p-6 w-full max-w-2xl border border-[#5C5537]/20 shadow-lg relative z-10">
+                            <div className="bg-[#FFFBEb] rounded-lg p-6 w-full max-w-2xl shadow-lg relative z-10">
                                 <AnnotationForm
                                     onClose={() => setShowAnnotationForm(false)}
                                     initialTrack={{

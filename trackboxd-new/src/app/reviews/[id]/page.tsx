@@ -124,14 +124,14 @@ export default async function ReviewPage({ params }: PageProps) {
         {/* Back link */}
         <Link
           href={review.spotify_items?.type === 'album' ? `/albums/${review.item_id}` : `/songs/${review.item_id}`}
-          className="inline-flex items-center gap-1.5 text-sm text-[#5C5537]/60 hover:text-[#5C5537] transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-sm text-[#6B6547] hover:text-[#5C5537] transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           {trackName}
         </Link>
 
         {/* Featured review card */}
-        <div className="rounded-2xl border border-[#5C5537]/20 bg-[#FFFBEb] p-6">
+        <div className="py-2">
           {/* Track header */}
           <div className="flex gap-4 items-start mb-5">
             {coverUrl && (
@@ -176,7 +176,7 @@ export default async function ReviewPage({ params }: PageProps) {
                     @{username}
                     <VipBadge username={username} />
                   </p>
-                  <p className="text-[#5C5537]/50 text-xs">{timeAgo}</p>
+                  <p className="text-[#6B6547] text-xs">{timeAgo}</p>
                 </div>
               </Link>
 
@@ -204,7 +204,7 @@ export default async function ReviewPage({ params }: PageProps) {
         <div className="mt-6 grid grid-cols-2 gap-4">
           <Link
             href={review.spotify_items?.type === 'album' ? `/albums/${review.item_id}` : `/songs/${review.item_id}`}
-            className="bg-[#FFFBEb] border border-[#5C5537]/15 rounded-xl p-4 flex gap-3 items-center hover:shadow-md transition-shadow group"
+            className="py-2 flex gap-3 items-center group"
           >
             {coverUrl && (
               <img src={coverUrl} alt={trackName} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
@@ -214,7 +214,7 @@ export default async function ReviewPage({ params }: PageProps) {
                 {review.spotify_items?.type === 'album' ? 'Album' : 'Track'}
               </p>
               <p className="font-semibold text-[#5C5537] text-sm truncate">{trackName}</p>
-              <p className="text-[#5C5537]/60 text-xs truncate">{artistName}</p>
+              <p className="text-[#6B6547] text-xs truncate">{artistName}</p>
               <p className="text-[#5C5537]/40 text-xs mt-1 group-hover:text-[#5C5537]/60 transition-colors">
                 View on Trackboxd →
               </p>
@@ -223,7 +223,7 @@ export default async function ReviewPage({ params }: PageProps) {
 
           <Link
             href={`/profile/${encodeURIComponent(username)}`}
-            className="bg-[#FFFBEb] border border-[#5C5537]/15 rounded-xl p-4 flex gap-3 items-center hover:shadow-md transition-shadow group"
+            className="py-2 flex gap-3 items-center group"
           >
             <img
               src={avatarUrl}

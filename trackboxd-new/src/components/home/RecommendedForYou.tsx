@@ -37,10 +37,10 @@ export default function RecommendedForYou({ data, fallbackData = [], likes = {} 
             : "Discover popular music"
         }
       />
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+      <div className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-1 sm:mx-0 sm:px-0 sm:overflow-visible sm:grid sm:gap-4 sm:grid-cols-3 md:grid-cols-5">
         {items.map((item) => (
+          <div key={item.id} className="w-[38%] shrink-0 snap-start sm:w-auto">
           <MediaCard
-            key={item.id}
             coverUrl={item.cover_url || "/default-album.jpg"}
             name={item.name}
             artist={item.artist}
@@ -49,6 +49,7 @@ export default function RecommendedForYou({ data, fallbackData = [], likes = {} 
             itemId={item.id}
             isLiked={likes[item.id] || false}
           />
+          </div>
         ))}
       </div>
     </section>

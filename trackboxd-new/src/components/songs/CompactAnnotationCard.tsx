@@ -95,7 +95,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
       {/* Card */}
       <div
         onClick={() => setIsModalOpen(true)}
-        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+        className="py-3 cursor-pointer"
       >
         <div className="flex items-start gap-2">
           <div className="flex-1 min-w-0">
@@ -112,7 +112,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
                 </Link>
                 <VipBadge username={annotation.users.name} />
               </div>
-              <div className="flex items-center text-[#5C5537]/70 text-xs">
+              <div className="flex items-center text-[#6B6547] text-xs">
                 <Clock className="h-4 w-4 mr-1" />
                 <span>{timestamp}</span>
               </div>
@@ -120,7 +120,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
 
             <div className="mb-2">
               <h3 className="font-semibold text-[#5C5537] text-sm">{trackName}</h3>
-              <p className="text-[#5C5537]/70 text-xs">{artistNames}</p>
+              <p className="text-[#6B6547] text-xs">{artistNames}</p>
             </div>
 
             {annotation.text && (
@@ -128,7 +128,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
             )}
 
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#5C5537]/70">{timeAgo}</span>
+              <span className="text-xs text-[#6B6547]">{timeAgo}</span>
               <div className="flex items-center gap-3">
                 <button
                   onClick={(e) => { e.stopPropagation(); handleLikeClick(); }}
@@ -136,7 +136,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
                   className={`flex items-center gap-1 text-xs focus:outline-none ${
                     isLoading || initialLoad || !user
                       ? "cursor-not-allowed text-[#5C5537]/40"
-                      : "cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]"
+                      : "cursor-pointer text-[#6B6547] hover:text-[#5C5537]"
                   }`}
                 >
                   {initialLoad ? (
@@ -151,7 +151,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
                 <Link
                   href={`/songs/${annotation.track_id}`}
                   onClick={(e) => e.stopPropagation()}
-                  className="text-xs text-[#5C5537]/70 hover:text-[#5C5537]"
+                  className="text-xs text-[#6B6547] hover:text-[#5C5537]"
                 >
                   View track
                 </Link>
@@ -165,12 +165,12 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-[#FFFBEb] rounded-xl w-full max-w-lg border border-[#5C5537]/20 shadow-xl max-h-[85vh] flex flex-col">
+          <div className="relative bg-[#FFFBEb] rounded-xl w-full max-w-lg shadow-xl max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#5C5537]/10 flex-shrink-0">
               <span className="text-sm font-semibold text-[#5C5537]">Annotation</span>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-[#5C5537]/60 hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1.5 rounded-full transition-colors"
+                className="text-[#6B6547] hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1.5 rounded-full transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -187,16 +187,16 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
                 )}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-[#5C5537] text-lg leading-tight">{trackName}</h3>
-                  <p className="text-[#5C5537]/70 text-sm mt-0.5">{artistNames}</p>
+                  <p className="text-[#6B6547] text-sm mt-0.5">{artistNames}</p>
                   <div className="flex items-center gap-1.5 mt-2">
-                    <Clock className="w-3.5 h-3.5 text-[#5C5537]/60 flex-shrink-0" />
-                    <span className="text-xs text-[#5C5537]/60">at {timestamp}</span>
+                    <Clock className="w-3.5 h-3.5 text-[#6B6547] flex-shrink-0" />
+                    <span className="text-xs text-[#6B6547]">at {timestamp}</span>
                   </div>
                 </div>
               </div>
 
               <div className="border-t border-[#5C5537]/10 pt-4 text-[#5C5537] text-sm leading-relaxed whitespace-pre-wrap">
-                {annotation.text || <span className="italic text-[#5C5537]/50">No annotation text.</span>}
+                {annotation.text || <span className="italic text-[#6B6547]">No annotation text.</span>}
               </div>
             </div>
 
@@ -210,20 +210,20 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
                 />
                 <Link
                   href={`/profile/${encodeURIComponent(annotation.users.name)}`}
-                  className="text-sm text-[#5C5537]/70 hover:text-[#5C5537] truncate"
+                  className="text-sm text-[#6B6547] hover:text-[#5C5537] truncate"
                 >
                   @{annotation.users.name}
                 </Link>
                 <VipBadge username={annotation.users.name} />
                 <span className="text-[#5C5537]/30 text-xs">·</span>
-                <span className="text-xs text-[#5C5537]/50 flex-shrink-0">{timeAgo}</span>
+                <span className="text-xs text-[#6B6547] flex-shrink-0">{timeAgo}</span>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0 ml-3">
                 <button
                   onClick={handleLikeClick}
                   disabled={isLoading || !user}
                   className={`flex items-center gap-1.5 text-sm transition-colors ${
-                    isLiked ? "text-[#5C5537]" : "text-[#5C5537]/50 hover:text-[#5C5537]"
+                    isLiked ? "text-[#5C5537]" : "text-[#6B6547] hover:text-[#5C5537]"
                   }`}
                 >
                   <Heart className={`w-4 h-4 ${isLiked ? "fill-[#5C5537]" : ""}`} />
@@ -231,7 +231,7 @@ const CompactAnnotationCard: React.FC<CompactAnnotationCardProps> = ({ annotatio
                 </button>
                 <Link
                   href={`/songs/${annotation.track_id}`}
-                  className="text-xs text-[#5C5537]/70 hover:text-[#5C5537] hover:underline"
+                  className="text-xs text-[#6B6547] hover:text-[#5C5537] hover:underline"
                 >
                   View track
                 </Link>

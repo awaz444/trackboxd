@@ -159,7 +159,7 @@ const NotificationsPage = () => {
           {unreadCount > 0 && (
             <button 
               onClick={markAllAsRead}
-              className="text-sm text-[#5C5537]/70 hover:text-[#5C5537] flex items-center gap-1"
+              className="text-sm text-[#6B6547] hover:text-[#5C5537] flex items-center gap-1"
             >
               <Check className="w-4 h-4" />
               Mark all read
@@ -182,9 +182,9 @@ const NotificationsPage = () => {
             </button>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="text-center py-12 bg-[#5C5537]/5 rounded-lg border border-[#5C5537]/10">
+          <div className="text-center py-12 bg-[#5C5537]/5 rounded-2xl">
             <Bell className="w-12 h-12 text-[#5C5537]/30 mx-auto mb-3" />
-            <p className="text-[#5C5537]/70">No notifications yet</p>
+            <p className="text-[#6B6547]">No notifications yet</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -229,7 +229,7 @@ const NotificationsPage = () => {
                     <span className={`font-semibold ${notification.is_read ? "text-[#5C5537]" : "text-[#FFFBEb]"}`}>
                       {notification.source_user?.name || "Someone"}
                     </span>
-                    <span className={`text-sm ${notification.is_read ? "text-[#5C5537]/70" : "text-[#FFFBEb]/70"}`}>
+                    <span className={`text-sm ${notification.is_read ? "text-[#6B6547]" : "text-[#FFFBEb]/70"}`}>
                       {formatTimeAgo(notification.created_at)}
                     </span>
                   </div>

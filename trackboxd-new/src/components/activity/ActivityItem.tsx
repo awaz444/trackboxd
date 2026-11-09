@@ -176,7 +176,7 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                 alt={activity.user.name}
                 className="w-6 h-6 rounded-full"
               />
-              <span className="text-sm text-[#5C5537]/70 inline-flex items-center gap-1 flex-wrap">
+              <span className="text-sm text-[#6B6547] inline-flex items-center gap-1 flex-wrap">
                 <Link href={`/profile/${encodeURIComponent(activity.user.name)}`} className="hover:underline">
                   {activity.user.name}
                 </Link>
@@ -207,7 +207,7 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                     {activity.title}
                   </Link>
                 </h4>
-                <p className="text-sm text-[#5C5537]/70">
+                <p className="text-sm text-[#6B6547]">
                   by {activity.artist}
                 </p>
               </div>
@@ -231,7 +231,7 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                 alt={activity.user.name}
                 className="w-6 h-6 rounded-full"
               />
-              <span className="text-sm text-[#5C5537]/70 inline-flex items-center gap-1 flex-wrap">
+              <span className="text-sm text-[#6B6547] inline-flex items-center gap-1 flex-wrap">
                 <Link href={`/profile/${encodeURIComponent(activity.user.name)}`} className="hover:underline">
                   {activity.user.name}
                 </Link>
@@ -258,7 +258,7 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                     {activity.title}
                   </Link>
                 </h4>
-                <p className="text-sm text-[#5C5537]/70">
+                <p className="text-sm text-[#6B6547]">
                   by {activity.artist} {activity.timestamp !== undefined && 
                     `· at ${formatDuration(activity.timestamp)}`}
                 </p>
@@ -345,7 +345,7 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                 alt={activity.user.name}
                 className="w-6 h-6 rounded-full"
               />
-              <span className="text-sm text-[#5C5537]/70 inline-flex items-center gap-1 flex-wrap">
+              <span className="text-sm text-[#6B6547] inline-flex items-center gap-1 flex-wrap">
                 <Link
                   href={`/profile/${encodeURIComponent(activity.user.name)}`}
                   className="hover:underline"
@@ -385,7 +385,7 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
                   )}
                 </h4>
                 {activity.artist && (
-                  <p className="text-sm text-[#5C5537]/70">by {activity.artist}</p>
+                  <p className="text-sm text-[#6B6547]">by {activity.artist}</p>
                 )}
               </div>
             </div>
@@ -407,17 +407,17 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
       {/* Timeline dot */}
       <div className="absolute left-4/5 top-0 transform -translate-x-4 w-3 h-3 rounded-full bg-[#5C5537] border-2 border-[#FFFBEb]" />
 
-      <div className="p-4 space-y-1">
+      <div className="py-4 pl-4 space-y-1">
         {renderContent()}
         <div className="flex items-center justify-between">
-          <span className="text-xs text-[#5C5537]/70">{timeAgo}</span>
+          <span className="text-xs text-[#6B6547]">{timeAgo}</span>
           {/* No actions on "like" type events */}
           {activity.type !== "like" && (
             <div className="flex items-center gap-3">
               {/* Share */}
               <button
                 onClick={handleShare}
-                className="flex items-center gap-1 text-xs text-[#5C5537]/50 hover:text-[#5C5537] transition-colors"
+                className="flex items-center justify-center min-w-[40px] min-h-[40px] text-xs text-[#6B6547] hover:text-[#5C5537] transition-colors"
               >
                 {copied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
               </button>
@@ -425,10 +425,10 @@ const ActivityItem = ({ activity, isLast = false }: ActivityItemProps) => {
               <button
                 onClick={handleToggleLike}
                 disabled={isLoading || initialLoad || !user || !effectiveLikeType}
-                className={`group flex items-center gap-1 text-sm focus:outline-none ${
+                className={`group flex items-center gap-1 min-h-[40px] px-1 text-sm focus:outline-none ${
                   isLoading || initialLoad || !user || !effectiveLikeType
                     ? "cursor-not-allowed text-[#5C5537]/40"
-                    : "cursor-pointer text-[#5C5537]/70 hover:text-[#5C5537]"
+                    : "cursor-pointer text-[#6B6547] hover:text-[#5C5537]"
                 }`}
               >
                 <Heart

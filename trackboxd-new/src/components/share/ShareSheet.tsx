@@ -125,7 +125,7 @@ export default function ShareSheet({
       <div className="fixed inset-0 bg-black/40" onClick={() => onOpenChange(false)} />
 
       {/* Sheet */}
-      <div className="relative bg-[#FFFBEb] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm mx-0 sm:mx-4 z-50 border border-[#5C5537]/15 shadow-xl max-h-[90vh] flex flex-col">
+      <div className="relative bg-[#FFFBEb] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm mx-0 sm:mx-4 z-50 shadow-xl max-h-[90vh] flex flex-col">
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#5C5537]/10 flex-shrink-0">
@@ -158,7 +158,7 @@ export default function ShareSheet({
               {/* Instagram Story */}
               <button
                 onClick={handleStoryClick}
-                className="flex items-center gap-3 w-full p-4 rounded-xl border border-[#5C5537]/15 hover:border-[#5C5537]/30 hover:bg-[#5C5537]/5 transition-all text-left"
+                className="flex items-center gap-3 w-full p-4 rounded-xl bg-[#5C5537]/5 hover:bg-[#5C5537]/10 transition-all text-left"
               >
                 <Camera className="w-5 h-5 text-[#5C5537]/55 flex-shrink-0" />
                 <div>
@@ -170,7 +170,7 @@ export default function ShareSheet({
               {/* X */}
               <button
                 onClick={handleShareOnX}
-                className="flex items-center gap-3 w-full p-4 rounded-xl border border-[#5C5537]/15 hover:border-[#5C5537]/30 hover:bg-[#5C5537]/5 transition-all text-left"
+                className="flex items-center gap-3 w-full p-4 rounded-xl bg-[#5C5537]/5 hover:bg-[#5C5537]/10 transition-all text-left"
               >
                 <span className="w-5 h-5 flex items-center justify-center text-[#5C5537]/55 flex-shrink-0 text-sm font-bold leading-none">
                   𝕏
@@ -186,7 +186,7 @@ export default function ShareSheet({
               {/* Copy Link */}
               <button
                 onClick={handleCopyLink}
-                className="flex items-center gap-3 w-full p-4 rounded-xl border border-[#5C5537]/15 hover:border-[#5C5537]/30 hover:bg-[#5C5537]/5 transition-all text-left"
+                className="flex items-center gap-3 w-full p-4 rounded-xl bg-[#5C5537]/5 hover:bg-[#5C5537]/10 transition-all text-left"
               >
                 {copied
                   ? <Check className="w-5 h-5 text-[#5C5537]/55 flex-shrink-0" />
@@ -236,7 +236,7 @@ export default function ShareSheet({
                   <img
                     src={previewUrl}
                     alt="Story card preview"
-                    className="max-h-96 w-auto rounded-xl border border-[#5C5537]/15 shadow-sm"
+                    className="max-h-96 w-auto rounded-xl shadow-sm"
                   />
 
                   <button

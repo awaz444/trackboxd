@@ -172,7 +172,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
             {availablePrompts.map((p) => {
               const existing = responses.find(r => r.promptKey === p.key);
               return (
-                <div key={p.id} className="border border-[#5C5537]/20 rounded-lg p-3 md:p-4 flex flex-col justify-between">
+                <div key={p.id} className="bg-[#5C5537]/5 rounded-xl p-3 md:p-4 flex flex-col justify-between">
                   <div className="text-sm md:text-base text-[#5C5537] mb-2 md:mb-3">{p.question}</div>
                   {existing ? (
                     <div className="flex items-center justify-between mt-auto pt-3 md:pt-4">
@@ -218,7 +218,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
 
           {/* Editor for active prompt */}
           {activePrompt && (
-            <div className="p-3 md:p-4 border border-[#5C5537]/20 rounded-lg">
+            <div className="p-3 md:p-4 bg-[#5C5537]/5 rounded-xl">
               <div className="text-sm md:text-base text-[#5C5537] mb-2 md:mb-3">{activePrompt.question}</div>
 
               {activePrompt.type === 'text' ? (

@@ -82,7 +82,7 @@ const ImportSpotifyPlaylistForm: React.FC<ImportSpotifyPlaylistFormProps> = ({
             )}
 
             {preview && (
-                <div className="border border-[#5C5537]/20 rounded-xl overflow-hidden">
+                <div className="rounded-xl overflow-hidden bg-[#5C5537]/5">
                     {/* Playlist header */}
                     <div className="flex items-center gap-3 p-4 bg-[#5C5537]/5">
                         {preview.cover_url ? (
@@ -99,12 +99,12 @@ const ImportSpotifyPlaylistForm: React.FC<ImportSpotifyPlaylistFormProps> = ({
                         <div className="flex-1 min-w-0">
                             <p className="font-semibold text-[#5C5537] truncate">{preview.title}</p>
                             {preview.subtitle && (
-                                <p className="text-sm text-[#5C5537]/60 line-clamp-2">{preview.subtitle}</p>
+                                <p className="text-sm text-[#6B6547] line-clamp-2">{preview.subtitle}</p>
                             )}
                             {preview.owner && (
                                 <p className="text-xs text-[#5C5537]/40 mt-0.5">by {preview.owner}</p>
                             )}
-                            <p className="text-xs text-[#5C5537]/50 mt-1">
+                            <p className="text-xs text-[#6B6547] mt-1">
                                 {preview.total_tracks} track{preview.total_tracks !== 1 ? "s" : ""}
                             </p>
                         </div>
@@ -125,7 +125,7 @@ const ImportSpotifyPlaylistForm: React.FC<ImportSpotifyPlaylistFormProps> = ({
                                 )}
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm text-[#5C5537] truncate font-medium">{track.name}</p>
-                                    <p className="text-xs text-[#5C5537]/50 truncate">{track.artist}</p>
+                                    <p className="text-xs text-[#6B6547] truncate">{track.artist}</p>
                                 </div>
                             </div>
                         ))}

@@ -124,7 +124,7 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
           {/* Track List */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {tracks.map((track) => (
-              <div key={track.id} className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg overflow-hidden group relative">
+              <div key={track.id} className="rounded-xl overflow-hidden group relative">
                 <div className="relative aspect-square">
                   <img
                     src={track.cover_url || "/default-avatar.jpg"}
@@ -153,7 +153,7 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
 
           {/* Add Track Modal-like Section */}
           {isAddingTrack && (
-            <div className="mt-6 p-4 border border-[#5C5537]/20 rounded-lg">
+            <div className="mt-6 p-4 bg-[#5C5537]/5 rounded-xl">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-medium text-[#5C5537]">Pick up to 4 tracks</h3>
                 <Button

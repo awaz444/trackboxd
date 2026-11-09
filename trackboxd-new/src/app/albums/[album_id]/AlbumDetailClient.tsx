@@ -310,9 +310,9 @@ const AlbumDetailClient = ({
 
             <div className="max-w-5xl mx-auto px-4 py-6">
                 {/* Album Header */}
-                <div className="flex flex-col md:flex-row gap-6 mb-8">
-                    <div className="w-full md:w-1/3 flex justify-center">
-                        <div className="w-56 h-56 relative overflow-hidden rounded-xl shadow border border-[#5C5537]/20">
+                <div className="flex flex-col md:flex-row gap-5 md:gap-6 mb-8">
+                    <div className="w-full md:w-1/3 flex md:justify-center">
+                        <div className="w-full aspect-square sm:max-w-md sm:mx-auto md:mx-0 md:w-56 md:h-56 relative overflow-hidden rounded-2xl md:rounded-xl bg-[#5C5537]/10">
                             <img
                                 src={
                                     album.images[0]?.url || "/default-album.png"
@@ -327,16 +327,16 @@ const AlbumDetailClient = ({
                     </div>
 
                     <div className="w-full md:w-2/3">
-                        <h1 className="text-2xl md:text-3xl font-bold text-[#5C5537] mb-1">
+                        <h1 className="text-3xl leading-tight font-bold text-[#5C5537] mb-1">
                             {album.name}
                         </h1>
-                        <p className="text-lg text-[#5C5537]/70 mb-4">
+                        <p className="text-lg text-[#6B6547] mb-4">
                             {album.artists.map((a) => a.name).join(", ")}
                         </p>
 
                         <div className="grid grid-cols-2 gap-3 mb-6">
                             <div>
-                                <p className="text-xs text-[#5C5537]/70">
+                                <p className="text-xs text-[#6B6547]">
                                     Release Date
                                 </p>
                                 <p className="text-sm font-medium text-[#5C5537]">
@@ -346,13 +346,13 @@ const AlbumDetailClient = ({
                                 </p>
                             </div>
                             <div>
-                                <p className="text-xs text-[#5C5537]/70">Type</p>
+                                <p className="text-xs text-[#6B6547]">Type</p>
                                 <p className="text-sm font-medium text-[#5C5537] capitalize">
                                     {album.album_type}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-xs text-[#5C5537]/70">
+                                <p className="text-xs text-[#6B6547]">
                                     Total Tracks
                                 </p>
                                 <p className="text-sm font-medium text-[#5C5537]">
@@ -365,10 +365,10 @@ const AlbumDetailClient = ({
                             <button
                                 onClick={handleLikeClick}
                                 disabled={likeLoading}
-                                className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors cursor-pointer ${
+                                className={`flex items-center space-x-1.5 px-4 h-11 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                                     isLiked
-                                        ? "bg-[#5C5537] text-[#FFFBEb] border border-[#5C5537]"
-                                        : "bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/30 hover:bg-[#5C5537]/10 hover:border-[#5C5537]/50"
+                                        ? "bg-[#5C5537] text-[#FFFBEb]"
+                                        : "bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15"
                                 }`}>
                                 {likeLoading ? (
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
@@ -384,7 +384,7 @@ const AlbumDetailClient = ({
 
                             <button
                                 onClick={() => album && setShowReviewForm(true)}
-                                className="flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/30 hover:bg-[#5C5537]/10 hover:border-[#5C5537]/50 cursor-pointer">
+                                className="flex items-center space-x-1.5 px-4 h-11 rounded-full text-sm font-medium bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15 cursor-pointer">
                                 <span>Review</span>
                             </button>
                         </div>
@@ -392,12 +392,12 @@ const AlbumDetailClient = ({
                 </div>
 
                 <div className="mb-8">
-                    <div className="grid grid-cols-3 gap-2 border-y border-[#5C5537]/20 py-5">
+                    <div className="grid grid-cols-3 gap-2 py-2">
                         <div className="text-center">
                             <div className="text-xl font-bold text-[#5C5537]">
                                 {albumStats.likes}
                             </div>
-                            <div className="text-xs text-[#5C5537]/70 flex items-center justify-center">
+                            <div className="text-xs text-[#6B6547] flex items-center justify-center">
                                 <Heart className="w-3 h-3 mr-1" /> Likes
                             </div>
                         </div>
@@ -405,7 +405,7 @@ const AlbumDetailClient = ({
                             <div className="text-xl font-bold text-[#5C5537]">
                                 {albumStats.reviews}
                             </div>
-                            <div className="text-xs text-[#5C5537]/70 flex items-center justify-center">
+                            <div className="text-xs text-[#6B6547] flex items-center justify-center">
                                 <Star className="w-3 h-3 mr-1" /> Reviews
                             </div>
                         </div>
@@ -413,7 +413,7 @@ const AlbumDetailClient = ({
                             <div className="text-xl font-bold text-[#5C5537]">
                                 {albumStats.avgRating.toFixed(1)}
                             </div>
-                            <div className="text-xs text-[#5C5537]/70">
+                            <div className="text-xs text-[#6B6547]">
                                 Avg Rating
                             </div>
                         </div>
@@ -442,7 +442,7 @@ const AlbumDetailClient = ({
                                             }}></div>
                                     </div>
                                 </div>
-                                <div className="w-10 text-right text-xs text-[#5C5537]/70">
+                                <div className="w-10 text-right text-xs text-[#6B6547]">
                                     {ratingDistribution[stars - 1]}%
                                 </div>
                             </div>
@@ -457,7 +457,7 @@ const AlbumDetailClient = ({
                             className={`py-2 px-4 text-sm font-medium ${
                                 activeTab === "tracks"
                                     ? "text-[#5C5537] border-b-2 border-[#5C5537]"
-                                    : "text-[#5C5537]/70"
+                                    : "text-[#6B6547]"
                             } cursor-pointer`}
                             onClick={() => setActiveTab("tracks")}>
                             Tracks ({album.total_tracks})
@@ -466,7 +466,7 @@ const AlbumDetailClient = ({
                             className={`py-2 px-4 text-sm font-medium ${
                                 activeTab === "reviews"
                                     ? "text-[#5C5537] border-b-2 border-[#5C5537]"
-                                    : "text-[#5C5537]/70"
+                                    : "text-[#6B6547]"
                             } cursor-pointer`}
                             onClick={() => setActiveTab("reviews")}>
                             Reviews ({reviews.length})
@@ -475,7 +475,7 @@ const AlbumDetailClient = ({
 
                     {activeTab === "tracks" && album.tracks?.items && (
                         <div className="mt-4">
-                            <div className="grid grid-cols-[50px_1fr_80px] gap-4 px-4 py-2 text-sm text-[#5C5537]/70 border-b border-[#5C5537]/20">
+                            <div className="grid grid-cols-[50px_1fr_80px] gap-4 px-4 py-2 text-sm text-[#6B6547] border-b border-[#5C5537]/20">
                                 <div>#</div>
                                 <div>Title</div>
                                 <div className="text-right">Duration</div>
@@ -487,20 +487,20 @@ const AlbumDetailClient = ({
                                     className="block hover:bg-[#5C5537]/5 rounded-lg transition-colors duration-200"
                                 >
                                     <div className="grid grid-cols-[50px_1fr_80px] gap-4 px-4 py-3">
-                                        <div className="text-[#5C5537]/70">
+                                        <div className="text-[#6B6547]">
                                             {track.track_number}
                                         </div>
                                         <div>
                                             <div className="font-medium text-[#5C5537] hover:text-[#5C5537]/80 transition-colors">
                                                 {track.name}
                                             </div>
-                                            <div className="text-sm text-[#5C5537]/70">
+                                            <div className="text-sm text-[#6B6547]">
                                                 {track.artists
                                                     .map((a) => a.name)
                                                     .join(", ")}
                                             </div>
                                         </div>
-                                        <div className="text-right text-[#5C5537]/70">
+                                        <div className="text-right text-[#6B6547]">
                                             {formatDuration(track.duration_ms)}
                                         </div>
                                     </div>
@@ -512,7 +512,7 @@ const AlbumDetailClient = ({
                     {activeTab === "reviews" && (
                         <div className="mt-4 space-y-4">
                             {reviews.length === 0 && !loadingReviews && (
-                                <div className="text-center py-8 text-[#5C5537]/70">
+                                <div className="text-center py-8 text-[#6B6547]">
                                     No reviews yet. Be the first to review this
                                     album!
                                 </div>
@@ -521,7 +521,7 @@ const AlbumDetailClient = ({
                             <ReviewThreads
                                 reviews={reviews}
                                 renderEntry={(review, ctx) => (
-                                    <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4">
+                                    <div className="py-3">
                                         {ctx.index === 0 ? (
                                             <div className="flex justify-between items-start min-h-[3.5rem]">
                                                 <div className="flex items-start gap-3">
@@ -541,7 +541,7 @@ const AlbumDetailClient = ({
                                                             <RatingStars rating={ctx.rating} />
                                                         </div>
                                                         {ctx.isThread && (
-                                                            <p className="mt-1 text-xs text-[#5C5537]/60">
+                                                            <p className="mt-1 text-xs text-[#6B6547]">
                                                                 {ctx.count} reviews over time
                                                             </p>
                                                         )}
@@ -549,7 +549,7 @@ const AlbumDetailClient = ({
                                                 </div>
                                             </div>
                                         ) : (
-                                            <p className="text-xs font-medium text-[#5C5537]/60 mb-2">
+                                            <p className="text-xs font-medium text-[#6B6547] mb-2">
                                                 Update {ctx.index}
                                             </p>
                                         )}
@@ -557,7 +557,7 @@ const AlbumDetailClient = ({
                                             {review.text}
                                         </p>
                                         <div className="flex justify-between items-center text-xs">
-                                            <span className="text-[#5C5537]/70">
+                                            <span className="text-[#6B6547]">
                                                 {formatDate(review.created_at)}
                                             </span>
                                         </div>
@@ -572,7 +572,7 @@ const AlbumDetailClient = ({
                             <div
                                 className="absolute inset-0 bg-[#5C5537]/20"
                                 onClick={() => setShowReviewForm(false)}></div>
-                            <div className="bg-[#FFFBEb] rounded-lg p-6 w-full max-w-2xl border border-[#5C5537]/20 shadow-lg relative z-10">
+                            <div className="bg-[#FFFBEb] rounded-lg p-6 w-full max-w-2xl shadow-lg relative z-10">
                                 <ReviewForm
                                     onClose={() => setShowReviewForm(false)}
                                     lockedRating={

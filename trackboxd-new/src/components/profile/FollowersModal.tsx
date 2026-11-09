@@ -87,7 +87,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
       />
       
       {/* Modal */}
-      <div className="relative bg-[#FFFBEb] rounded-lg w-full max-w-md mx-4 z-50 border border-[#5C5537]/20">
+      <div className="relative bg-[#FFFBEb] rounded-lg w-full max-w-md mx-4 z-50 shadow-xl">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-[#5C5537]/10">
           <h2 className="text-lg font-semibold text-[#5C5537]">Followers</h2>

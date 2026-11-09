@@ -35,7 +35,7 @@ const transformAlbum = (data: any): Album => ({
 });
 
 const SkeletonCard = () => (
-  <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl overflow-hidden animate-pulse">
+  <div className="animate-pulse">
     <div className="aspect-square bg-[#5C5537]/10" />
     <div className="p-3 space-y-2">
       <div className="h-3.5 bg-[#5C5537]/10 rounded w-3/4" />
@@ -198,10 +198,10 @@ const AlbumsPage = () => {
         <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-[#5C5537]">Albums</h1>
-            <p className="text-[#5C5537]/70 mt-2">Discover and explore music collections</p>
+            <p className="text-[#6B6547] mt-2">Discover and explore music collections</p>
           </div>
           <div className="w-full md:w-[320px] relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5C5537]/50 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B6547] w-5 h-5" />
             <input
               type="text"
               placeholder="Search albums..."
@@ -217,7 +217,7 @@ const AlbumsPage = () => {
             {searchTerm && !isSearching && (
               <button
                 onClick={() => { setSearchTerm(""); setShowSearchResults(false); }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -235,7 +235,7 @@ const AlbumsPage = () => {
               </h2>
               <button
                 onClick={() => setShowSearchResults(false)}
-                className="text-sm text-[#5C5537]/70 hover:text-[#5C5537]"
+                className="text-sm text-[#6B6547] hover:text-[#5C5537]"
               >
                 Clear results
               </button>
@@ -243,7 +243,7 @@ const AlbumsPage = () => {
             {searchResults.length > 0 ? (
               <AlbumGrid albums={searchResults} cols={5} />
             ) : (
-              <p className="text-[#5C5537]/70">{isSearching ? "Searching…" : "No albums found"}</p>
+              <p className="text-[#6B6547]">{isSearching ? "Searching…" : "No albums found"}</p>
             )}
           </div>
         )}
@@ -270,7 +270,7 @@ const AlbumsPage = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-[#5C5537]/70">No album reviews yet</p>
+                <p className="text-[#6B6547]">No album reviews yet</p>
               )}
             </div>
 
@@ -294,7 +294,7 @@ const AlbumsPage = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-[#5C5537]/70">No popular album reviews yet</p>
+                <p className="text-[#6B6547]">No popular album reviews yet</p>
               )}
             </div>
 

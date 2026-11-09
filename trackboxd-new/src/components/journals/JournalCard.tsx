@@ -48,9 +48,9 @@ const JournalCard: React.FC<JournalCardProps> = ({
 }) => {
     return (
         <Link href={`/journals/${id}`} className="group block">
-            <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-200 flex flex-col h-full">
+            <div className="flex flex-col h-full">
                 {/* Cover */}
-                <div className="relative aspect-square bg-[#5C5537]/5">
+                <div className="relative aspect-square bg-[#5C5537]/10 rounded-xl overflow-hidden transition-opacity group-hover:opacity-90">
                     <JournalCover coverUrl={cover_url} trackCovers={track_covers} title={title} />
                     {/* Privacy badge */}
                     {!is_public && (
@@ -80,14 +80,14 @@ const JournalCard: React.FC<JournalCardProps> = ({
                 </div>
 
                 {/* Info */}
-                <div className="p-3 flex flex-col gap-1 flex-1">
+                <div className="pt-2.5 flex flex-col gap-1 flex-1">
                     <p className="text-sm font-semibold text-[#5C5537] truncate leading-snug">{title}</p>
                     {subtitle && (
-                        <p className="text-xs text-[#5C5537]/60 line-clamp-2">{subtitle}</p>
+                        <p className="text-xs text-[#6B6547] line-clamp-2">{subtitle}</p>
                     )}
                     <div className="mt-auto pt-2">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs text-[#5C5537]/50">
+                            <span className="text-xs text-[#6B6547]">
                                 {reviewed_tracks}/{total_tracks} reviewed
                             </span>
                             {source_type === "spotify_playlist" && (

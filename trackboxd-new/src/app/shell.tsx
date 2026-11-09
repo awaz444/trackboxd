@@ -5,9 +5,11 @@ import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import AuthGuard from '@/components/AuthGuard';
 import { initAnalytics } from '@/lib/analytics';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user } = useAuth();
   React.useEffect(() => {
     initAnalytics();
 
@@ -33,7 +35,10 @@ export default function ClientShell({ children }: { children: React.ReactNode })
   return (
     <AuthGuard>
       {!hideHeader && <Header />}
-      {children}
+      {/* Leave room for the phone bottom tab bar (rendered by Header when signed in). */}
+      <div className={!hideHeader && user ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' : undefined}>
+        {children}
+      </div>
     </AuthGuard>
   );
 }

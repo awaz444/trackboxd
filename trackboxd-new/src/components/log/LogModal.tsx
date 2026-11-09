@@ -24,7 +24,7 @@ const LogModal: React.FC<LogModalProps> = ({ isOpen, onClose }) => {
             {/* Modal Container */}
             <div className="flex items-center justify-center min-h-screen p-4">
                 <div
-                    className="relative bg-[#FFFBEb] rounded-lg shadow-lg w-full max-w-2xl border border-[#5C5537]/20 overflow-hidden"
+                    className="relative bg-[#FFFBEb] rounded-lg shadow-lg w-full max-w-2xl overflow-hidden"
                     onClick={(e) => e.stopPropagation()}>
                     {/* Modal Header */}
                     <div className="bg-[#5C5537] p-4 flex items-center justify-between">

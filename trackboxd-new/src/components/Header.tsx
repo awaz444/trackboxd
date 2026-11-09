@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import LogModal from "./log/LogModal";
+import BottomTabBar from "./BottomTabBar";
 import AuthModal from "./AuthModal";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -341,7 +342,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
     );
 
     return (
-        <header className="bg-[#FFFBEb] border-b border-[#5C5537]/20 sticky top-0 z-50">
+        <header className="bg-[#FFFBEb]/95 backdrop-blur sticky top-0 z-50">
             {/* Safe-area filler to cover iOS PWA status bar space on mobile */}
             <div
                 className="md:hidden bg-[#FFFBEb]"
@@ -575,7 +576,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
 
                                 <button
                                     onClick={() => setIsLogModalOpen(true)}
-                                    className="hidden md:flex items-center gap-1.5 border border-[#5C5537]/40 text-[#5C5537] py-2 px-4 rounded-lg transition-colors duration-200 hover:bg-[#5C5537]/5 hover:border-[#5C5537]">
+                                    className="hidden md:flex items-center gap-1.5 bg-[#5C5537]/10 text-[#5C5537] py-2 px-4 rounded-lg transition-colors duration-200 hover:bg-[#5C5537]/15">
                                     <Plus className="w-4 h-4" />
                                     <span className="font-medium text-sm">Log</span>
                                 </button>
@@ -621,7 +622,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                                 onClick={() => setIsDropdownOpen(false)}
                                             />
 
-                                            <div className="absolute left-1/2 transform -translate-x-1/2 translate-y-1/25 top-full mt-2 w-56 bg-[#FFFBEb] rounded-xl shadow-lg border border-[#5C5537]/20 py-2 z-20">
+                                            <div className="absolute left-1/2 transform -translate-x-1/2 translate-y-1/25 top-full mt-2 w-56 bg-[#FFFBEb] rounded-xl shadow-lg py-2 z-20">
                                                 {dropdownItems.map((item, index) =>
                                                     item.type === "divider" ? (
                                                         <div
@@ -669,13 +670,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
 
                     {/* Mobile menu button */}
                     <div className="flex md:hidden items-center gap-2">
-                        {/* Log + Button - Mobile (always visible) */}
-                        <button
-                            onClick={() => setIsLogModalOpen(true)}
-                            aria-label="Log"
-                            className="flex md:hidden ml-2 mr-2 items-center gap-1 border border-[#5C5537]/40 text-[#5C5537] p-2 rounded-lg transition-colors duration-200 hover:bg-[#5C5537]/5 hover:border-[#5C5537]">
-                            <Plus className="w-4 h-4" />
-                        </button>
+
 
                         <div className="relative">
                             <div
@@ -856,25 +851,8 @@ const Header: React.FC<HeaderProps> = ({ }) => {
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <div className="md:hidden">
-                    {/* Navigation */}
-                    <div className="px-4 py-3">
-                        <nav className="flex flex-col gap-1">
-                            {navItems.map((item) => (
-                                <a
-                                    key={item.label}
-                                    href={item.href}
-                                    className={`px-3 py-3 rounded-lg text-base transition-colors duration-200 text-[#5C5537] hover:bg-[#5C5537]/5 ${pathname === item.href
-                                        ? "font-semibold underline underline-offset-8 decoration-2"
-                                        : "font-medium"
-                                        }`}>
-                                    {item.label}
-                                </a>
-                            ))}
-                        </nav>
-                    </div>
-
                     {/* User Section */}
-                    <div className="border-t border-[#5C5537]/20 px-4 py-3">
+                    <div className="px-4 py-3">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="relative">
                                 <div className="w-10 h-10 rounded-full bg-[#5C5537] flex items-center justify-center ring-2 ring-[#5C5537]">
@@ -941,6 +919,13 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                         </div>
                     </div>
                 </div>
+            )}
+            {authUser && (
+                <BottomTabBar
+                    profileHref={`/profile/${encodeURIComponent(user.name)}`}
+                    avatarUrl={user.avatar}
+                    onLog={() => setIsLogModalOpen(true)}
+                />
             )}
             <LogModal
                 isOpen={isLogModalOpen}

@@ -375,7 +375,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
             </button>
           </div>
 
-          <div className="flex items-center gap-4 p-4 bg-[#FFFBEb] rounded-lg border border-[#5C5537]/20">
+          <div className="flex items-center gap-4 p-4 bg-[#5C5537]/5 rounded-xl">
             <div className="w-16 h-16 relative overflow-hidden rounded-lg bg-[#5C5537]/10 flex-shrink-0">
               <img
                 src={selectedTrack.coverArt}
