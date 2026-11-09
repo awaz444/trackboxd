@@ -61,7 +61,7 @@ const FavoriteTracks: React.FC<FavoriteTracksProps> = ({
         )}
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className={`grid ${currentTracks.length === 3 ? "grid-cols-3 gap-3" : "grid-cols-2 gap-4"} sm:grid-cols-4 sm:gap-4`}>
         {currentTracks.map((track) => (
           <Link key={track.id} href={`/songs/${track.id}`}>
             <div className="group cursor-pointer">

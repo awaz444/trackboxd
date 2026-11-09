@@ -50,14 +50,27 @@ export async function GET(req: NextRequest) {
         startOfWeek.setHours(0, 0, 0, 0);
         const startOfWeekISO = startOfWeek.toISOString();
 
-        // Get album likes from this week
-        const { data: weeklyLikes, error: likesError } = await supabase
-            .from("likes")
-            .select("target_id, created_at")
-            .eq("target_type", "album")
-            .gte("created_at", startOfWeekISO);
-
-        if (likesError) throw likesError;
+        // Likes from this week; if fewer than 4 albums were liked, widen to
+        // 30 days, 90 days, then all time so the section is never empty.
+        const DAY = 24 * 60 * 60 * 1000;
+        const windows: (string | null)[] = [
+            startOfWeekISO,
+            new Date(Date.now() - 30 * DAY).toISOString(),
+            new Date(Date.now() - 90 * DAY).toISOString(),
+            null,
+        ];
+        let weeklyLikes: { target_id: string; created_at?: string }[] = [];
+        for (const since of windows) {
+            let q = supabase
+                .from("likes")
+                .select("target_id, created_at")
+                .eq("target_type", "album");
+            if (since) q = q.gte("created_at", since);
+            const { data, error: likesError } = await q;
+            if (likesError) throw likesError;
+            weeklyLikes = data ?? [];
+            if (new Set(weeklyLikes.map((l) => l.target_id)).size >= 4) break;
+        }
         
         // If no likes, return empty array
         if (!weeklyLikes || weeklyLikes.length === 0) {

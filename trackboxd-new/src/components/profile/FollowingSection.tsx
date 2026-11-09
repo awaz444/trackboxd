@@ -42,7 +42,7 @@ const FollowingSection: React.FC<FollowingSectionProps> = ({
       
       {/* Horizontal scrollable container with proper spacing */}
       <div className="relative">
-        <div className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide pb-4 px-1 scroll-smooth">
+        <div className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 scroll-px-4 sm:mx-0 sm:px-1 scroll-smooth">
           {following.map((user) => (
             <Link key={user.id} href={`/profile/${user.name}`}>
               <div className="flex-shrink-0 flex flex-col items-center cursor-pointer min-w-[80px] sm:min-w-[90px]">

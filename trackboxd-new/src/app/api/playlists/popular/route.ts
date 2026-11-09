@@ -16,14 +16,27 @@ export async function GET(req: NextRequest) {
         startOfWeek.setHours(0, 0, 0, 0);
         const startOfWeekISO = startOfWeek.toISOString();
 
-        // Get playlist likes from this week
-        const { data: weeklyLikes, error: likesError } = await supabase
-            .from("likes")
-            .select("target_id")
-            .eq("target_type", "playlist")
-            .gte("created_at", startOfWeekISO);
-
-        if (likesError) throw likesError;
+        // Likes from this week; if fewer than 4 playlists were liked, widen to
+        // 30 days, 90 days, then all time so the section is never empty.
+        const DAY = 24 * 60 * 60 * 1000;
+        const windows: (string | null)[] = [
+            startOfWeekISO,
+            new Date(Date.now() - 30 * DAY).toISOString(),
+            new Date(Date.now() - 90 * DAY).toISOString(),
+            null,
+        ];
+        let weeklyLikes: { target_id: string; created_at?: string }[] = [];
+        for (const since of windows) {
+            let q = supabase
+                .from("likes")
+                .select("target_id")
+                .eq("target_type", "playlist");
+            if (since) q = q.gte("created_at", since);
+            const { data, error: likesError } = await q;
+            if (likesError) throw likesError;
+            weeklyLikes = data ?? [];
+            if (new Set(weeklyLikes.map((l) => l.target_id)).size >= 4) break;
+        }
 
         // Count likes per playlist
         const playlistCounts: Record<string, number> = {};
@@ -50,8 +63,9 @@ export async function GET(req: NextRequest) {
                         .eq("type", "playlist")
                         .single();
 
-                    // If we have complete data in DB, use that
-                    if (dbPlaylist?.name && dbPlaylist?.cover_url) {
+                    // Use the DB row only when it has everything the card shows;
+                    // spotify_items rows usually lack creator and track count.
+                    if (dbPlaylist?.name && dbPlaylist?.cover_url && (dbPlaylist as any).creator && typeof (dbPlaylist as any).tracks === "number") {
                         return {
                             ...dbPlaylist,
                             creator: dbPlaylist.creator || "Unknown",

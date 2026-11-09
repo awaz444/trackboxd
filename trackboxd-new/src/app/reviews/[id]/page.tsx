@@ -154,13 +154,13 @@ export default async function ReviewPage({ params }: PageProps) {
 
           {/* Review text */}
           {review.text && (
-            <p className="text-[#5C5537] text-sm leading-relaxed border-t border-[#5C5537]/10 pt-4 mb-5">
+            <p className="text-[#5C5537] text-sm leading-relaxed mb-5">
               {review.text}
             </p>
           )}
 
           {/* Footer row */}
-          <div className={`flex items-center justify-between gap-4 ${review.text ? '' : 'border-t border-[#5C5537]/10 pt-4'}`}>
+          <div className={`flex items-center justify-between gap-4 ${review.text ? '' : 'pt-1'}`}>
             <Link
               href={`/profile/${encodeURIComponent(username)}`}
               className="flex items-center gap-2 group min-w-0"
@@ -201,7 +201,7 @@ export default async function ReviewPage({ params }: PageProps) {
         />
 
         {/* Track + Author info cards */}
-        <div className="mt-6 grid grid-cols-2 gap-4">
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
           <Link
             href={review.spotify_items?.type === 'album' ? `/albums/${review.item_id}` : `/songs/${review.item_id}`}
             className="py-2 flex gap-3 items-center group"

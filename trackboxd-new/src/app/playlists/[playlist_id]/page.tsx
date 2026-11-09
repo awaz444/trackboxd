@@ -320,7 +320,7 @@ const PlaylistDetailsPage = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="overflow-hidden">
+                        <div className="space-y-0.5">
                             {items.map((track, index) => (
                                 <Link 
                                     key={track.id} 
@@ -328,11 +328,7 @@ const PlaylistDetailsPage = () => {
                                     className="group"
                                 >
                                     <div
-                                        className={`flex items-center p-4 hover:bg-[#5C5537]/5 transition-colors duration-200 ${
-                                            index < items.length - 1
-                                                ? "border-b border-[#5C5537]/20"
-                                                : ""
-                                        }`}>
+                                        className="flex items-center -mx-3 px-3 py-2.5 rounded-xl hover:bg-[#5C5537]/5 transition-colors duration-200">
                                         <span className="text-sm text-[#6B6547] w-8">
                                             {index + 1}
                                         </span>

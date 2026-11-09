@@ -328,7 +328,7 @@ const Tracks = () => {
 
             {/* Popular Annotations This Week */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#5C5537] mb-6">Popular Annotations This Week</h2>
+              <h2 className="text-2xl font-bold text-[#5C5537] mb-6">Popular Annotations</h2>
               {isLoadingPopularAnnotations ? (
                 <div className="flex justify-center items-center h-32">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5C5537]" />

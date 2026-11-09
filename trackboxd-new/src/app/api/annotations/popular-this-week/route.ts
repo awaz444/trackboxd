@@ -27,11 +27,21 @@ export async function GET(req: NextRequest) {
         );
         startOfWeek.setHours(0, 0, 0, 0);
 
-        // Get top 5 public annotations from this week, ordered by like_count descending
-        const { data: annotations, error } = await supabase
-            .from("annotations")
-            .select(
-                `
+        // Top 5 public annotations from this week, most liked first. If the week
+        // has fewer than 5, widen to 30 days, 90 days, then all time.
+        const DAY = 24 * 60 * 60 * 1000;
+        const windows: (string | null)[] = [
+            startOfWeek.toISOString(),
+            new Date(Date.now() - 30 * DAY).toISOString(),
+            new Date(Date.now() - 90 * DAY).toISOString(),
+            null,
+        ];
+        let annotations: any[] = [];
+        for (const since of windows) {
+            let q = supabase
+                .from("annotations")
+                .select(
+                    `
                 id,
                 text,
                 timestamp,
@@ -42,14 +52,17 @@ export async function GET(req: NextRequest) {
                 track_id,
                 users:user_id(id, name, image_url)
             `
-            )
-            .eq("is_public", true) // Only public annotations
-            .gte("created_at", startOfWeek.toISOString()) // From start of this week
-            .order("like_count", { ascending: false }) // Most liked first
-            .order("created_at", { ascending: false }) // Then newest first
-            .limit(5); // Top 5
-
-        if (error) throw error;
+                )
+                .eq("is_public", true);
+            if (since) q = q.gte("created_at", since);
+            const { data, error } = await q
+                .order("like_count", { ascending: false })
+                .order("created_at", { ascending: false })
+                .limit(5);
+            if (error) throw error;
+            annotations = data ?? [];
+            if (annotations.length >= 5) break;
+        }
 
         // Fetch track details from Spotify for each annotation
         const annotationsWithTrackDetails = await Promise.all(

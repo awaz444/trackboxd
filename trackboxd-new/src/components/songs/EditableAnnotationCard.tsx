@@ -57,7 +57,7 @@ const EditableAnnotationCard: React.FC<EditableAnnotationCardProps> = ({
 
   return (
     <div className="py-3 mb-4">
-      <div className="p-4 flex items-start gap-4">
+      <div className="flex items-start gap-4">
         <div className="w-16 h-16 relative overflow-hidden rounded-lg bg-[#5C5537]/10 flex-shrink-0">
           <img
             src={annotation.item.cover_url || "/default-album.png"}
@@ -67,9 +67,9 @@ const EditableAnnotationCard: React.FC<EditableAnnotationCardProps> = ({
         </div>
         
         <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h3 className="font-semibold text-[#5C5537]">
+          <div className="flex justify-between items-start gap-2 mb-2">
+            <div className="min-w-0">
+              <h3 className="font-semibold text-[#5C5537] truncate">
                 {annotation.item.name}
               </h3>
               <p className="text-[#6B6547] text-sm truncate">
@@ -80,7 +80,7 @@ const EditableAnnotationCard: React.FC<EditableAnnotationCardProps> = ({
               </p>
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex gap-1 shrink-0">
               <button 
                 onClick={() => setIsEditMode(true)}
                 className="p-2 text-[#5C5537] hover:bg-[#5C5537]/10 rounded-full transition-colors"
