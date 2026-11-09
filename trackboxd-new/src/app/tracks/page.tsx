@@ -9,6 +9,7 @@ import CompactReviewCard from "@/components/songs/CompactReviewCard";
 import ReviewCard from "@/components/songs/ReviewCard";
 import AnnotationCard from "@/components/songs/AnnotationCard";
 import MediaCard from "@/components/MediaCard";
+import TileRail from "@/components/TileRail";
 import { Review, Annotation, SpotifyPlaylistTrack } from "./types";
 
 interface SpotifyTrack {
@@ -259,7 +260,7 @@ const Tracks = () => {
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]" />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                  <TileRail>
                     {trackboxdTrending.map((track: any) => (
                       <MediaCard
                         key={`tb-trending-${track.id}`}
@@ -276,7 +277,7 @@ const Tracks = () => {
                         showPopularStats
                       />
                     ))}
-                  </div>
+                  </TileRail>
                 )}
               </div>
             )}

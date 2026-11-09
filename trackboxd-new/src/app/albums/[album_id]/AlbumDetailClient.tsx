@@ -11,6 +11,7 @@ import ReviewThreads from "@/components/songs/ReviewThreads";
 import { spotifyToTrack } from "@/utils/trackConverters";
 import Link from "next/link";
 import MediaCard from "@/components/MediaCard";
+import TileRail from "@/components/TileRail";
 import RatingStars from "@/components/RatingStars";
 
 interface Review {
@@ -599,7 +600,7 @@ const AlbumDetailClient = ({
                     <h2 className="text-xl font-bold text-[#5C5537] mb-4">
                         Similar Albums
                     </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                    <TileRail>
                         {similarAlbums.map((a: any) => (
                             <MediaCard
                                 key={a.id}
@@ -611,7 +612,7 @@ const AlbumDetailClient = ({
                                 itemId={a.id}
                             />
                         ))}
-                    </div>
+                    </TileRail>
                 </div>
             )}
 
