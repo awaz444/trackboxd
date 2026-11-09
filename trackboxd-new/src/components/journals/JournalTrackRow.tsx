@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Plus, Check, Music, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Check, Music, ChevronDown, ChevronUp, Heart } from "lucide-react";
 import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
 import { friendlyError } from "@/lib/friendlyError";
@@ -21,6 +21,7 @@ interface ReviewData {
     id: string;
     rating: number;
     text?: string | null;
+    like_count?: number | null;
 }
 
 interface AnnotationItem {
@@ -42,6 +43,8 @@ interface JournalTrackRowProps {
     review?: ReviewData | null;
     annotations?: AnnotationItem[];
     isOwner: boolean;
+    currentUserId?: string | null;
+    initialLiked?: boolean;
     journalIsPublic: boolean;
     removedFromSource?: boolean;
     onReviewSaved?: (itemId: string, review: ReviewData) => void;
@@ -74,6 +77,8 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
     review,
     annotations = [],
     isOwner,
+    currentUserId = null,
+    initialLiked = false,
     journalIsPublic,
     removedFromSource = false,
     onReviewSaved,
@@ -85,6 +90,33 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
     const [error, setError] = useState<string | null>(null);
     const [localReview, setLocalReview] = useState<ReviewData | null>(review ?? null);
     const [expanded, setExpanded] = useState(false);
+    const [isLiked, setIsLiked] = useState(initialLiked);
+    const [likeCount, setLikeCount] = useState<number>(review?.like_count ?? 0);
+    const [isLiking, setIsLiking] = useState(false);
+
+    const handleLikeClick = async () => {
+        if (!localReview?.id || !currentUserId || isLiking) return;
+        const nextLiked = !isLiked;
+        const prevCount = likeCount;
+        setIsLiking(true);
+        // Optimistic update
+        setIsLiked(nextLiked);
+        setLikeCount(Math.max(0, prevCount + (nextLiked ? 1 : -1)));
+        try {
+            const res = await fetch("/api/likes/review", {
+                method: nextLiked ? "POST" : "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: currentUserId, reviewId: localReview.id }),
+            });
+            if (!res.ok) throw new Error("Failed to update review like");
+        } catch (err) {
+            console.error("Journal review like failed:", err);
+            setIsLiked(!nextLiked);
+            setLikeCount(prevCount);
+        } finally {
+            setIsLiking(false);
+        }
+    };
 
     const hasComments = annotations.length > 0;
 
@@ -177,14 +209,34 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                             <RatingStars rating={localReview.rating} showNumber={false} />
                             <span className="text-sm font-bold text-[#5C5537]">{localReview.rating.toFixed(1)}</span>
                         </div>
-                        {isOwner && (
+                        <div className="flex items-center gap-3">
+                            {isOwner && (
+                                <button
+                                    onClick={() => setShowForm(!showForm)}
+                                    className="text-xs text-[#5C5537]/50 hover:text-[#5C5537] underline"
+                                >
+                                    edit
+                                </button>
+                            )}
                             <button
-                                onClick={() => setShowForm(!showForm)}
-                                className="text-xs text-[#5C5537]/50 hover:text-[#5C5537] underline"
+                                onClick={handleLikeClick}
+                                disabled={!currentUserId || isLiking}
+                                title={currentUserId ? (isLiked ? "Unlike review" : "Like review") : "Sign in to like reviews"}
+                                aria-pressed={isLiked}
+                                className="group flex items-center gap-1 focus:outline-none disabled:cursor-default"
                             >
-                                edit
+                                <Heart
+                                    className={`w-4 h-4 transition-all duration-200 ${
+                                        isLiked
+                                            ? "text-[#5C5537] fill-[#5C5537]"
+                                            : "text-[#5C5537]/50 group-hover:text-[#5C5537]"
+                                    }`}
+                                />
+                                <span className={`text-sm ${isLiked ? "text-[#5C5537] font-medium" : "text-[#5C5537]/70"}`}>
+                                    {likeCount}
+                                </span>
                             </button>
-                        )}
+                        </div>
                     </div>
                     {localReview.text && (
                         <p className="text-sm text-[#5C5537] leading-relaxed whitespace-pre-wrap mt-2">{localReview.text}</p>
