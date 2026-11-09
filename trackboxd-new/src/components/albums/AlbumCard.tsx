@@ -26,9 +26,9 @@ export const AlbumCard = ({
 
     return (
         <Link href={`/albums/${album.id}`} className="group">
-        <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-200 h-full flex flex-col">
+        <div className="h-full flex flex-col">
             {/* Cover Art */}
-            <div className="relative">
+            <div className="relative rounded-xl overflow-hidden bg-[#5C5537]/10 transition-opacity group-hover:opacity-90">
                 <img
                     src={album.cover_url}
                     alt={album.name}
@@ -40,13 +40,13 @@ export const AlbumCard = ({
             </div>
 
             {/* Content */}
-            <div className="p-4 flex flex-col flex-grow">
+            <div className="pt-3 flex flex-col flex-grow">
                 <div className="flex justify-between items-start gap-2">
                     <div className="min-w-0 flex-grow">
                         <h3 className="font-bold text-[#5C5537] truncate text-base md:text-lg">
                             {album.name}
                         </h3>
-                        <p className="text-[#5C5537]/70 truncate mt-1 text-xs md:text-sm">
+                        <p className="text-[#6B6547] truncate mt-1 text-xs md:text-sm">
                             by {album.creator}
                         </p>
                     </div>
@@ -55,7 +55,7 @@ export const AlbumCard = ({
 
                 {/* Bottom row with stats and like on right */}
                 <div className="flex justify-between items-center mt-auto">
-                    <div className="flex items-center gap-1 text-[#5C5537]/70 text-xs md:text-sm">
+                    <div className="flex items-center gap-1 text-[#6B6547] text-xs md:text-sm">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-3 w-3 md:h-4 md:w-4"
@@ -86,12 +86,12 @@ export const AlbumCard = ({
                             ) : (
                                 <Heart
                                     className={`w-5 h-5 transition-colors ${
-                                        isLiked ? "text-[#5C5537] fill-[#5C5537]" : "text-[#5C5537]/50 group-hover:text-[#5C5537]"
+                                        isLiked ? "text-[#5C5537] fill-[#5C5537]" : "text-[#6B6547] group-hover:text-[#5C5537]"
                                     }`}
                                 />
                             )}
                         </button>
-                        <span className={`text-sm ${isLiked ? "text-[#5C5537] font-medium" : "text-[#5C5537]/70"}`}>
+                        <span className={`text-sm ${isLiked ? "text-[#5C5537] font-medium" : "text-[#6B6547]"}`}>
                             {album.like_count}
                         </span>
                     </div>

@@ -404,10 +404,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       ></div>
 
       {/* Modal Content */}
-      <div className="bg-[#FFFBEb] rounded-lg p-8 w-full max-w-md border border-[#5C5537]/20 shadow-lg relative z-10 max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#FFFBEb] rounded-lg p-8 w-full max-w-md shadow-lg relative z-10 max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
-          className="absolute top-4 right-4 text-[#5C5537]/50 hover:text-[#5C5537] transition-colors"
+          className="absolute top-4 right-4 text-[#6B6547] hover:text-[#5C5537] transition-colors"
           onClick={onClose}
         >
           <X size={20} />
@@ -421,7 +421,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
             {mode === 'forgot-password' && 'Forgot Password'}
             {mode === 'update-password' && 'Update Password'}
           </h2>
-          <p className="text-[#5C5537]/70 mt-2">
+          <p className="text-[#6B6547] mt-2">
             {mode === 'login' && 'Sign in to your account'}
             {mode === 'signup' && 'Join the Trackboxd community'}
             {mode === 'forgot-password' && "Enter your email address and we'll send you a link to reset your password."}
@@ -431,14 +431,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
         {/* Success Message */}
         {success && (
-          <div className="mb-4 p-4 bg-[#5C5537]/10 border border-[#5C5537]/20 text-[#5C5537] rounded-lg">
+          <div className="mb-4 text-[#5C5537]">
             <p className="text-sm">{success}</p>
           </div>
         )}
 
         {/* General Error */}
         {errors.general && (
-          <div className="mb-4 p-4 bg-[#5C5537]/10 border border-[#5C5537]/20 text-[#5C5537] rounded-lg">
+          <div className="mb-4 text-[#5C5537]">
             <p className="text-sm">{errors.general}</p>
           </div>
         )}
@@ -500,7 +500,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -512,7 +512,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                 <button
                   type="button"
                   onClick={() => setMode('forgot-password')}
-                  className="text-sm text-[#5C5537]/70 hover:text-[#5C5537] hover:underline"
+                  className="text-sm text-[#6B6547] hover:text-[#5C5537] hover:underline"
                 >
                   Forgot your password?
                 </button>
@@ -543,7 +543,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -556,7 +556,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   Confirm New Password *
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50" size={16} />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6B6547]" size={16} />
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     id="confirmPassword"
@@ -572,7 +572,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
                   >
                     {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -627,7 +627,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -655,7 +655,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
                   >
                     {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -682,8 +682,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
         {/* Mode Switch - Only show for login/signup modes */}
         {(mode === 'login' || mode === 'signup') && (
-          <div className="text-center mt-6 pt-6 border-t border-[#5C5537]/10">
-            <p className="text-[#5C5537]/70">
+          <div className="text-center mt-6 pt-2">
+            <p className="text-[#6B6547]">
               {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
               <button
                 onClick={switchMode}
@@ -697,8 +697,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
         {/* Back to Login - Show for forgot-password mode */}
         {mode === 'forgot-password' && (
-          <div className="text-center mt-6 pt-6 border-t border-[#5C5537]/10">
-            <p className="text-[#5C5537]/70">
+          <div className="text-center mt-6 pt-2">
+            <p className="text-[#6B6547]">
               Remember your password?{' '}
               <button
                 onClick={() => setMode('login')}

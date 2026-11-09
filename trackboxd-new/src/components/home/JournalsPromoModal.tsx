@@ -25,9 +25,9 @@ const JournalsPromoModal: React.FC<JournalsPromoModalProps> = ({ onClose }) => {
             />
 
             {/* Modal Content */}
-            <div className="bg-[#FFFBEb] rounded-xl p-6 w-full max-w-sm border border-[#5C5537]/20 shadow-lg relative z-10 text-center">
+            <div className="bg-[#FFFBEb] rounded-xl p-6 w-full max-w-sm shadow-lg relative z-10 text-center">
                 <button
-                    className="absolute top-4 right-4 text-[#5C5537]/50 hover:text-[#5C5537] transition-colors"
+                    className="absolute top-4 right-4 text-[#6B6547] hover:text-[#5C5537] transition-colors"
                     onClick={onClose}
                 >
                     <X size={18} />
@@ -38,7 +38,7 @@ const JournalsPromoModal: React.FC<JournalsPromoModalProps> = ({ onClose }) => {
                 </div>
 
                 <h2 className="text-lg font-bold text-[#5C5537]">Introducing Journals</h2>
-                <p className="text-sm text-[#5C5537]/70 mt-2 leading-relaxed">
+                <p className="text-sm text-[#6B6547] mt-2 leading-relaxed">
                     Curate a set of tracks, write reviews for each one, and share the
                     whole story with friends, or import a Spotify playlist to get started.
                 </p>
@@ -53,7 +53,7 @@ const JournalsPromoModal: React.FC<JournalsPromoModalProps> = ({ onClose }) => {
                     </button>
                     <button
                         onClick={onClose}
-                        className="text-sm text-[#5C5537]/60 hover:text-[#5C5537] py-1 transition-colors"
+                        className="text-sm text-[#6B6547] hover:text-[#5C5537] py-1 transition-colors"
                     >
                         Maybe later
                     </button>

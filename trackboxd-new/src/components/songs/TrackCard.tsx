@@ -26,15 +26,15 @@ const TrackCard: React.FC<TrackCardProps> = ({
 
     return (
         <Link href={`/songs/${track.id}`}>
-            <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
+            <div className="group">
                 <div
-                    className={`p-4 ${
+                    className={`py-2 ${
                         viewMode === "list" ? "flex items-center space-x-4" : ""
                     }`}>
                     <div
                         className={`${
                             viewMode === "list" ? "w-16 h-16" : "w-full aspect-square"
-                        } relative overflow-hidden rounded-lg bg-[#5C5537]/10`}>
+                        } relative overflow-hidden rounded-xl bg-[#5C5537]/10 transition-opacity group-hover:opacity-90`}>
                         <img
                             src={track.coverArt}
                             alt={`${track.title} cover`}
@@ -59,28 +59,28 @@ const TrackCard: React.FC<TrackCardProps> = ({
                                 <h3 className="font-semibold text-[#5C5537] cursor-pointer hover:text-[#5C5537]/70 transition-colors">
                                     {track.title}
                                 </h3>
-                                <p className="text-[#5C5537]/70 text-sm truncate">
+                                <p className="text-[#6B6547] text-sm truncate">
                                     {track.artist}
                                 </p>
-                                <p className="text-[#5C5537]/70 text-xs truncate">
+                                <p className="text-[#6B6547] text-xs truncate">
                                     {track.album}
                                 </p>
                             </div>
 
                             <div className="flex items-center space-x-4 mt-2">
-                                <div className="flex items-center space-x-1 text-[#5C5537]/70">
+                                <div className="flex items-center space-x-1 text-[#6B6547]">
                                     <Heart className="w-4 h-4" />
                                     <span className="text-sm">
                                         {track.stats?.like_count || 0}
                                     </span>
                                 </div>
-                                <div className="flex items-center space-x-1 text-[#5C5537]/70">
+                                <div className="flex items-center space-x-1 text-[#6B6547]">
                                     <Star className="w-4 h-4" />
                                     <span className="text-sm">
                                         {track.stats?.review_count || 0}
                                     </span>
                                 </div>
-                                <div className="flex items-center space-x-1 text-[#5C5537]/70">
+                                <div className="flex items-center space-x-1 text-[#6B6547]">
                                     <MessageCircle className="w-4 h-4" />
                                     <span className="text-sm">
                                         {track.stats?.annotation_count || 0}
@@ -121,7 +121,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
                                 e.preventDefault();
                                 onReviewClick(track);
                             }}
-                            className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/20 hover:bg-[#5C5537]/10 transition-colors">
+                            className="flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15 transition-colors">
                             <Star className="w-3 h-3" />
                             <span>Review</span>
                         </button>
@@ -130,7 +130,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
                                 e.preventDefault();
                                 onAnnotationClick(track);
                             }}
-                            className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-[#FFFBEb] text-[#5C5537] border border-[#5C5537]/20 hover:bg-[#5C5537]/10 transition-colors">
+                            className="flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15 transition-colors">
                             <MessageCircle className="w-3 h-3" />
                             <span>Annotate</span>
                         </button>

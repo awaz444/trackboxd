@@ -30,7 +30,7 @@ interface Playlist {
 }
 
 const SkeletonPlaylistCard = () => (
-    <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl p-4">
+    <div className="py-3">
         <div className="animate-pulse">
             <div className="bg-[#5C5537]/10 rounded-xl h-48 w-full mb-4"></div>
             <div className="space-y-2">
@@ -296,7 +296,7 @@ const Playlists = () => {
                             <h1 className="text-3xl font-bold text-[#5C5537]">
                                 Playlists
                             </h1>
-                            <p className="text-[#5C5537]/70 mt-2">
+                            <p className="text-[#6B6547] mt-2">
                                 Discover and organize your favorite music
                                 collections
                             </p>
@@ -305,7 +305,7 @@ const Playlists = () => {
                         {/* Search Bar */}
                         <div className="w-full md:w-[320px]">
                             <div className="relative h-full">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 w-5 h-5" />
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] w-5 h-5" />
                                 <input
                                     type="text"
                                     placeholder="Search playlists..."
@@ -327,7 +327,7 @@ const Playlists = () => {
                                             setSearchTerm("");
                                             setShowSearchResults(false);
                                         }}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/50 hover:text-[#5C5537]">
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]">
                                         <X className="w-5 h-5" />
                                     </button>
                                 )}
@@ -352,7 +352,7 @@ const Playlists = () => {
                             </h2>
                             <button
                                 onClick={() => setShowSearchResults(false)}
-                                className="text-sm text-[#5C5537]/70 hover:text-[#5C5537]">
+                                className="text-sm text-[#6B6547] hover:text-[#5C5537]">
                                 Clear results
                             </button>
                         </div>
@@ -371,7 +371,7 @@ const Playlists = () => {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-[#5C5537]/70">
+                            <p className="text-[#6B6547]">
                                 {isSearching
                                     ? "Searching..."
                                     : "No playlists found"}
@@ -430,7 +430,7 @@ const Playlists = () => {
                             </div>
 
                             {loadingRecent ? (
-                                <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl overflow-hidden">
+                                <div className="rounded-xl overflow-hidden">
                                     {[...Array(3)].map((_, i) => (
                                         <SkeletonPlaylistListItem
                                             key={`skeleton-recent-${i}`}
@@ -438,7 +438,7 @@ const Playlists = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-xl overflow-hidden">
+                                <div className="rounded-xl overflow-hidden">
                                     {recentlyLikedPlaylists.map(
                                         (playlist, index) => (
                                             <PlaylistListItem

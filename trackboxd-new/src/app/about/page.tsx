@@ -56,7 +56,7 @@ export default function AboutPage() {
           <h1 className="text-4xl font-bold text-[#5C5537] mb-2">
             About Trackboxd
           </h1>
-          <p className="text-lg text-[#5C5537]/60 mb-10">
+          <p className="text-lg text-[#6B6547] mb-10">
             The Letterboxd for Tracks
           </p>
 

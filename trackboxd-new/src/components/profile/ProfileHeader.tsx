@@ -144,14 +144,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   className="text-center flex flex-row gap-1 hover:bg-[#5C5537]/5 px-2 py-1 rounded-md transition-colors"
                 >
                   <div className="font-semibold text-[#5C5537]">{followerCount}</div>
-                  <div className="text-xs text-[#5C5537]/60 mt-[3px]">Followers</div>
+                  <div className="text-xs text-[#6B6547] mt-[3px]">Followers</div>
                 </button>
                 <button
                   onClick={() => setIsFollowingModalOpen(true)}
                   className="text-center flex flex-row gap-1 hover:bg-[#5C5537]/5 px-2 py-1 rounded-md transition-colors"
                 >
                   <div className="font-semibold text-[#5C5537]">{stats.following}</div>
-                  <div className="text-xs text-[#5C5537]/60 mt-[3px]">Following</div>
+                  <div className="text-xs text-[#6B6547] mt-[3px]">Following</div>
                 </button>
               </div>
 
@@ -160,8 +160,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 {/* Country */}
                 {user.country && user.country.toLowerCase() !== 'none' && (
                   <div className="flex h-8 items-center gap-1 bg-[#5C5537]/5 px-2 py-1 rounded-md">
-                    <MapPin className="w-3 h-3 text-[#5C5537]/70" />
-                    <span className="text-sm text-[#5C5537]/70">
+                    <MapPin className="w-3 h-3 text-[#6B6547]" />
+                    <span className="text-sm text-[#6B6547]">
                       {user.country}
                     </span>
                   </div>
@@ -174,7 +174,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                       href={normalizedSpotifyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-0.5 text-[10px] text-[#5C5537]/50 hover:text-[#5C5537]/80 transition-colors"
+                      className="flex items-center gap-0.5 text-[10px] text-[#6B6547] hover:text-[#5C5537]/80 transition-colors"
                     >
                       www.spotify.com
                       <ArrowUpRight className="w-2.5 h-2.5" />
@@ -185,7 +185,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                       href={normalizedInstagramUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-0.5 text-[10px] text-[#5C5537]/50 hover:text-[#5C5537]/80 transition-colors"
+                      className="flex items-center gap-0.5 text-[10px] text-[#6B6547] hover:text-[#5C5537]/80 transition-colors"
                     >
                       www.instagram.com
                       <ArrowUpRight className="w-2.5 h-2.5" />

@@ -375,17 +375,17 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
             <div className="max-w-5xl mx-auto px-4 py-8">
                 {/* Success Modal - brand colors, floating, no green */}
                 <Dialog open={!!success} onOpenChange={(open) => !open && setSuccess(null)}>
-                    <DialogContent className="bg-[#FFFBEb] border-[#5C5537]/20 text-[#5C5537] shadow-lg rounded-lg px-5 w-[calc(100%-2rem)] sm:w-auto">
+                    <DialogContent className="bg-[#FFFBEb] border-0 text-[#5C5537] shadow-xl rounded-2xl px-5 w-[calc(100%-2rem)] sm:w-auto">
                         <DialogHeader>
                             <DialogTitle className="text-[#5C5537]">Profile Updated</DialogTitle>
-                            <DialogDescription className="text-[#5C5537]/70">
+                            <DialogDescription className="text-[#6B6547]">
                                 {success}
                             </DialogDescription>
                         </DialogHeader>
                     </DialogContent>
                 </Dialog>
                 {error && (
-                    <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    <div className="mb-6 text-red-700">
                         {error}
                     </div>
                 )}
@@ -485,7 +485,7 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                     </div>
 
                                     {showSpotifyHelp && (
-                                        <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-800">
+                                        <div className="mb-3 text-sm text-[#5C5537]">
                                             <p className="font-medium">
                                                 How to find your Spotify Profile
                                                 URL:

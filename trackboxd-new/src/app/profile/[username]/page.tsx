@@ -184,16 +184,16 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 {shouldHideContent ? (
                     // Private profile message
                     <div className="text-center py-16">
-                        <div className="bg-white/50 rounded-lg p-8 max-w-md mx-auto">
+                        <div className="py-8 max-w-md mx-auto">
                             <div className="text-6xl mb-4">🔒</div>
                             <h3 className="text-xl font-bold text-[#5C5537] mb-2">
                                 This account is private
                             </h3>
-                            <p className="text-[#5C5537]/70 mb-4">
+                            <p className="text-[#6B6547] mb-4">
                                 Follow this account to see their activity, favorite tracks, and more.
                             </p>
                             {followStatus === 'requested' && (
-                                <p className="text-[#5C5537]/70 text-sm">
+                                <p className="text-[#6B6547] text-sm">
                                     Follow request sent
                                 </p>
                             )}
@@ -300,7 +300,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                     <LikeSentence key={l.id} like={l} />
                                 ))}
                                 {(!likesActivity || likesActivity.length === 0) && (
-                                    <div className="text-center text-[#5C5537]/70 py-8">
+                                    <div className="text-center text-[#6B6547] py-8">
                                         No recent likes
                                     </div>
                                 )}
@@ -320,7 +320,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                     {isOwnProfile && (
                                         <Link
                                             href="/journals/new"
-                                            className="flex items-center gap-1.5 text-xs font-medium text-[#5C5537]/60 hover:text-[#5C5537] border border-[#5C5537]/20 hover:border-[#5C5537]/40 rounded-full px-3 py-1.5 transition-colors"
+                                            className="flex items-center gap-1.5 text-xs font-medium bg-[#5C5537]/10 hover:bg-[#5C5537]/15 text-[#5C5537] rounded-full px-3.5 h-9 transition-colors"
                                         >
                                             <Plus className="w-3 h-3" />
                                             New
@@ -347,12 +347,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-10 border border-dashed border-[#5C5537]/20 rounded-xl">
+                                    <div className="text-center py-10 bg-[#5C5537]/5 rounded-2xl">
                                         <BookOpen className="w-10 h-10 text-[#5C5537]/20 mx-auto mb-2" />
-                                        <p className="text-sm text-[#5C5537]/50">No journals yet.</p>
+                                        <p className="text-sm text-[#6B6547]">No journals yet.</p>
                                         <Link
                                             href="/journals/new"
-                                            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5C5537]/60 hover:text-[#5C5537] mt-2"
+                                            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6B6547] hover:text-[#5C5537] mt-2"
                                         >
                                             <Plus className="w-3 h-3" />
                                             Start your first journal

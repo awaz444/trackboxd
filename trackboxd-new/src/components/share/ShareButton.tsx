@@ -21,7 +21,7 @@ export default function ShareButton({ type, id, variant = 'dark' }: ShareButtonP
         className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
           dark
             ? 'text-[#FFFBeb]/55 hover:text-[#FFFBeb] hover:bg-[#FFFBeb]/10'
-            : 'text-[#5C5537]/50 hover:text-[#5C5537]'
+            : 'text-[#6B6547] hover:text-[#5C5537]'
         }`}
       >
         <Share2 className="w-4 h-4" />

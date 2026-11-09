@@ -28,7 +28,7 @@ export default function SuggestedUsers({ users, onFollowSuccess }: SuggestedUser
   }
 
   return (
-    <div className="bg-[#5C5537]/5 rounded-lg p-4 mb-8">
+    <div className="mb-8">
       <h3 className="text-lg font-semibold text-[#5C5537] mb-3">
         Suggested Users to Follow
       </h3>
@@ -68,7 +68,7 @@ export default function SuggestedUsers({ users, onFollowSuccess }: SuggestedUser
                     {user.name}
                     <VipBadge username={user.name} />
                   </div>
-                  {/* <div className="text-sm text-[#5C5537]/70">
+                  {/* <div className="text-sm text-[#6B6547]">
                     @{user.username}
                   </div> */}
                 </div>

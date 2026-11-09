@@ -49,7 +49,7 @@ function UserRow({ user }: { user: PopularUser }) {
             {user.name}
             <VipBadge username={user.name} />
           </p>
-          <p className="text-xs text-[#5C5537]/60">
+          <p className="text-xs text-[#6B6547]">
             {user.followers} follower{user.followers !== 1 ? "s" : ""} ·{" "}
             {user.review_count} review{user.review_count !== 1 ? "s" : ""}
           </p>
@@ -92,7 +92,7 @@ export default function PopularUsersSection({ data }: Props) {
         title="Popular on Trackboxd"
         subtitle="Top users by community engagement"
       />
-      <div className="bg-[#5C5537]/5 rounded-xl p-2">
+      <div className="-mx-3">
         {data.map((user) => (
           <UserRow key={user.id} user={user} />
         ))}

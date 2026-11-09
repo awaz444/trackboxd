@@ -103,7 +103,7 @@ export default async function JournalDetailPage({ params }: Props) {
             <div className="max-w-3xl mx-auto px-4 pt-6">
                 <Link
                     href={journalUsername ? `/profile/${journalUsername}` : "/"}
-                    className="inline-flex items-center gap-1.5 text-sm text-[#5C5537]/60 hover:text-[#5C5537] mb-2"
+                    className="inline-flex items-center gap-1.5 text-sm text-[#6B6547] hover:text-[#5C5537] mb-2"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     {journalUsername ? "Back to profile" : "Back home"}

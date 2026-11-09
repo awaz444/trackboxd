@@ -84,7 +84,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
       {/* Card */}
       <div
         onClick={() => setIsModalOpen(true)}
-        className="bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg p-4 cursor-pointer hover:shadow-md transition-all duration-200 group"
+        className="py-3 cursor-pointer group"
       >
         <div className="flex items-center justify-between mb-2">
           <div className="text-sm font-medium text-[#5C5537]">at {annotation.timestamp}</div>
@@ -92,7 +92,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
         <div className="mb-1 text-sm text-[#5C5537] flex items-center min-w-0">
           <div className="flex-1 min-w-0 truncate">
             <span className="font-semibold">{annotation.track.title}</span>
-            <span className="text-[#5C5537]/70"> by {annotation.track.artist}</span>
+            <span className="text-[#6B6547]"> by {annotation.track.artist}</span>
           </div>
         </div>
         {annotation.text && (
@@ -104,7 +104,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
           <Link
             href={`/songs/${annotation.track.id}`}
             onClick={(e) => e.stopPropagation()}
-            className="text-xs text-[#5C5537]/70 hover:text-[#5C5537] hover:underline"
+            className="text-xs text-[#6B6547] hover:text-[#5C5537] hover:underline"
           >
             View track
           </Link>
@@ -136,9 +136,9 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-[#FFFBEb] rounded-xl w-full max-w-lg border border-[#5C5537]/20 shadow-xl max-h-[85vh] flex flex-col">
+          <div className="relative bg-[#FFFBEb] rounded-xl w-full max-w-lg shadow-xl max-h-[85vh] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#5C5537]/10 flex-shrink-0">
+            <div className="flex items-center justify-between px-5 py-4 flex-shrink-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-semibold text-[#5C5537]">Annotation</span>
                 <Link
@@ -153,7 +153,7 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-[#5C5537]/60 hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1.5 rounded-full transition-colors"
+                className="text-[#6B6547] hover:text-[#5C5537] hover:bg-[#5C5537]/10 p-1.5 rounded-full transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -172,29 +172,29 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
                 )}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-[#5C5537] text-lg leading-tight">{annotation.track.title}</h3>
-                  <p className="text-[#5C5537]/70 text-sm mt-0.5">{annotation.track.artist}</p>
+                  <p className="text-[#6B6547] text-sm mt-0.5">{annotation.track.artist}</p>
                   <div className="flex items-center gap-1.5 mt-2">
-                    <Clock className="w-3.5 h-3.5 text-[#5C5537]/60 flex-shrink-0" />
-                    <span className="text-xs text-[#5C5537]/60">at {annotation.timestamp}</span>
+                    <Clock className="w-3.5 h-3.5 text-[#6B6547] flex-shrink-0" />
+                    <span className="text-xs text-[#6B6547]">at {annotation.timestamp}</span>
                   </div>
                 </div>
               </div>
 
               {/* Annotation text */}
-              <div className="border-t border-[#5C5537]/10 pt-4 text-[#5C5537] text-sm leading-relaxed whitespace-pre-wrap">
-                {annotation.text || <span className="italic text-[#5C5537]/50">No annotation text.</span>}
+              <div className="pt-1 text-[#5C5537] text-sm leading-relaxed whitespace-pre-wrap">
+                {annotation.text || <span className="italic text-[#6B6547]">No annotation text.</span>}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex-shrink-0 border-t border-[#5C5537]/10 px-5 py-4 flex items-center justify-between">
-              <span className="text-sm text-[#5C5537]/60">at {annotation.timestamp} in the track</span>
+            <div className="flex-shrink-0 px-5 py-4 flex items-center justify-between">
+              <span className="text-sm text-[#6B6547]">at {annotation.timestamp} in the track</span>
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleLikeClick}
                   disabled={isLoading || !user}
                   className={`flex items-center gap-1.5 text-sm transition-colors ${
-                    isLiked ? "text-[#5C5537]" : "text-[#5C5537]/50 hover:text-[#5C5537]"
+                    isLiked ? "text-[#5C5537]" : "text-[#6B6547] hover:text-[#5C5537]"
                   }`}
                 >
                   <Heart className={`w-4 h-4 ${isLiked ? "fill-[#5C5537]" : ""}`} />
@@ -203,14 +203,14 @@ const ProfileAnnotationCard: React.FC<ProfileAnnotationCardProps> = ({ annotatio
                 </button>
                 <Link
                   href={`/songs/${annotation.track.id}`}
-                  className="text-xs text-[#5C5537]/70 hover:text-[#5C5537] hover:underline"
+                  className="text-xs text-[#6B6547] hover:text-[#5C5537] hover:underline"
                 >
                   View track
                 </Link>
                 {(annotation.is_public !== false) && (
                   <button
                     onClick={() => setShareOpen(true)}
-                    className="text-[#5C5537]/50 hover:text-[#5C5537] transition-colors"
+                    className="text-[#6B6547] hover:text-[#5C5537] transition-colors"
                     aria-label="Share"
                   >
                     <Share2 className="w-3.5 h-3.5" />

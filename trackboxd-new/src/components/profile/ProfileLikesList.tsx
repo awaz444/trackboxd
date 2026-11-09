@@ -11,21 +11,21 @@ export default function ProfileLikesList({ username, data }: { username: string;
       <div className="max-w-3xl mx-auto px-4 py-8">
         <Link
           href={`/profile/${username}`}
-          className="inline-flex items-center gap-1 text-sm text-[#5C5537]/70 hover:text-[#5C5537] mb-4"
+          className="inline-flex items-center gap-1 text-sm text-[#6B6547] hover:text-[#5C5537] mb-4"
         >
           <ArrowLeft className="w-4 h-4" /> Back to {data.user.name}&apos;s profile
         </Link>
         <h1 className="text-3xl font-bold text-[#5C5537] mb-1">{data.user.name}&apos;s Likes</h1>
 
         {data.hidden ? (
-          <p className="text-[#5C5537]/70 mt-6">This account is private.</p>
+          <p className="text-[#6B6547] mt-6">This account is private.</p>
         ) : (
           <>
-            <p className="text-[#5C5537]/70 mb-6">
+            <p className="text-[#6B6547] mb-6">
               {data.total} like{data.total !== 1 ? "s" : ""}
             </p>
             {data.items.length === 0 ? (
-              <p className="text-[#5C5537]/70">Nothing here yet.</p>
+              <p className="text-[#6B6547]">Nothing here yet.</p>
             ) : (
               <div className="space-y-3">
                 {data.items.map((like) => (

@@ -90,7 +90,7 @@ const ProfilePrompts: React.FC<ProfilePromptsProps> = ({ username, isOwnProfile 
             return (
               <div key={p.id}>
                 <h2 className="text-xl font-bold text-[#5C5537]">{p.question}...</h2>
-                <div className="mt-6 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg">
+                <div className="mt-6">
                   {r.type === 'text' ? (
                     <div className="text-[#5C5537]">{r.text}</div>
                   ) : r.item ? (
@@ -102,7 +102,7 @@ const ProfilePrompts: React.FC<ProfilePromptsProps> = ({ username, isOwnProfile 
                         <div className="min-w-0">
                           <div className="font-medium text-[#5C5537] truncate">{r.item.name}</div>
                           {r.item.artist && (
-                            <div className="text-sm text-[#5C5537]/70 truncate">{r.item.artist}</div>
+                            <div className="text-sm text-[#6B6547] truncate">{r.item.artist}</div>
                           )}
                         </div>
                       </a>
@@ -114,7 +114,7 @@ const ProfilePrompts: React.FC<ProfilePromptsProps> = ({ username, isOwnProfile 
                         <div className="min-w-0">
                           <div className="font-medium text-[#5C5537] truncate">{r.item.name}</div>
                           {r.item.artist && (
-                            <div className="text-sm text-[#5C5537]/70 truncate">{r.item.artist}</div>
+                            <div className="text-sm text-[#6B6547] truncate">{r.item.artist}</div>
                           )}
                         </div>
                       </div>
@@ -125,7 +125,7 @@ const ProfilePrompts: React.FC<ProfilePromptsProps> = ({ username, isOwnProfile 
             );
           })}
         {prompts.length === 0 && (
-          <div className="text-[#5C5537]/50">No prompts available.</div>
+          <div className="text-[#6B6547]">No prompts available.</div>
         )}
       </div>
 

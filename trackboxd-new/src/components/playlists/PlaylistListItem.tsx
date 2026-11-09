@@ -42,7 +42,7 @@ export const PlaylistListItem = ({
               <h3 className="font-bold text-[#5C5537] truncate text-sm md:text-base">
                 {playlist.name}
               </h3>
-              <p className="text-[#5C5537]/70 truncate text-xs md:text-sm">
+              <p className="text-[#6B6547] truncate text-xs md:text-sm">
                 by {playlist.creator}
               </p>
             </div>
@@ -54,7 +54,7 @@ export const PlaylistListItem = ({
           </p>
 
           {/* Stats - only track count remains */}
-          <div className="flex items-center justify-between text-[#5C5537]/70 text-xs">
+          <div className="flex items-center justify-between text-[#6B6547] text-xs">
             <div className="flex items-center gap-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +76,7 @@ export const PlaylistListItem = ({
               <button
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (!isLoading) onLikeToggle(playlist.id); }}
                 disabled={isLoading}
-                className={`p-1 ${isLoading ? "cursor-not-allowed" : "cursor-pointer"} ${isLiked ? "text-[#5C5537]" : "text-[#5C5537]/50 hover:text-[#5C5537]"}`}
+                className={`p-1 ${isLoading ? "cursor-not-allowed" : "cursor-pointer"} ${isLiked ? "text-[#5C5537]" : "text-[#6B6547] hover:text-[#5C5537]"}`}
               >
                 {isLoading ? (
                   <div className="w-5 h-5 flex items-center justify-center">
@@ -86,7 +86,7 @@ export const PlaylistListItem = ({
                   <Heart className={`w-5 h-5 ${isLiked ? "fill-[#5C5537]" : ""}`} />
                 )}
               </button>
-              <span className={`text-sm ${isLiked ? 'text-[#5C5537] font-medium' : 'text-[#5C5537]/70'}`}>{playlist.like_count}</span>
+              <span className={`text-sm ${isLiked ? 'text-[#5C5537] font-medium' : 'text-[#6B6547]'}`}>{playlist.like_count}</span>
             </div>
           </div>
         </div>

@@ -334,7 +334,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                         Search for a track or album to review
                     </h3>
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#5C5537]/50" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#6B6547]" />
                         <Input
                             type="search"
                             placeholder="Search tracks or albums..."
@@ -347,16 +347,16 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                 type="button"
                                 onClick={() => setSearchQuery("")}
                                 className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <X className="w-5 h-5 text-[#5C5537]/50" />
+                                <X className="w-5 h-5 text-[#6B6547]" />
                             </button>
                         )}
                     </div>
 
                     {/* Search Results - Scrollable container */}
-                    <div className="border rounded-lg p-4 bg-[#FFFBEb] border-[#5C5537]/20 max-h-96 overflow-y-auto">
+                    <div className="py-2 max-h-96 overflow-y-auto">
                         {isSearching ? (
                             <div className="flex justify-center py-4">
-                                <p className="text-[#5C5537]/50">Searching...</p>
+                                <p className="text-[#6B6547]">Searching...</p>
                             </div>
                         ) : searchError ? (
                             <div className="text-center py-4 text-red-500">
@@ -377,8 +377,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                                     className="w-16 h-16 rounded-lg object-cover"
                                                 />
                                             ) : (
-                                                <div className="bg-[#5C5537]/10 border-2 border-dashed rounded-md w-16 h-16 flex items-center justify-center">
-                                                    <Music className="text-[#5C5537]/50 w-6 h-6" />
+                                                <div className="bg-[#5C5537]/10 rounded-md w-16 h-16 flex items-center justify-center">
+                                                    <Music className="text-[#6B6547] w-6 h-6" />
                                                 </div>
                                             )}
                                             <div className="absolute bottom-1 right-1 bg-[#5C5537]/70 rounded-full p-1">
@@ -401,7 +401,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                                         : "ALBUM"}
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-[#5C5537]/70 truncate">
+                                            <p className="text-sm text-[#6B6547] truncate">
                                                 {getArtists(item)}
                                                 {item.album &&
                                                     ` • ${getAlbumName(item)}`}
@@ -411,7 +411,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                 ))}
                             </div>
                         ) : searchQuery ? (
-                            <div className="text-center py-4 text-[#5C5537]/50">
+                            <div className="text-center py-4 text-[#6B6547]">
                                 No results found for "{searchQuery}"
                             </div>
                         ) : (
@@ -463,7 +463,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                                     <h4 className="font-medium text-[#5C5537] truncate">
                                                         {track.name}
                                                     </h4>
-                                                    <p className="text-sm text-[#5C5537]/70 truncate">
+                                                    <p className="text-sm text-[#6B6547] truncate">
                                                         {track.artist}
                                                     </p>
                                                 </div>
@@ -471,7 +471,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-8 text-[#5C5537]/50">
+                                    <div className="text-center py-8 text-[#6B6547]">
                                         <Music className="w-12 h-12 mx-auto mb-2" />
                                         <p>No trending tracks available</p>
                                     </div>
@@ -492,12 +492,12 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                         <button
                             type="button"
                             onClick={() => setSelectedItem(null)}
-                            className="text-[#5C5537]/50 hover:text-[#5C5537]">
+                            className="text-[#6B6547] hover:text-[#5C5537]">
                             <X className="w-5 h-5" />
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-4 p-4 bg-[#FFFBEb] rounded-lg border border-[#5C5537]/20">
+                    <div className="flex items-center gap-4 p-4 bg-[#5C5537]/5 rounded-xl">
                         <div className="relative">
                             {getImageUrl(selectedItem) ? (
                                 <img
@@ -506,8 +506,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                     className="w-16 h-16 rounded-lg object-cover"
                                 />
                             ) : (
-                                <div className="bg-[#5C5537]/10 border-2 border-dashed rounded-md w-16 h-16 flex items-center justify-center">
-                                    <Music className="text-[#5C5537]/50 w-6 h-6" />
+                                <div className="bg-[#5C5537]/10 rounded-md w-16 h-16 flex items-center justify-center">
+                                    <Music className="text-[#6B6547] w-6 h-6" />
                                 </div>
                             )}
                             <div className="absolute bottom-1 right-1 bg-[#5C5537]/70 rounded-full p-1">
@@ -529,7 +529,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                         : "ALBUM"}
                                 </span>
                             </div>
-                            <p className="text-sm text-[#5C5537]/70">
+                            <p className="text-sm text-[#6B6547]">
                                 {getArtists(selectedItem)}
                                 {selectedItem.album &&
                                     ` • ${getAlbumName(selectedItem)}`}
@@ -543,13 +543,13 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                 Rating
                             </label>
                             {lockedRating !== undefined && !initialReview && (
-                                <p className="text-xs text-[#5C5537]/70">
+                                <p className="text-xs text-[#6B6547]">
                                     You&apos;ve already rated this. Your new review is added to your thread
                                     with the same rating. To change it, edit one of your reviews.
                                 </p>
                             )}
                             {initialReview && (
-                                <p className="text-xs text-[#5C5537]/70">
+                                <p className="text-xs text-[#6B6547]">
                                     Changing the rating updates all your reviews of this.
                                 </p>
                             )}

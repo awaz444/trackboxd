@@ -16,12 +16,12 @@ const LogFormTabs: React.FC<LogFormTabsProps> = ({ onClose }) => {
   return (
     <div className="flex flex-col">
       {/* Tabs */}
-      <div className="flex border-b border-[#5C5537]/20 mb-6">
+      <div className="flex gap-2 mb-6">
         <button
           className={`flex items-center gap-2 px-4 py-3 font-medium ${
             activeTab === "review"
               ? "text-[#5C5537] border-b-2 border-[#5C5537]"
-              : "text-[#5C5537]/70 hover:text-[#5C5537]"
+              : "text-[#6B6547] hover:text-[#5C5537]"
           }`}
           onClick={() => setActiveTab("review")}
         >
@@ -32,7 +32,7 @@ const LogFormTabs: React.FC<LogFormTabsProps> = ({ onClose }) => {
           className={`flex items-center gap-2 px-4 py-3 font-medium ${
             activeTab === "annotation"
               ? "text-[#5C5537] border-b-2 border-[#5C5537]"
-              : "text-[#5C5537]/70 hover:text-[#5C5537]"
+              : "text-[#6B6547] hover:text-[#5C5537]"
           }`}
           onClick={() => setActiveTab("annotation")}
         >

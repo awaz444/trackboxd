@@ -78,7 +78,7 @@ const Filters: React.FC<FiltersProps> = ({
                         <h1 className="text-3xl font-bold text-[#5C5537]">
                             Tracks
                         </h1>
-                        <p className="text-[#5C5537]/70 mt-2">
+                        <p className="text-[#6B6547] mt-2">
                             Discover global tracks and artists, explore genres, moods, and more.
                         </p>
                     </div>
@@ -87,7 +87,7 @@ const Filters: React.FC<FiltersProps> = ({
                 {/* Search - Right-aligned */}
                 <div className="w-full lg:w-[320px]">
                     <div className="relative h-full/2">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C5537]/70 w-5 h-5" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] w-5 h-5" />
                         <input
                             type="text"
                             placeholder="Search tracks, artists, albums..."

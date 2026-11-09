@@ -151,8 +151,8 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
     };
 
     return (
-        <div className={`border border-[#5C5537]/15 rounded-xl bg-[#FFFBEb] overflow-hidden ${removedFromSource ? "opacity-60" : ""}`}>
-            <div className="flex items-center gap-3 p-3">
+        <div className={removedFromSource ? "opacity-60" : undefined}>
+            <div className="flex items-center gap-3 py-1">
                 {/* Cover */}
                 <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#5C5537]/10 flex-shrink-0">
                     {track.cover_url ? (
@@ -174,9 +174,9 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                     <Link href={`/songs/${track.id}`} className="hover:underline">
                         <p className="text-sm font-semibold text-[#5C5537] truncate">{track.name}</p>
                     </Link>
-                    <p className="text-xs text-[#5C5537]/60 truncate">{track.artist}</p>
+                    <p className="text-xs text-[#6B6547] truncate">{track.artist}</p>
                     {track.album && (
-                        <p className="text-xs text-[#5C5537]/40 truncate">{track.album}</p>
+                        <p className="text-xs text-[#6B6547] truncate">{track.album}</p>
                     )}
                     {removedFromSource && (
                         <p className="text-xs text-amber-600/80 italic mt-0.5">Removed from Spotify playlist</p>
@@ -189,13 +189,13 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                         {isOwner ? (
                             <button
                                 onClick={() => setShowForm(!showForm)}
-                                className="flex items-center gap-1 text-xs font-medium text-[#5C5537]/60 hover:text-[#5C5537] border border-[#5C5537]/20 hover:border-[#5C5537]/40 rounded-full px-2.5 py-1 transition-colors"
+                                className="flex items-center gap-1 text-sm font-medium bg-[#5C5537]/10 hover:bg-[#5C5537]/15 text-[#5C5537] rounded-full px-3.5 h-9 transition-colors"
                             >
                                 <Plus className="w-3 h-3" />
                                 Review
                             </button>
                         ) : (
-                            <span className="text-xs text-[#5C5537]/30 italic">not yet reviewed</span>
+                            <span className="text-xs text-[#6B6547] italic">not yet reviewed</span>
                         )}
                     </div>
                 )}
@@ -203,7 +203,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
 
             {/* Prominent rating + review */}
             {localReview && (
-                <div className="border-t border-[#5C5537]/10 px-3 py-3">
+                <div className="pl-[60px] pt-1">
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                             <RatingStars rating={localReview.rating} showNumber={false} />
@@ -213,7 +213,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                             {isOwner && (
                                 <button
                                     onClick={() => setShowForm(!showForm)}
-                                    className="text-xs text-[#5C5537]/50 hover:text-[#5C5537] underline"
+                                    className="text-xs text-[#6B6547] hover:text-[#5C5537] underline"
                                 >
                                     edit
                                 </button>
@@ -229,24 +229,24 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                                     className={`w-4 h-4 transition-all duration-200 ${
                                         isLiked
                                             ? "text-[#5C5537] fill-[#5C5537]"
-                                            : "text-[#5C5537]/50 group-hover:text-[#5C5537]"
+                                            : "text-[#6B6547] group-hover:text-[#5C5537]"
                                     }`}
                                 />
-                                <span className={`text-sm ${isLiked ? "text-[#5C5537] font-medium" : "text-[#5C5537]/70"}`}>
+                                <span className={`text-sm ${isLiked ? "text-[#5C5537] font-medium" : "text-[#6B6547]"}`}>
                                     {likeCount}
                                 </span>
                             </button>
                         </div>
                     </div>
                     {localReview.text && (
-                        <p className="text-sm text-[#5C5537] leading-relaxed whitespace-pre-wrap mt-2">{localReview.text}</p>
+                        <p className="text-[15px] text-[#3E3725] leading-relaxed whitespace-pre-wrap mt-2">{localReview.text}</p>
                     )}
                 </div>
             )}
 
             {/* Inline review form */}
             {showForm && isOwner && (
-                <div className="border-t border-[#5C5537]/10 p-3 bg-[#5C5537]/5 space-y-3">
+                <div className="mt-2 space-y-3">
                     <div className="flex items-center gap-3">
                         <Rating
                             name={`rating-${itemId}`}
@@ -257,7 +257,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                             icon={<StarIcon className="text-[#5C5537]" fontSize="inherit" />}
                             emptyIcon={<StarIcon style={{ opacity: 0.4 }} fontSize="inherit" />}
                         />
-                        <span className="text-xs text-[#5C5537]/50">{rating > 0 ? rating.toFixed(1) : "Rate"}</span>
+                        <span className="text-xs text-[#6B6547]">{rating > 0 ? rating.toFixed(1) : "Rate"}</span>
                     </div>
                     <textarea
                         value={text}
@@ -270,7 +270,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                         <button
                             type="button"
                             onClick={() => { setShowForm(false); setError(null); }}
-                            className="text-xs text-[#5C5537]/60 hover:text-[#5C5537] px-3 py-1.5 rounded-lg border border-[#5C5537]/20"
+                            className="text-xs bg-[#5C5537]/10 hover:bg-[#5C5537]/15 text-[#5C5537] px-3 py-1.5 rounded-lg"
                         >
                             Cancel
                         </button>
@@ -295,7 +295,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
             {hasComments && (
                 <button
                     onClick={() => setExpanded(!expanded)}
-                    className="w-full flex items-center justify-center gap-1 text-xs text-[#5C5537]/50 hover:text-[#5C5537] py-1.5 border-t border-[#5C5537]/10 transition-colors"
+                    className="flex items-center gap-1 text-xs text-[#6B6547] hover:text-[#5C5537] pl-[60px] min-h-[36px] transition-colors"
                 >
                     {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                     {expanded ? "Hide comments" : `Show comments (${annotations.length})`}
@@ -304,7 +304,7 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
 
             {/* Expanded comments */}
             {expanded && hasComments && (
-                <div className="border-t border-[#5C5537]/10 p-3 bg-[#5C5537]/[0.03] space-y-3">
+                <div className="ml-[60px] pb-1 space-y-3">
                     {annotations.map((annotation) => (
                         <div key={annotation.id} className="flex gap-2.5">
                             <img

@@ -43,7 +43,7 @@ export default function MyJournalsPage() {
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-[#5C5537]">My Journals</h1>
-                        <p className="text-[#5C5537]/60 mt-1">
+                        <p className="text-[#6B6547] mt-1">
                             Curated sets of songs reviewed together.
                         </p>
                     </div>
@@ -64,7 +64,7 @@ export default function MyJournalsPage() {
                     <div className="text-center py-20">
                         <BookOpen className="w-16 h-16 text-[#5C5537]/20 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-[#5C5537] mb-2">No journals yet</h3>
-                        <p className="text-[#5C5537]/60 mb-6">
+                        <p className="text-[#6B6547] mb-6">
                             Create your first journal — import a Spotify playlist or start from scratch.
                         </p>
                         <Link
@@ -94,7 +94,7 @@ export default function MyJournalsPage() {
                         {/* Add new card */}
                         <Link
                             href="/journals/new"
-                            className="flex flex-col items-center justify-center aspect-square border-2 border-dashed border-[#5C5537]/20 hover:border-[#5C5537]/40 rounded-xl text-[#5C5537]/40 hover:text-[#5C5537]/60 transition-colors"
+                            className="flex flex-col items-center justify-center aspect-square bg-[#5C5537]/5 hover:bg-[#5C5537]/10 rounded-xl text-[#5C5537]/40 hover:text-[#5C5537]/60 transition-colors"
                         >
                             <Plus className="w-8 h-8 mb-1" />
                             <span className="text-xs font-medium">New</span>

@@ -10,19 +10,19 @@ export default function ProfileFollowingList({ username, data }: { username: str
       <div className="max-w-3xl mx-auto px-4 py-8">
         <Link
           href={`/profile/${username}`}
-          className="inline-flex items-center gap-1 text-sm text-[#5C5537]/70 hover:text-[#5C5537] mb-4"
+          className="inline-flex items-center gap-1 text-sm text-[#6B6547] hover:text-[#5C5537] mb-4"
         >
           <ArrowLeft className="w-4 h-4" /> Back to {data.user.name}&apos;s profile
         </Link>
         <h1 className="text-3xl font-bold text-[#5C5537] mb-1">People {data.user.name} follows</h1>
 
         {data.hidden ? (
-          <p className="text-[#5C5537]/70 mt-6">This account is private.</p>
+          <p className="text-[#6B6547] mt-6">This account is private.</p>
         ) : (
           <>
-            <p className="text-[#5C5537]/70 mb-6">{data.total} following</p>
+            <p className="text-[#6B6547] mb-6">{data.total} following</p>
             {data.items.length === 0 ? (
-              <p className="text-[#5C5537]/70">Not following anyone yet.</p>
+              <p className="text-[#6B6547]">Not following anyone yet.</p>
             ) : (
               <ul className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {data.items.map((u) => (
