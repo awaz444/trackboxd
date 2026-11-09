@@ -46,7 +46,7 @@ export default async function JournalDetailPage({ params }: Props) {
             journal_items(
                 id, track_id, review_id, is_native_review, sort_order, created_at, removed_from_source,
                 spotify_items(id, name, artist, album, cover_url, spotify_url),
-                reviews(id, rating, text, is_public, created_at)
+                reviews(id, rating, text, is_public, created_at, like_count)
             )
         `)
         .eq("id", id)
@@ -83,6 +83,21 @@ export default async function JournalDetailPage({ params }: Props) {
         }
     }
 
+    // Which of this journal's reviews the viewer has already liked.
+    const reviewIds = (journal.journal_items || [])
+        .map((item: any) => item.review_id)
+        .filter(Boolean) as string[];
+    let likedReviewIds: string[] = [];
+    if (currentUser && reviewIds.length > 0) {
+        const { data: likes } = await supabase
+            .from("likes")
+            .select("target_id")
+            .eq("user_id", currentUser.id)
+            .eq("target_type", "review")
+            .in("target_id", reviewIds);
+        likedReviewIds = (likes || []).map((l) => l.target_id as string);
+    }
+
     return (
         <div className="min-h-screen bg-[#FFFBEb]">
             <div className="max-w-3xl mx-auto px-4 pt-6">
@@ -101,6 +116,7 @@ export default async function JournalDetailPage({ params }: Props) {
                 }}
                 currentUserId={currentUser?.id ?? null}
                 annotationsByTrack={annotationsByTrack}
+                likedReviewIds={likedReviewIds}
             />
         </div>
     );

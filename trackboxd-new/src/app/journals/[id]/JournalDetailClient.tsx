@@ -64,6 +64,7 @@ interface JournalItem {
         id: string;
         rating: number;
         text?: string | null;
+        like_count?: number | null;
     } | null;
 }
 
@@ -102,6 +103,7 @@ interface JournalDetailClientProps {
     };
     currentUserId: string | null;
     annotationsByTrack: Record<string, AnnotationItem[]>;
+    likedReviewIds?: string[];
 }
 
 const ProgressBar = ({ reviewed, total }: { reviewed: number; total: number }) => {
@@ -123,7 +125,7 @@ const ProgressBar = ({ reviewed, total }: { reviewed: number; total: number }) =
     );
 };
 
-export default function JournalDetailClient({ journal, currentUserId, annotationsByTrack }: JournalDetailClientProps) {
+export default function JournalDetailClient({ journal, currentUserId, annotationsByTrack, likedReviewIds = [] }: JournalDetailClientProps) {
     const router = useRouter();
     const isOwner = currentUserId === journal.user_id;
 
@@ -642,6 +644,8 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                             review={item.reviews}
                             annotations={annotationsByTrack[item.track_id] || []}
                             isOwner={isOwner}
+                            currentUserId={currentUserId}
+                            initialLiked={!!item.review_id && likedReviewIds.includes(item.review_id)}
                             journalIsPublic={isPublic}
                             removedFromSource={item.removed_from_source ?? false}
                             onReviewSaved={handleReviewSaved}
