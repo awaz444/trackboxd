@@ -27,7 +27,7 @@ export default function PopularOnTrackboxd({ data, likes = {} }: Props) {
     <section className="mb-10">
       <HomeSectionHeader
         title="Popular on Trackboxd"
-        subtitle="Ranked by likes, reviews & annotations"
+        subtitle="Trending now: recent likes, reviews & annotations"
       />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
         {data.map((item) => (
