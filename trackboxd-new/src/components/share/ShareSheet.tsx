@@ -8,8 +8,8 @@ import {
   Download,
   Check,
   ArrowLeft,
-  Loader2,
 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface ShareSheetProps {
   type: 'review' | 'annotation'
@@ -213,9 +213,9 @@ export default function ShareSheet({
           {view === 'story' && (
             <div className="flex flex-col items-center gap-4">
               {loading && (
-                <div className="flex flex-col items-center gap-3 py-10">
-                  <Loader2 className="w-6 h-6 text-[#6B6547] animate-spin" />
-                  <span className="text-sm text-[#6B6547]">Generating story card…</span>
+                <div className="w-full flex flex-col items-center gap-4" aria-busy="true">
+                  <Skeleton className="h-96 aspect-[9/16]" rounded="rounded-xl" />
+                  <Skeleton className="h-11 w-full" rounded="rounded-xl" />
                 </div>
               )}
 

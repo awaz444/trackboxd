@@ -12,6 +12,7 @@ import FollowRequestsModal from "./FollowRequestsModal";
 import AuthModal from "@/components/AuthModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { VipBadge } from "@/components/VipBadge";
+import { pendingClass } from "@/components/ui/skeleton";
 
 interface ProfileHeaderProps {
   user: {
@@ -230,28 +231,22 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                       : currentFollowStatus === 'requested'
                         ? "bg-[#5C5537]/50 hover:bg-[#5C5537]/60 text-white cursor-not-allowed"
                         : "bg-[#5C5537]/90 hover:bg-[#5C5537] text-white"
-                    }`}
+                    } ${isLoading ? pendingClass : ""}`}
                 >
-                  {isLoading ? (
-                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                  {currentFollowStatus === 'following' ? (
+                    <>
+                      <Users className="w-3 h-3" />
+                      Following
+                    </>
+                  ) : currentFollowStatus === 'requested' ? (
+                    <>
+                      <UserPlus className="w-3 h-3" />
+                      Requested
+                    </>
                   ) : (
                     <>
-                      {currentFollowStatus === 'following' ? (
-                        <>
-                          <Users className="w-3 h-3" />
-                          Following
-                        </>
-                      ) : currentFollowStatus === 'requested' ? (
-                        <>
-                          <UserPlus className="w-3 h-3" />
-                          Requested
-                        </>
-                      ) : (
-                        <>
-                          <UserPlus className="w-3 h-3" />
-                          {isPrivateProfile ? 'Request' : 'Follow'}
-                        </>
-                      )}
+                      <UserPlus className="w-3 h-3" />
+                      {isPrivateProfile ? 'Request' : 'Follow'}
                     </>
                   )}
                 </Button>

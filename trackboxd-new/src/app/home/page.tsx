@@ -13,6 +13,14 @@ import PeopleYouMayKnow from "@/components/home/PeopleYouMayKnow";
 import PopularUsersSection from "@/components/home/PopularUsersSection";
 import JournalsPromoModal from "@/components/home/JournalsPromoModal";
 import HomeSectionHeader from "@/components/home/HomeSectionHeader";
+import TileRail from "@/components/TileRail";
+import {
+  TileSkeleton,
+  TileGridSkeleton,
+  TileRailSkeleton,
+  RowListSkeleton,
+  ReviewListSkeleton,
+} from "@/components/ui/skeleton";
 import GlobalActivityGrid from "@/components/activity/GlobalActivityGrid";
 import type { GlobalActivityItem } from "@/lib/global-activity";
 
@@ -182,11 +190,48 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFBEb]">
+      <div className="min-h-screen bg-[#FFFBEb]" aria-busy="true" aria-label="Loading">
         <main className="max-w-6xl mx-auto px-4 pt-4 pb-8 md:py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]" />
-          </div>
+          <section className="mb-10">
+            <HomeSectionHeader title="New on Trackboxd" />
+            <TileRail cols="sm:grid-cols-4" itemWidth="w-[42%]">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <TileSkeleton key={i} poster />
+              ))}
+            </TileRail>
+          </section>
+
+          <section className="mb-10">
+            <HomeSectionHeader
+              title="Popular on Trackboxd"
+              subtitle="Trending now: recent likes, reviews & annotations"
+            />
+            <RowListSkeleton count={5} rank className="md:hidden" />
+            <div className="hidden md:block">
+              <TileGridSkeleton count={5} cols="grid-cols-5" />
+            </div>
+          </section>
+
+          <section className="mb-10">
+            <HomeSectionHeader
+              title="Popular Reviews This Week"
+              subtitle="Most liked reviews in the past week"
+            />
+            <ReviewListSkeleton count={5} className="space-y-3" />
+          </section>
+
+          <section className="mb-10">
+            <HomeSectionHeader
+              title="Popular Annotations This Week"
+              subtitle="Most liked annotations this week"
+            />
+            <ReviewListSkeleton count={5} className="space-y-3" />
+          </section>
+
+          <section className="mb-10">
+            <HomeSectionHeader title="Recommended for You" />
+            <TileRailSkeleton count={5} cols="sm:grid-cols-3 md:grid-cols-5" itemWidth="w-[38%]" />
+          </section>
         </main>
         <Footer variant="light" />
       </div>

@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { Plus, X, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { RowListSkeleton, pendingClass } from "@/components/ui/skeleton";
 
 interface Track {
   id: string;
@@ -134,13 +134,9 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
                   <button
                     onClick={() => handleRemoveTrack(track.id)}
                     disabled={isRemoving === track.id}
-                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className={`absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity ${isRemoving === track.id ? `opacity-100 ${pendingClass}` : ""}`}
                   >
-                    {isRemoving === track.id ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    ) : (
-                      <X className="w-3 h-3" />
-                    )}
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
                 <div className="p-2">
@@ -198,11 +194,6 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
                   }}
                   className="pl-3 pr-10"
                 />
-                {isSearching && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <Loader2 className="w-5 h-5 text-[#5C5537] animate-spin" />
-                  </div>
-                )}
               </div>
 
               <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -212,7 +203,10 @@ const FavoriteTracksEditor: React.FC<FavoriteTracksEditorProps> = ({
                     <p>{searchQuery ? `No results for "${searchQuery}"` : 'Search for tracks to add'}</p>
                   </div>
                 )}
-                {searchResults.map((t) => (
+                {isSearching && (
+                  <RowListSkeleton count={4} media="square" size="w-16 h-16" className="px-3" />
+                )}
+                {!isSearching && searchResults.map((t) => (
                   <div
                     key={t.id}
                     className="flex items-center gap-3 p-3 hover:bg-[#5C5537]/5 rounded-lg cursor-pointer"

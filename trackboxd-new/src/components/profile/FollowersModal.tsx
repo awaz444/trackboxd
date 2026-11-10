@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, UserMinus, Loader2 } from "lucide-react";
+import { X, UserMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { VipBadge } from "@/components/VipBadge";
+import { RowListSkeleton, pendingClass } from "@/components/ui/skeleton";
 
 interface Follower {
   id: string;
@@ -102,9 +103,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
         {/* Content */}
         <div className="max-h-[60vh] overflow-y-auto p-4">
           {isLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-[#5C5537]" />
-            </div>
+            <RowListSkeleton count={4} media="round" size="w-10 h-10" trailing={isOwnProfile} className="px-2" />
           ) : followers.length === 0 ? (
             <div className="text-center py-8 text-[#6B6547]">
               No followers yet
@@ -137,26 +136,23 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
                   </Link>
 
                   {isOwnProfile && (
-                    removingId === follower.id ? (
-                      <div className="flex items-center gap-1 text-[#6B6547] text-xs px-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Removing…
-                      </div>
-                    ) : confirmingId === follower.id ? (
+                    confirmingId === follower.id ? (
                       <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
                           className="h-8 px-2 text-xs text-[#6B6547] hover:bg-[#5C5537]/10"
                           onClick={() => setConfirmingId(null)}
+                          disabled={removingId === follower.id}
                         >
                           Cancel
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 font-medium"
+                          className={`h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 font-medium ${removingId === follower.id ? pendingClass : ""}`}
                           onClick={() => handleRemoveFollower(follower.id)}
+                          disabled={removingId === follower.id}
                         >
                           Remove
                         </Button>

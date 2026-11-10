@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 // Removed private visibility toggle: no Checkbox needed
 import useUser from "@/hooks/useUser";
 import { track } from "@/lib/analytics";
+import { RowListSkeleton, pendingClass } from "@/components/ui/skeleton";
 import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
 
@@ -130,7 +131,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [trendingTracks, setTrendingTracks] = useState<SimplifiedTrack[]>([]);
-    const [isLoadingTrending, setIsLoadingTrending] = useState(false);
+    const [isLoadingTrending, setIsLoadingTrending] = useState(!initialTrack);
     // Removed visibility state: reviews are public by default
     const [hover, setHover] = useState(-1);
 
@@ -355,9 +356,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                     {/* Search Results - Scrollable container */}
                     <div className="py-2 max-h-96 overflow-y-auto">
                         {isSearching ? (
-                            <div className="flex justify-center py-4">
-                                <p className="text-[#6B6547]">Searching...</p>
-                            </div>
+                            <RowListSkeleton count={4} media="square" size="w-16 h-16" className="px-3" />
                         ) : searchError ? (
                             <div className="text-center py-4 text-red-500">
                                 {searchError}
@@ -421,9 +420,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                     Trending This Week
                                 </h4>
                                 {isLoadingTrending ? (
-                                    <div className="flex justify-center items-center h-32">
-                                        <div className="w-4 h-4 border-2 border-[#5C5537] border-t-transparent rounded-full animate-spin" />
-                                    </div>
+                                    <RowListSkeleton count={3} media="square" size="w-16 h-16" className="px-3" />
                                 ) : trendingTracks.length > 0 ? (
                                     <div className="space-y-3">
                                         {trendingTracks.map((track) => (
@@ -614,16 +611,9 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                             </Button>
                             <Button
                                 type="submit"
-                                className="bg-[#5C5537] hover:bg-[#3E3725] text-white"
+                                className={`bg-[#5C5537] hover:bg-[#3E3725] text-white ${isSubmitting ? pendingClass : ""}`}
                                 disabled={!rating || isSubmitting}>
-                                {isSubmitting ? (
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        Posting...
-                                    </div>
-                                ) : (
-                                    "Post Review"
-                                )}
+                                Post Review
                             </Button>
                         </div>
                     </div>

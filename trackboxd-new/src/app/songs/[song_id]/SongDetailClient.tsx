@@ -15,6 +15,7 @@ import AnnotationForm from "@/components/log/forms/AnnotationForm";
 import { spotifyToTrack } from "@/utils/trackConverters";
 import MediaCard from "@/components/MediaCard";
 import TileRail from "@/components/TileRail";
+import { Skeleton, DetailHeaderSkeleton, ReviewListSkeleton, pendingClass } from "@/components/ui/skeleton";
 import { SITE_URL } from '@/lib/site';
 
 interface Review {
@@ -496,8 +497,19 @@ const SongDetailClient = ({
         return (
             <div className="min-h-screen bg-[#FFFBEb]">
 
-                <div className="max-w-5xl mx-auto px-4 py-8 flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
+                <div className="max-w-5xl mx-auto px-4 py-6" aria-busy="true">
+                    <DetailHeaderSkeleton />
+                    <div className="mb-8">
+                        <div className="grid grid-cols-4 gap-2 py-2">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="flex flex-col items-center gap-1.5">
+                                    <Skeleton className="h-6 w-10" />
+                                    <Skeleton className="h-3 w-14" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <ReviewListSkeleton cover={false} />
                 </div>
                 <Footer variant="light" />
             </div>
@@ -596,17 +608,11 @@ const SongDetailClient = ({
                                     isLiked
                                         ? "bg-[#5C5537] text-[#FFFBEb]"
                                         : "bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15"
-                                }`}>
-                                {likeLoading ? (
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
-                                ) : (
-                                    <>
-                                        <Heart className="w-3 h-3" />
-                                        <span>
-                                            {isLiked ? "Liked" : "Like"}
-                                        </span>
-                                    </>
-                                )}
+                                } ${likeLoading ? pendingClass : ""}`}>
+                                <Heart className="w-3 h-3" />
+                                <span>
+                                    {isLiked ? "Liked" : "Like"}
+                                </span>
                             </button>
 
                             <button
@@ -726,6 +732,9 @@ const SongDetailClient = ({
 
                     {activeTab === "reviews" && (
                         <div className="mt-4 space-y-4">
+                            {loadingReviews && reviews.length === 0 && (
+                                <ReviewListSkeleton cover={false} />
+                            )}
                             <ReviewThreads
                                 reviews={reviews}
                                 renderEntry={(review, ctx) => (
@@ -771,7 +780,7 @@ const SongDetailClient = ({
                                             <button
                                                 onClick={() => handleReviewLikeClick(review.id)}
                                                 disabled={reviewLoading[review.id]}
-                                                className="group flex items-center space-x-1 focus:outline-none cursor-pointer"
+                                                className={`group flex items-center space-x-1 focus:outline-none cursor-pointer ${reviewLoading[review.id] ? pendingClass : ""}`}
                                             >
                                                 <Heart
                                                     className={`w-4 h-4 transition-all duration-200 ${
@@ -807,6 +816,9 @@ const SongDetailClient = ({
 
                     {activeTab === "annotations" && (
                         <div className="mt-4 space-y-4">
+                            {loadingAnnotations && annotations.length === 0 && (
+                                <ReviewListSkeleton cover={false} />
+                            )}
                             {annotations.map((annotation) => {
                                 const minutes = Math.floor(annotation.timestamp / 60);
                                 const seconds = Math.floor(annotation.timestamp % 60);
@@ -863,7 +875,7 @@ const SongDetailClient = ({
                                             <button
                                                 onClick={() => handleAnnotationLikeClick(annotation.id)}
                                                 disabled={annotationLoading[annotation.id]}
-                                                className="group flex items-center space-x-1 focus:outline-none cursor-pointer"
+                                                className={`group flex items-center space-x-1 focus:outline-none cursor-pointer ${annotationLoading[annotation.id] ? pendingClass : ""}`}
                                             >
                                                 <Heart
                                                     className={`w-4 h-4 transition-all duration-200 ${

@@ -3,12 +3,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-    Lock, Globe, Trash2, Edit2, Check, X, Music, Plus, Search, Link2, ExternalLink, Upload, Loader2, RefreshCw
+    Lock, Globe, Trash2, Edit2, Check, X, Music, Plus, Search, Link2, ExternalLink, Upload, RefreshCw
 } from "lucide-react";
 import JournalTrackRow from "@/components/journals/JournalTrackRow";
 import JournalCover from "@/components/journals/JournalCover";
 import Link from "next/link";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
+import { RowListSkeleton, pendingClass } from "@/components/ui/skeleton";
 
 // Center-crops an image file to a square and re-encodes it as JPEG.
 const cropImageToSquare = (file: File): Promise<Blob> => {
@@ -362,13 +363,9 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                         />
                         {isOwner && (
                             <label
-                                className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity cursor-pointer ${isUploadingCover ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                                className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity cursor-pointer ${isUploadingCover ? `opacity-100 ${pendingClass}` : "opacity-0 group-hover:opacity-100"}`}
                             >
-                                {isUploadingCover ? (
-                                    <Loader2 className="w-6 h-6 text-white animate-spin" />
-                                ) : (
-                                    <Upload className="w-6 h-6 text-white" />
-                                )}
+                                <Upload className="w-6 h-6 text-white" />
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -482,10 +479,10 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                                     <button
                                         onClick={handleResync}
                                         disabled={isSyncing}
-                                        className="flex items-center gap-1.5 text-xs rounded-full px-3.5 h-9 bg-[#5C5537]/10 hover:bg-[#5C5537]/15 text-[#5C5537] disabled:opacity-50"
+                                        className={`flex items-center gap-1.5 text-xs rounded-full px-3.5 h-9 bg-[#5C5537]/10 hover:bg-[#5C5537]/15 text-[#5C5537] disabled:opacity-50 ${isSyncing ? pendingClass : ""}`}
                                     >
-                                        <RefreshCw className={`w-3 h-3 ${isSyncing ? "animate-spin" : ""}`} />
-                                        {isSyncing ? "Syncing..." : "Resync from Spotify"}
+                                        <RefreshCw className="w-3 h-3" />
+                                        Resync from Spotify
                                     </button>
                                 )}
                                 {isOwner && (
@@ -544,7 +541,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                             <button
                                 onClick={handleDelete}
                                 disabled={isDeleting}
-                                className="flex-1 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
+                                className={`flex-1 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 ${isDeleting ? pendingClass : ""}`}
                             >
                                 {isDeleting ? "Deleting..." : "Delete"}
                             </button>
@@ -576,7 +573,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                                 {trackSearch.trim() && (
                                     <div className="absolute left-0 right-0 top-full mt-1 bg-[#FFFBEb] rounded-xl shadow-xl z-20 overflow-hidden">
                                         {isSearching ? (
-                                            <p className="text-xs text-[#6B6547] text-center py-3">Searching...</p>
+                                            <RowListSkeleton count={3} size="w-9 h-9" className="px-2" />
                                         ) : trackResults.length > 0 ? (
                                             <div>
                                                 {trackResults.slice(0, 3).map((track: any) => (

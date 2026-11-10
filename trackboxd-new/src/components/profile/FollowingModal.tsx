@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, UserMinus, Loader2 } from "lucide-react";
+import { X, UserMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { VipBadge } from "@/components/VipBadge";
+import { RowListSkeleton, pendingClass } from "@/components/ui/skeleton";
 
 interface Following {
   id: string;
@@ -98,9 +99,7 @@ const FollowingModal: React.FC<FollowingModalProps> = ({
         {/* Content */}
         <div className="max-h-[60vh] overflow-y-auto p-4">
           {isLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-[#5C5537]" />
-            </div>
+            <RowListSkeleton count={4} media="round" size="w-10 h-10" trailing={isOwnProfile} className="px-2" />
           ) : following.length === 0 ? (
             <div className="text-center py-8 text-[#6B6547]">
               Not following anyone yet
@@ -136,15 +135,11 @@ const FollowingModal: React.FC<FollowingModalProps> = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-[#6B6547] hover:text-red-500 hover:bg-red-50"
+                      className={`text-[#6B6547] hover:text-red-500 hover:bg-red-50 ${unfollowingId === user.id ? pendingClass : ""}`}
                       onClick={() => handleUnfollow(user.id)}
                       disabled={unfollowingId === user.id}
                     >
-                      {unfollowingId === user.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <UserMinus className="h-4 w-4" />
-                      )}
+                      <UserMinus className="h-4 w-4" />
                     </Button>
                   )}
                 </div>

@@ -10,6 +10,7 @@ import ReviewCard from "@/components/songs/ReviewCard";
 import AnnotationCard from "@/components/songs/AnnotationCard";
 import MediaCard from "@/components/MediaCard";
 import TileRail from "@/components/TileRail";
+import { TileGridSkeleton, TileRailSkeleton, ReviewListSkeleton } from "@/components/ui/skeleton";
 import { Review, Annotation, SpotifyPlaylistTrack } from "./types";
 
 interface SpotifyTrack {
@@ -227,9 +228,7 @@ const Tracks = () => {
                 Trending This Week Globally
               </h2>
               {isLoadingTopTracks ? (
-                <div className="flex justify-center items-center h-48">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]" />
-                </div>
+                <TileGridSkeleton count={4} cols="grid-cols-2 sm:grid-cols-2 md:grid-cols-4" />
               ) : topTracksError ? (
                 <p className="text-[#5C5537]">{topTracksError}</p>
               ) : (
@@ -256,9 +255,7 @@ const Tracks = () => {
                   Trending on Trackboxd This Week
                 </h2>
                 {isLoadingTrackboxdTrending ? (
-                  <div className="flex justify-center items-center h-48">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]" />
-                  </div>
+                  <TileRailSkeleton count={5} />
                 ) : (
                   <TileRail>
                     {trackboxdTrending.map((track: any) => (
@@ -293,9 +290,7 @@ const Tracks = () => {
               <div>
                 <h2 className="text-xl font-bold text-[#5C5537] mb-6">Recently Annotated</h2>
                 {isLoadingRecentlyAnnotated ? (
-                  <div className="flex justify-center items-center h-32">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5C5537]" />
-                  </div>
+                  <ReviewListSkeleton count={4} cover={false} />
                 ) : recentlyAnnotatedError ? (
                   <p className="text-[#5C5537]">{recentlyAnnotatedError}</p>
                 ) : (
@@ -312,9 +307,7 @@ const Tracks = () => {
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-[#5C5537] mb-6">Popular Reviews This Week</h2>
               {isLoadingPopularReviews ? (
-                <div className="flex justify-center items-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5C5537]" />
-                </div>
+                <ReviewListSkeleton count={5} />
               ) : popularReviews.length > 0 ? (
                 <div className="space-y-4">
                   {popularReviews.map((review) => (
@@ -330,9 +323,7 @@ const Tracks = () => {
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-[#5C5537] mb-6">Popular Annotations</h2>
               {isLoadingPopularAnnotations ? (
-                <div className="flex justify-center items-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5C5537]" />
-                </div>
+                <ReviewListSkeleton count={5} />
               ) : popularAnnotations.length > 0 ? (
                 <div className="space-y-4">
                   {popularAnnotations.map((annotation) => (

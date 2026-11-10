@@ -3,7 +3,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search, X, Send, Loader2, Check, UserPlus, Users } from "lucide-react";
+import { Search, X, Send, Check, UserPlus, Users } from "lucide-react";
+import { RowListSkeleton, pendingClass } from "@/components/ui/skeleton";
 
 interface UserResult {
     id: string;
@@ -238,9 +239,9 @@ export default function AdminEmailsPage() {
                                 <button
                                     onClick={addAllUsers}
                                     disabled={isAddingAll}
-                                    className="flex items-center gap-1.5 text-xs font-medium text-[#5C5537] hover:underline disabled:opacity-50"
+                                    className={`flex items-center gap-1.5 text-xs font-medium text-[#5C5537] hover:underline disabled:opacity-50 ${isAddingAll ? pendingClass : ""}`}
                                 >
-                                    {isAddingAll ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Users className="w-3.5 h-3.5" />}
+                                    <Users className="w-3.5 h-3.5" />
                                     Add all users
                                 </button>
                                 {recipients.length > 0 && (
@@ -287,7 +288,7 @@ export default function AdminEmailsPage() {
                             {userQuery.trim() && (
                                 <div className="absolute left-0 right-0 top-full mt-1 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg shadow-lg z-20 overflow-hidden max-h-64 overflow-y-auto">
                                     {isSearching ? (
-                                        <p className="text-xs text-[#5C5537]/50 text-center py-3">Searching...</p>
+                                        <RowListSkeleton count={3} media="round" size="w-8 h-8" className="px-2" />
                                     ) : userResults.length > 0 ? (
                                         <div className="divide-y divide-[#5C5537]/10">
                                             {userResults.map((u) => (
@@ -393,10 +394,10 @@ export default function AdminEmailsPage() {
                             <button
                                 onClick={handleSend}
                                 disabled={isSending}
-                                className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm bg-[#5C5537] text-white rounded-lg hover:bg-[#3E3725] disabled:opacity-50"
+                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-sm bg-[#5C5537] text-white rounded-lg hover:bg-[#3E3725] disabled:opacity-50 ${isSending ? pendingClass : ""}`}
                             >
-                                {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                                {isSending ? "Sending..." : "Send"}
+                                <Check className="w-4 h-4" />
+                                Send
                             </button>
                         </div>
                     </div>

@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { UserPlus, Loader2, Users } from "lucide-react";
+import { UserPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useFollow } from "@/hooks/useFollow";
 import { VipBadge } from "@/components/VipBadge";
+import { pendingClass } from "@/components/ui/skeleton";
 
 interface User {
   id: string;
@@ -79,18 +80,14 @@ export default function SuggestedUsers({ users, onFollowSuccess }: SuggestedUser
                 size="sm"
                 className={`text-[#5C5537] border-[#5C5537]/30 hover:bg-[#5C5537]/10 ${
                   followStatus === 'following' ? "bg-[#5C5537]/20" : ""
-                }`}
+                } ${isLoading ? pendingClass : ""}`}
                 onClick={handleUserFollow}
                 disabled={isLoading}
               >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                {followStatus === 'following' ? (
+                  <Users className="h-4 w-4 mr-1" />
                 ) : (
-                  followStatus === 'following' ? (
-                    <Users className="h-4 w-4 mr-1" />
-                  ) : (
-                    <UserPlus className="h-4 w-4 mr-1" />
-                  )
+                  <UserPlus className="h-4 w-4 mr-1" />
                 )}
                 {followStatus === 'following' ? "Following" : "Follow"}
               </Button>

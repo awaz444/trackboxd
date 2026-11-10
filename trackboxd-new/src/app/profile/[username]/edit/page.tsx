@@ -18,7 +18,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Save, X, Upload, HelpCircle, Lock, Loader2 } from "lucide-react";
+import { Save, X, Upload, HelpCircle, Lock } from "lucide-react";
+import { Skeleton, pendingClass } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { COUNTRIES } from "./countries";
@@ -297,50 +298,36 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
         return (
             <div className="min-h-screen bg-[#FFFBEb]">
                 <div className="max-w-5xl mx-auto px-4 py-8">
-                    <div className="animate-pulse">
-                        {/* Avatar + form fields row */}
-                        <div className="flex flex-col items-center md:flex-row gap-8 mb-8">
-                            {/* Avatar circle */}
-                            <div className="flex-shrink-0">
-                                <div className="rounded-full bg-[#5C5537]/10 h-32 w-32 md:h-40 md:w-40" />
-                            </div>
-
-                            {/* Form fields */}
-                            <div className="flex-1 w-full">
-                                <div className="flex flex-col md:flex-row md:justify-between gap-4">
-                                    <div className="w-full">
-                                        {/* Username */}
-                                        <div className="mb-4">
-                                            <div className="h-4 bg-[#5C5537]/10 rounded w-20 mb-2 ml-1" />
-                                            <div className="h-10 bg-[#5C5537]/10 rounded w-full md:w-80" />
-                                        </div>
-                                        {/* Country */}
-                                        <div className="mb-4">
-                                            <div className="h-4 bg-[#5C5537]/10 rounded w-16 mb-2 ml-1" />
-                                            <div className="h-10 bg-[#5C5537]/10 rounded w-full md:w-80" />
-                                            <div className="h-3 bg-[#5C5537]/10 rounded w-48 mt-1 ml-1" />
-                                        </div>
-                                        {/* Spotify URL */}
-                                        <div className="mb-4">
-                                            <div className="h-4 bg-[#5C5537]/10 rounded w-32 mb-2 ml-1" />
-                                            <div className="h-10 bg-[#5C5537]/10 rounded w-full md:w-80" />
-                                        </div>
-                                        {/* Instagram URL */}
-                                        <div className="mb-4">
-                                            <div className="h-4 bg-[#5C5537]/10 rounded w-36 mb-2 ml-1" />
-                                            <div className="h-10 bg-[#5C5537]/10 rounded w-full md:w-80" />
-                                        </div>
-                                        {/* Private checkbox */}
-                                        <div className="mb-4 flex items-center gap-3">
-                                            <div className="h-4 w-4 bg-[#5C5537]/10 rounded" />
-                                            <div className="h-4 bg-[#5C5537]/10 rounded w-32" />
-                                        </div>
+                    <div aria-busy="true" className="flex flex-col items-center md:flex-row gap-8 mb-8">
+                        <Skeleton className="h-32 w-32 md:h-40 md:w-40 flex-shrink-0" rounded="rounded-full" />
+                        <div className="flex-1 w-full">
+                            <div className="flex flex-col md:flex-row md:justify-between gap-4">
+                                <div className="w-full">
+                                    <div className="mb-4">
+                                        <Skeleton className="h-4 w-20 mb-2 ml-1" />
+                                        <Skeleton className="h-10 w-full md:w-80" />
                                     </div>
-                                    {/* Save / Cancel buttons */}
-                                    <div className="flex gap-3 md:self-start">
-                                        <div className="h-10 bg-[#5C5537]/10 rounded w-28" />
-                                        <div className="h-10 bg-[#5C5537]/10 rounded w-20" />
+                                    <div className="mb-4">
+                                        <Skeleton className="h-4 w-16 mb-2 ml-1" />
+                                        <Skeleton className="h-10 w-full md:w-80" />
+                                        <Skeleton className="h-3 w-48 mt-1 ml-1" />
                                     </div>
+                                    <div className="mb-4">
+                                        <Skeleton className="h-4 w-32 mb-2 ml-1" />
+                                        <Skeleton className="h-10 w-full md:w-80" />
+                                    </div>
+                                    <div className="mb-4">
+                                        <Skeleton className="h-4 w-36 mb-2 ml-1" />
+                                        <Skeleton className="h-10 w-full md:w-80" />
+                                    </div>
+                                    <div className="mb-4 flex items-center gap-3">
+                                        <Skeleton className="h-4 w-4" rounded="rounded" />
+                                        <Skeleton className="h-4 w-32" />
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 md:self-start">
+                                    <Skeleton className="h-10 w-28" />
+                                    <Skeleton className="h-10 w-20" />
                                 </div>
                             </div>
                         </div>
@@ -403,13 +390,9 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                 className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-[#FFFFF5] shadow-lg"
                             />
                             <label
-                                className={`absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center transition-opacity cursor-pointer ${imageUploading ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                                className={`absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center transition-opacity cursor-pointer ${imageUploading ? `opacity-100 ${pendingClass}` : "opacity-0 group-hover:opacity-100"}`}
                             >
-                                {imageUploading ? (
-                                    <Loader2 className="w-8 h-8 text-white animate-spin" />
-                                ) : (
-                                    <Upload className="w-8 h-8 text-white" />
-                                )}
+                                <Upload className="w-8 h-8 text-white" />
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -571,13 +554,9 @@ export default function EditProfilePage({ params }: ProfilePageProps) {
                                 <Button
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className="bg-[#5C5537] hover:bg-[#5C5537] text-[#FFFBEb]">
-                                    {saving ? (
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                    ) : (
-                                        <Save className="w-4 h-4 mr-2" />
-                                    )}
-                                    {saving ? "Saving..." : "Save Changes"}
+                                    className={`bg-[#5C5537] hover:bg-[#5C5537] text-[#FFFBEb] ${saving ? pendingClass : ""}`}>
+                                    <Save className="w-4 h-4 mr-2" />
+                                    Save Changes
                                 </Button>
 
                                 <Button

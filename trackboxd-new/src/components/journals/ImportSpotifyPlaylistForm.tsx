@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Music, Loader2 } from "lucide-react";
+import { Search, Music } from "lucide-react";
+import { Skeleton, RowListSkeleton, pendingClass } from "@/components/ui/skeleton";
 import { friendlyError } from "@/lib/friendlyError";
 
 interface PlaylistPreview {
@@ -71,14 +72,28 @@ const ImportSpotifyPlaylistForm: React.FC<ImportSpotifyPlaylistFormProps> = ({
                 <button
                     type="submit"
                     disabled={!input.trim() || loading}
-                    className="px-4 py-2.5 text-sm font-medium bg-[#5C5537] text-white rounded-lg hover:bg-[#3E3725] disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                    className={`px-4 py-2.5 text-sm font-medium bg-[#5C5537] text-white rounded-lg hover:bg-[#3E3725] disabled:opacity-50 transition-colors flex items-center gap-1.5 ${loading ? pendingClass : ""}`}
                 >
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Preview"}
+                    Preview
                 </button>
             </form>
 
             {error && (
                 <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+            )}
+
+            {loading && (
+                <div className="overflow-hidden" aria-busy="true">
+                    <div className="flex items-center gap-3 p-4 bg-[#5C5537]/5">
+                        <Skeleton className="w-16 h-16 flex-shrink-0" rounded="rounded-lg" />
+                        <div className="flex-1 min-w-0 space-y-2">
+                            <Skeleton className="h-4 w-1/2" />
+                            <Skeleton className="h-3 w-1/3" />
+                            <Skeleton className="h-3 w-16" />
+                        </div>
+                    </div>
+                    <RowListSkeleton count={4} size="w-8 h-8" className="px-4" />
+                </div>
             )}
 
             {preview && (
@@ -140,16 +155,9 @@ const ImportSpotifyPlaylistForm: React.FC<ImportSpotifyPlaylistFormProps> = ({
                         <button
                             onClick={() => onConfirm(preview)}
                             disabled={isSubmitting}
-                            className="w-full py-2.5 text-sm font-medium bg-[#5C5537] text-white rounded-lg hover:bg-[#3E3725] disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                            className={`w-full py-2.5 text-sm font-medium bg-[#5C5537] text-white rounded-lg hover:bg-[#3E3725] disabled:opacity-50 transition-colors flex items-center justify-center gap-2 ${isSubmitting ? pendingClass : ""}`}
                         >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    Importing...
-                                </>
-                            ) : (
-                                "Import & Start Journal"
-                            )}
+                            Import & Start Journal
                         </button>
                     </div>
                 </div>

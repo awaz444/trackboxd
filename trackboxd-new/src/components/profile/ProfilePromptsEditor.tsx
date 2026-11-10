@@ -3,7 +3,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, X, Music, Album, ListMusic } from "lucide-react";
+import { X, Music, Album, ListMusic } from "lucide-react";
+import { RowListSkeleton, Skeleton, pendingClass } from "@/components/ui/skeleton";
 
 interface PromptDef {
   id: string;
@@ -30,6 +31,7 @@ interface Props {
 
 const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponsesUpdate, onClose }) => {
   const [prompts, setPrompts] = useState<PromptDef[]>([]);
+  const [promptsLoading, setPromptsLoading] = useState(true);
   const [activePromptKey, setActivePromptKey] = useState<string | null>(null);
   const [textValue, setTextValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,7 +44,8 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
     fetch('/api/profile/prompts')
       .then(r => r.json())
       .then((list) => setPrompts(list))
-      .catch(() => setPrompts([]));
+      .catch(() => setPrompts([]))
+      .finally(() => setPromptsLoading(false));
   }, []);
 
   const activePrompt = useMemo(() => prompts.find(p => p.key === activePromptKey) || null, [prompts, activePromptKey]);
@@ -169,7 +172,14 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
 
           {/* Prompts list */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
-            {availablePrompts.map((p) => {
+            {promptsLoading && Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} aria-hidden className="py-3 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3.5 w-1/2" />
+                <Skeleton className="h-8 w-20 mt-2" />
+              </div>
+            ))}
+            {!promptsLoading && availablePrompts.map((p) => {
               const existing = responses.find(r => r.promptKey === p.key);
               return (
                 <div key={p.id} className="py-3 flex flex-col justify-between">
@@ -191,11 +201,11 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-[#5C5537]/20 text-[#5C5537] hover:bg-[#5C5537]/10 text-xs md:text-sm px-2 md:px-3 py-1 md:py-2 h-auto"
+                          className={`border-[#5C5537]/20 text-[#5C5537] hover:bg-[#5C5537]/10 text-xs md:text-sm px-2 md:px-3 py-1 md:py-2 h-auto ${deletingKey === p.key ? pendingClass : ""}`}
                           disabled={deletingKey === p.key}
                           onClick={() => deleteResponse(p.key)}
                         >
-                          {deletingKey === p.key ? <Loader2 className="w-3 h-3 md:w-4 md:h-4 animate-spin" /> : 'Delete'}
+                          Delete
                         </Button>
                       </div>
                   </div>
@@ -211,7 +221,7 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
               </div>
             );
           })}
-            {availablePrompts.length === 0 && (
+            {!promptsLoading && availablePrompts.length === 0 && (
               <div className="text-[#6B6547] text-sm md:text-base">No prompts available.</div>
             )}
           </div>
@@ -238,11 +248,6 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
                       onChange={(e) => handleSearch(e.target.value)}
                       className="pl-3 pr-10 text-sm md:text-base"
                     />
-                    {isSearching && (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <Loader2 className="w-4 h-4 md:w-5 md:h-5 text-[#5C5537] animate-spin" />
-                      </div>
-                    )}
                   </div>
                   <div className="space-y-2 md:space-y-3 max-h-60 md:max-h-80 overflow-y-auto">
                     {searchResults.length === 0 && !isSearching && (
@@ -253,7 +258,10 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
                         <p className="text-sm md:text-base">{searchQuery ? `No results for "${searchQuery}"` : `Search for ${activePrompt.type}s`}</p>
                       </div>
                     )}
-                    {searchResults.map((t) => (
+                    {isSearching && (
+                      <RowListSkeleton count={3} media="square" size="w-12 h-12 md:w-16 md:h-16" className="px-2 md:px-3" />
+                    )}
+                    {!isSearching && searchResults.map((t) => (
                       <div key={t.id} className="flex items-center gap-2 md:gap-3 p-2 md:p-3 hover:bg-[#5C5537]/5 rounded-lg cursor-pointer" onClick={() => setSearchResults([t])}>
                         <div className="w-12 h-12 md:w-16 md:h-16 relative overflow-hidden rounded-lg bg-[#5C5537]/10 flex-shrink-0">
                           <img src={t.cover || '/default-avatar.jpg'} alt={t.name} className="w-full h-full object-cover" />
@@ -270,11 +278,11 @@ const ProfilePromptsEditor: React.FC<Props> = ({ username, responses, onResponse
 
               <div className="mt-3 md:mt-4 flex gap-2">
                 <Button 
-                  className="bg-[#5C5537] hover:bg-[#3E3725] text-white text-xs md:text-sm px-3 md:px-4 py-2 h-auto" 
+                  className={`bg-[#5C5537] hover:bg-[#3E3725] text-white text-xs md:text-sm px-3 md:px-4 py-2 h-auto ${saving ? pendingClass : ""}`}
                   onClick={saveResponse} 
                   disabled={saving}
                 >
-                  {saving ? <Loader2 className="w-3 h-3 md:w-4 md:h-4 animate-spin" /> : 'Save'}
+                  Save
                 </Button>
                 <Button 
                   variant="outline" 

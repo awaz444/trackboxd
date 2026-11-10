@@ -6,7 +6,8 @@ import ActivityItem, { ActivityItem as ActivityItemType } from "@/components/act
 import SuggestedUsers from "@/components/activity/SuggestedUsers";
 import PopularUsersSection from "@/components/home/PopularUsersSection";
 import useUser from "@/hooks/useUser";
-import { Music, Loader2 } from "lucide-react";
+import { Music } from "lucide-react";
+import { ReviewListSkeleton } from "@/components/ui/skeleton";
 
 const PAGE_SIZE = 20;
 const SPARSE_THRESHOLD = 10;
@@ -94,10 +95,17 @@ export default function ActivityPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFBEb]">
+      <div className="min-h-screen bg-[#FFFBEb]" aria-busy="true" aria-label="Loading">
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]" />
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-[#5C5537] mb-2">Activity</h1>
+            <p className="text-[#6B6547]">
+              See what you and your friends have been listening to
+            </p>
+          </div>
+          <div>
+            <h2 className="text-2xl font-semibold text-[#5C5537] mb-6">Recent Activity</h2>
+            <ReviewListSkeleton count={5} />
           </div>
         </div>
         <Footer variant="light" />
@@ -143,10 +151,8 @@ export default function ActivityPage() {
                   />
                 ))}
                 {hasMore && (
-                  <div ref={sentinelRef} className="pt-4 flex justify-center h-12">
-                    {loadingMore && (
-                      <Loader2 className="w-5 h-5 animate-spin text-[#6B6547]" />
-                    )}
+                  <div ref={sentinelRef} className={loadingMore ? "pt-4" : "pt-4 h-12"}>
+                    {loadingMore && <ReviewListSkeleton count={2} />}
                   </div>
                 )}
               </>

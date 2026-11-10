@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Check, Loader2 } from "lucide-react";
+import { X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { VipBadge } from "@/components/VipBadge";
+import { RowListSkeleton, pendingClass } from "@/components/ui/skeleton";
 
 interface FollowRequest {
   follower_id: string;
@@ -117,9 +118,7 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
         {/* Content */}
         <div className="max-h-[60vh] overflow-y-auto p-4">
           {isLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#5C5537] border-t-transparent" />
-            </div>
+            <RowListSkeleton count={3} media="round" size="w-12 h-12" trailing className="px-3" />
           ) : requests.length === 0 ? (
             <div className="text-center py-8 text-[#6B6547]">
               No pending follow requests
@@ -154,29 +153,21 @@ const FollowRequestsModal: React.FC<FollowRequestsModalProps> = ({
                   <div className="flex gap-2">
                     <Button
                       size="sm"
-                      className="bg-[#5C5537]/90 hover:bg-[#5C5537] text-white"
+                      className={`bg-[#5C5537]/90 hover:bg-[#5C5537] text-white ${loadingActions[request.follower_id] === 'accept' ? pendingClass : ""}`}
                       onClick={() => handleAccept(request.follower_id)}
                       disabled={!!loadingActions[request.follower_id]}
                     >
-                      {loadingActions[request.follower_id] === 'accept' ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Check className="h-4 w-4" />
-                      )}
+                      <Check className="h-4 w-4" />
                     </Button>
                     
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-[#6B6547]"
+                      className={`text-[#6B6547] ${loadingActions[request.follower_id] === 'reject' ? pendingClass : ""}`}
                       onClick={() => handleReject(request.follower_id)}
                       disabled={!!loadingActions[request.follower_id]}
                     >
-                      {loadingActions[request.follower_id] === 'reject' ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <X className="h-4 w-4" />
-                      )}
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
