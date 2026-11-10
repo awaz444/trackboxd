@@ -7,6 +7,7 @@ import { Grid, List, Heart } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
+import { DetailHeaderSkeleton, RowSkeleton, Skeleton, pendingClass } from "@/components/ui/skeleton";
 import { SpotifyTrack } from "../../tracks/types";
 
 import Link from "next/link";
@@ -141,10 +142,20 @@ const PlaylistDetailsPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#FFFBEb]">
-
-                <div className="max-w-5xl mx-auto px-4 py-8 flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
+            <div className="min-h-screen bg-[#FFFBEb]" aria-busy="true" aria-label="Loading">
+                <div className="max-w-5xl mx-auto px-4 py-6">
+                    <DetailHeaderSkeleton />
+                    <div className="mb-8">
+                        <div className="flex justify-between items-center mb-4">
+                            <Skeleton className="h-7 w-32" />
+                            <Skeleton className="h-11 w-24" rounded="rounded-full" />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            {Array.from({ length: 9 }).map((_, i) => (
+                                <RowSkeleton key={i} size="w-16 h-16" />
+                            ))}
+                        </div>
+                    </div>
                 </div>
                 <Footer variant="light" />
             </div>
@@ -233,17 +244,11 @@ const PlaylistDetailsPage = () => {
                                     isLiked
                                         ? "bg-[#5C5537] text-[#FFFBEb]"
                                         : "bg-[#5C5537]/10 text-[#5C5537] hover:bg-[#5C5537]/15"
-                                }`}>
-                                {likeLoading ? (
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
-                                ) : (
-                                    <>
-                                        <Heart className="w-3 h-3" />
-                                        <span>
-                                            {isLiked ? "Liked" : "Like"}
-                                        </span>
-                                    </>
-                                )}
+                                } ${likeLoading ? pendingClass : ""}`}>
+                                <Heart className="w-3 h-3" />
+                                <span>
+                                    {isLiked ? "Liked" : "Like"}
+                                </span>
                             </button>
                         </div>
                     </div>

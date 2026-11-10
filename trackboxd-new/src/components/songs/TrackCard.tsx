@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Heart, Star, MessageCircle } from "lucide-react";
 import RatingStars from "../RatingStars";
 import { Track } from "@/app/tracks/types";
+import { pendingClass } from "@/components/ui/skeleton";
 
 interface TrackCardProps {
     track: Track;
@@ -106,15 +107,9 @@ const TrackCard: React.FC<TrackCardProps> = ({
                                 isLiked
                                     ? "bg-[#5C5537] text-[#FFFBEb]"
                                     : "bg-[#5C5537]/20 text-[#5C5537] hover:bg-[#5C5537]/30"
-                            }`}>
-                            {isLoading ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
-                            ) : (
-                                <>
-                                    <Heart className="w-3 h-3" />
-                                    <span>{isLiked ? "Liked" : "Like"}</span>
-                                </>
-                            )}
+                            } ${isLoading ? pendingClass : ""}`}>
+                            <Heart className="w-3 h-3" />
+                            <span>{isLiked ? "Liked" : "Like"}</span>
                         </button>
                         <button
                             onClick={(e) => {

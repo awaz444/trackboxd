@@ -2,11 +2,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, X, Music, Loader2 } from "lucide-react";
+import { Search, X, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useUser from "@/hooks/useUser";
 import { track } from "@/lib/analytics";
+import { RowListSkeleton, pendingClass } from "@/components/ui/skeleton";
 
 interface InitialAnnotation {
   id: string;
@@ -255,12 +256,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-10 py-3 rounded-md bg-[#FFFBEb] border border-[#5C5537]/20 text-[#5C5537]"
             />
-            {isSearching && (
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <Loader2 className="w-5 h-5 text-[#5C5537] animate-spin" />
-              </div>
-            )}
-            {searchQuery && !isSearching && (
+            {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
@@ -279,7 +275,9 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
           <div className="py-2">
             {searchQuery ? (
               // Search Results
-              searchResults.length > 0 ? (
+              isSearching ? (
+                <RowListSkeleton count={4} media="square" size="w-16 h-16" className="px-3" />
+              ) : searchResults.length > 0 ? (
                 <div className="space-y-3">
                   {searchResults.map((track) => (
                     <div
@@ -321,9 +319,7 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
                   Trending This Week
                 </h4>
                 {isLoadingTrending ? (
-                  <div className="flex justify-center items-center h-32">
-                    <Loader2 className="w-8 h-8 text-[#5C5537] animate-spin" />
-                  </div>
+                  <RowListSkeleton count={3} media="square" size="w-16 h-16" className="px-3" />
                 ) : trendingTracks.length > 0 ? (
                   <div className="space-y-3">
                     {trendingTracks.map((track) => (
@@ -444,15 +440,10 @@ const AnnotationForm: React.FC<AnnotationFormProps> = ({
               </Button>
               <Button
                 type="submit"
-                className="bg-[#5C5537] hover:bg-[#3E3725] text-white"
+                className={`bg-[#5C5537] hover:bg-[#3E3725] text-white ${isSubmitting ? pendingClass : ""}`}
                 disabled={!timestamp || !annotationText || isSubmitting}
               >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Posting...
-                  </div>
-                ) : "Post Annotation"}
+                Post Annotation
               </Button>
             </div>
           </div>

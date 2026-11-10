@@ -29,6 +29,7 @@ import AuthModal from "./AuthModal";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
+import { RowListSkeleton } from "@/components/ui/skeleton";
 
 interface HeaderProps {
     user?: {
@@ -446,9 +447,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                     (isSearching || searchQuery) && (
                                         <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-[#FFFBEb] rounded-xl shadow-xl z-50 max-h-[700px] overflow-y-auto min-w-[400px] max-w-[600px]">
                                             {isSearching ? (
-                                                <div className="p-4 text-center text-[#6B6547]">
-                                                    Searching...
-                                                </div>
+                                                <RowListSkeleton count={4} media="square" size="w-12 h-12" className="py-2 px-3" />
                                             ) : searchResults ? (
                                                 <div className="py-2">
                                                     {searchResults.tracks?.filter(
@@ -699,9 +698,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                             (isSearching || searchQuery) && (
                                                 <div className="fixed top-16 left-0 right-0 mx-auto bg-[#FFFBEb] rounded-xl shadow-xl z-50 max-h-[70vh] overflow-y-auto w-[90vw]">
                                                     {isSearching ? (
-                                                        <div className="p-4 text-center text-[#6B6547]">
-                                                            Searching...
-                                                        </div>
+                                                        <RowListSkeleton count={4} media="square" size="w-12 h-12" className="py-2 px-3" />
                                                     ) : searchResults ? (
                                                         <div className="py-2">
                                                             {searchResults.tracks?.filter(

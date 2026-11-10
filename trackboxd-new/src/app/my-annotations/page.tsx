@@ -8,6 +8,7 @@ import useUser from "@/hooks/useUser";
 import EditableAnnotationCard from "@/components/songs/EditableAnnotationCard";
 import { Annotation } from "@/app/tracks/types";
 import ListControls from "@/components/ListControls";
+import { ReviewListSkeleton, Skeleton } from "@/components/ui/skeleton";
 
 const PAGE_SIZE = 20;
 
@@ -98,10 +99,11 @@ const MyAnnotationsPage = () => {
 
   if (userLoading) {
     return (
-      <div className="min-h-screen bg-[#FFFBEb]">
-        {/* <Header /> */}
-        <div className="max-w-5xl mx-auto px-4 py-8 flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
+      <div className="min-h-screen bg-[#FFFBEb]" aria-busy="true" aria-label="Loading">
+        <div className="max-w-5xl mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold text-[#5C5537] mb-2">My Annotations</h1>
+          <Skeleton className="h-6 w-28 mb-8" />
+          <ReviewListSkeleton count={4} />
         </div>
         <Footer variant="light" />
       </div>
@@ -132,14 +134,16 @@ const MyAnnotationsPage = () => {
       
       <div className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-[#5C5537] mb-2">My Annotations</h1>
-        <p className="text-[#6B6547] mb-8">
-          {annotations.length} annotation{annotations.length !== 1 ? 's' : ''}
-        </p>
+        {loading ? (
+          <Skeleton className="h-6 w-28 mb-8" />
+        ) : (
+          <p className="text-[#6B6547] mb-8">
+            {annotations.length} annotation{annotations.length !== 1 ? 's' : ''}
+          </p>
+        )}
 
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
-          </div>
+          <ReviewListSkeleton count={4} />
         ) : error ? (
           <div className="py-4 text-center text-red-600">
             <p className="text-red-600">{error}</p>

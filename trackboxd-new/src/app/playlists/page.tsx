@@ -16,6 +16,7 @@ import { useCallback } from "react";
 
 import { PlaylistCard } from "@/components/playlists/PlaylistCard";
 import { PlaylistListItem } from "@/components/playlists/PlaylistListItem";
+import { TileGridSkeleton, RowListSkeleton } from "@/components/ui/skeleton";
 
 interface Playlist {
     id: string;
@@ -28,34 +29,6 @@ interface Playlist {
     liked_at?: string;
     weekly_likes?: number;
 }
-
-const SkeletonPlaylistCard = () => (
-    <div className="py-3">
-        <div className="animate-pulse">
-            <div className="bg-[#5C5537]/10 rounded-xl h-48 w-full mb-4"></div>
-            <div className="space-y-2">
-                <div className="h-4 bg-[#5C5537]/10 rounded w-3/4"></div>
-                <div className="h-3 bg-[#5C5537]/10 rounded w-1/2"></div>
-                <div className="h-3 bg-[#5C5537]/10 rounded w-1/3"></div>
-            </div>
-        </div>
-    </div>
-);
-
-const SkeletonPlaylistListItem = () => (
-    <div className="flex items-center py-3">
-        <div className="animate-pulse flex items-center w-full">
-            <div className="bg-[#5C5537]/10 rounded-lg w-16 h-16"></div>
-            <div className="ml-4 flex-1">
-                <div className="h-4 bg-[#5C5537]/10 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-[#5C5537]/10 rounded w-1/2"></div>
-            </div>
-            <div className="w-20">
-                <div className="h-3 bg-[#5C5537]/10 rounded w-full"></div>
-            </div>
-        </div>
-    </div>
-);
 
 const Playlists = () => {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -316,11 +289,6 @@ const Playlists = () => {
                                     }}
                                     className="w-full h-full pl-10 pr-4 py-3 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5C5537]/30 text-[#5C5537] placeholder-[#5C5537]/50"
                                 />
-                                {isSearching && (
-                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
-                                    </div>
-                                )}
                                 {searchTerm && !isSearching && (
                                     <button
                                         onClick={() => {
@@ -341,7 +309,7 @@ const Playlists = () => {
                     </div>
                 </div>
 
-                {showSearchResults && (
+                {(showSearchResults || isSearching) && (
                     <div className="mb-8">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-[#5C5537]">
@@ -356,7 +324,9 @@ const Playlists = () => {
                                 Clear results
                             </button>
                         </div>
-                        {searchResults.length > 0 ? (
+                        {isSearching && (!showSearchResults || searchResults.length === 0) ? (
+                            <TileGridSkeleton count={6} cols="grid-cols-2 md:grid-cols-3" gap="gap-6" />
+                        ) : searchResults.length > 0 ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                                 {searchResults.map((playlist) => (
                                     <PlaylistCard
@@ -371,17 +341,13 @@ const Playlists = () => {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-[#6B6547]">
-                                {isSearching
-                                    ? "Searching..."
-                                    : "No playlists found"}
-                            </p>
+                            <p className="text-[#6B6547]">No playlists found</p>
                         )}
                     </div>
                 )}
 
                 {/* Popular This Week Section */}
-                {!showSearchResults && (
+                {!(showSearchResults || isSearching) && (
                     <>
                         <div className="mb-12">
                             <div className="flex justify-between items-center mb-6">
@@ -391,13 +357,7 @@ const Playlists = () => {
                             </div>
 
                             {loadingPopular ? (
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                                    {[...Array(4)].map((_, i) => (
-                                        <SkeletonPlaylistCard
-                                            key={`skeleton-popular-${i}`}
-                                        />
-                                    ))}
-                                </div>
+                                <TileGridSkeleton count={4} cols="grid-cols-2 md:grid-cols-4" gap="gap-6" />
                             ) : (
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                     {popularPlaylists.map((playlist) => (
@@ -427,13 +387,7 @@ const Playlists = () => {
                             </div>
 
                             {loadingRecent ? (
-                                <div className="space-y-1">
-                                    {[...Array(3)].map((_, i) => (
-                                        <SkeletonPlaylistListItem
-                                            key={`skeleton-recent-${i}`}
-                                        />
-                                    ))}
-                                </div>
+                                <RowListSkeleton count={3} size="w-14 h-14 md:w-16 md:h-16" />
                             ) : (
                                 <div className="space-y-1">
                                     {recentlyLikedPlaylists.map(

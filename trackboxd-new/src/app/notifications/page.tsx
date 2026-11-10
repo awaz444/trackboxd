@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import { Bell, Heart, UserPlus, Check } from "lucide-react";
+import { RowListSkeleton } from "@/components/ui/skeleton";
 
 interface Notification {
   id: string;
@@ -115,9 +116,12 @@ const NotificationsPage = () => {
 
   if (userLoading) {
     return (
-      <div className="min-h-screen bg-[#FFFBEb]">
-        <div className="max-w-5xl mx-auto px-4 py-8 flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
+      <div className="min-h-screen bg-[#FFFBEb]" aria-busy="true" aria-label="Loading">
+        <div className="max-w-2xl mx-auto px-4 pt-5 pb-8 md:py-8">
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <h1 className="text-[28px] md:text-3xl font-bold text-[#5C5537]">Notifications</h1>
+          </div>
+          <RowListSkeleton count={6} media="round" size="w-9 h-9" />
         </div>
         <Footer variant="light" />
       </div>
@@ -168,9 +172,7 @@ const NotificationsPage = () => {
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5C5537]"></div>
-          </div>
+          <RowListSkeleton count={6} media="round" size="w-9 h-9" />
         ) : error ? (
           <div className="py-4 text-center text-red-600">
             <p className="text-red-600">{error}</p>

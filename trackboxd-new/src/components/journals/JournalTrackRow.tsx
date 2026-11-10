@@ -8,6 +8,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { friendlyError } from "@/lib/friendlyError";
 import { track as trackEvent } from "@/lib/analytics";
 import RatingStars from "@/components/RatingStars";
+import { pendingClass } from "@/components/ui/skeleton";
 
 interface Track {
     id: string;
@@ -278,13 +279,9 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                             type="button"
                             onClick={handleSubmit}
                             disabled={!rating || !text.trim() || isSubmitting}
-                            className="flex items-center gap-1.5 text-xs font-medium bg-[#5C5537] text-white px-3 py-1.5 rounded-lg disabled:opacity-50 hover:bg-[#3E3725] transition-colors"
+                            className={`flex items-center gap-1.5 text-xs font-medium bg-[#5C5537] text-white px-3 py-1.5 rounded-lg disabled:opacity-50 hover:bg-[#3E3725] transition-colors ${isSubmitting ? pendingClass : ""}`}
                         >
-                            {isSubmitting ? (
-                                <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                                <Check className="w-3 h-3" />
-                            )}
+                            <Check className="w-3 h-3" />
                             {localReview ? "Update" : "Save"}
                         </button>
                     </div>

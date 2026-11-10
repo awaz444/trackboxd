@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import useUser from "@/hooks/useUser";
 import MediaCard from "@/components/MediaCard";
 import TileRail from "@/components/TileRail";
+import { TileSkeleton, ReviewSkeleton, ReviewListSkeleton } from "@/components/ui/skeleton";
 import CompactReviewCard from "@/components/songs/CompactReviewCard";
 import ReviewCard from "@/components/songs/ReviewCard";
 
@@ -34,16 +35,6 @@ const transformAlbum = (data: any): Album => ({
   review_count: data.review_count || 0,
   avg_rating: data.avg_rating || 0,
 });
-
-const SkeletonCard = () => (
-  <div className="animate-pulse">
-    <div className="aspect-square bg-[#5C5537]/10" />
-    <div className="p-3 space-y-2">
-      <div className="h-3.5 bg-[#5C5537]/10 rounded w-3/4" />
-      <div className="h-3 bg-[#5C5537]/10 rounded w-1/2" />
-    </div>
-  </div>
-);
 
 const AlbumsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -171,7 +162,7 @@ const AlbumsPage = () => {
     if (loading) {
       return (
         <Wrap>
-          {[...Array(cols)].map((_, i) => <SkeletonCard key={i} />)}
+          {[...Array(cols)].map((_, i) => <TileSkeleton key={i} />)}
         </Wrap>
       );
     }
@@ -214,11 +205,6 @@ const AlbumsPage = () => {
               onChange={(e) => { setSearchTerm(e.target.value); searchAlbums(e.target.value); }}
               className="w-full pl-10 pr-4 py-3 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5C5537]/30 text-[#5C5537] placeholder-[#5C5537]/50"
             />
-            {isSearching && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]" />
-              </div>
-            )}
             {searchTerm && !isSearching && (
               <button
                 onClick={() => { setSearchTerm(""); setShowSearchResults(false); }}
@@ -232,7 +218,7 @@ const AlbumsPage = () => {
         </div>
 
         {/* Search results */}
-        {showSearchResults && (
+        {(showSearchResults || isSearching) && (
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#5C5537]">
@@ -245,15 +231,17 @@ const AlbumsPage = () => {
                 Clear results
               </button>
             </div>
-            {searchResults.length > 0 ? (
+            {isSearching && (!showSearchResults || searchResults.length === 0) ? (
+              <AlbumGrid albums={[]} loading cols={5} />
+            ) : searchResults.length > 0 ? (
               <AlbumGrid albums={searchResults} cols={5} />
             ) : (
-              <p className="text-[#6B6547]">{isSearching ? "Searching…" : "No albums found"}</p>
+              <p className="text-[#6B6547]">No albums found</p>
             )}
           </div>
         )}
 
-        {!showSearchResults && (
+        {!(showSearchResults || isSearching) && (
           <>
             {/* 1. Cards — Popular This Week */}
             <div className="mb-12">
@@ -265,8 +253,10 @@ const AlbumsPage = () => {
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-[#5C5537] mb-6">Recent Reviews</h2>
               {loadingRecentReviews ? (
-                <div className="flex justify-center items-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5C5537]" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <ReviewSkeleton key={i} cover={false} />
+                  ))}
                 </div>
               ) : recentReviews.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -289,9 +279,7 @@ const AlbumsPage = () => {
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-[#5C5537] mb-6">Popular Reviews This Week</h2>
               {loadingPopularReviews ? (
-                <div className="flex justify-center items-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5C5537]" />
-                </div>
+                <ReviewListSkeleton count={5} />
               ) : popularReviews.length > 0 ? (
                 <div className="space-y-4">
                   {popularReviews.map((review) => (

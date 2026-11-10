@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { findUserByNameOrEmail } from "@/lib/auth-utils";
 import { useRouter } from "next/navigation";
 import { identify, track } from "@/lib/analytics";
+import { pendingClass } from "@/components/ui/skeleton";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -669,10 +670,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#5C5537] text-white py-2 px-4 rounded-md hover:bg-[#3E3725] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`w-full bg-[#5C5537] text-white py-2 px-4 rounded-md hover:bg-[#3E3725] transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isLoading ? pendingClass : ""}`}
           >
-            {isLoading ? 'Please wait...' :
-              mode === 'login' ? 'Sign In' :
+            {mode === 'login' ? 'Sign In' :
                 mode === 'signup' ? 'Create Account' :
                   mode === 'forgot-password' ? 'Send Reset Email' :
                     'Update Password'

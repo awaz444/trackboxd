@@ -3,9 +3,10 @@
 import Link from "next/link";
 import HomeSectionHeader from "./HomeSectionHeader";
 import { useFollow } from "@/hooks/useFollow";
-import { Loader2, UserPlus, Users } from "lucide-react";
+import { UserPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VipBadge } from "@/components/VipBadge";
+import { pendingClass } from "@/components/ui/skeleton";
 
 interface PopularUser {
   id: string;
@@ -62,11 +63,9 @@ function UserRow({ user }: { user: PopularUser }) {
         disabled={isLoading}
         className={`ml-3 text-[#5C5537] border-[#5C5537]/30 hover:bg-[#5C5537]/10 flex-shrink-0 ${
           followStatus === "following" ? "bg-[#5C5537]/20" : ""
-        }`}
+        } ${isLoading ? pendingClass : ""}`}
       >
-        {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : followStatus === "following" ? (
+        {followStatus === "following" ? (
           <Users className="h-4 w-4" />
         ) : (
           <UserPlus className="h-4 w-4" />

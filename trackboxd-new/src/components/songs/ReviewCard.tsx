@@ -8,6 +8,7 @@ import { Review } from "@/app/tracks/types";
 import useUser from "@/hooks/useUser";
 import { VipBadge } from "@/components/VipBadge";
 import RatingStars from "@/components/RatingStars";
+import { pendingClass } from "@/components/ui/skeleton";
 
 interface ReviewCardProps {
     review: Review;
@@ -139,15 +140,9 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
                                         isLoading || initialLoad || !user
                                             ? "cursor-not-allowed text-[#5C5537]/40"
                                             : "cursor-pointer text-[#6B6547] hover:text-[#5C5537]"
-                                    }`}
+                                    } ${isLoading || initialLoad ? pendingClass : ""}`}
                                 >
-                                    {initialLoad ? (
-                                        <div className="w-4 h-4 flex items-center justify-center">
-                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#5C5537]" />
-                                        </div>
-                                    ) : (
-                                        <Heart className={`w-4 h-4 ${isLiked ? "text-[#5C5537] fill-[#5C5537]" : ""}`} />
-                                    )}
+                                    <Heart className={`w-4 h-4 ${isLiked ? "text-[#5C5537] fill-[#5C5537]" : ""}`} />
                                     <span className={isLiked ? "text-[#5C5537] font-medium" : ""}>{likeCount}</span>
                                 </button>
                                 <Link
@@ -254,7 +249,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
                                     disabled={isLoading || !user}
                                     className={`flex items-center gap-1.5 text-sm transition-colors ${
                                         isLiked ? "text-[#5C5537]" : "text-[#6B6547] hover:text-[#5C5537]"
-                                    }`}
+                                    } ${isLoading ? pendingClass : ""}`}
                                 >
                                     <Heart className={`w-4 h-4 ${isLiked ? "fill-[#5C5537]" : ""}`} />
                                     <span className={isLiked ? "font-medium" : ""}>{likeCount}</span>

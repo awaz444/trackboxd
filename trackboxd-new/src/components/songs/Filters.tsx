@@ -6,6 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { pendingClass } from "@/components/ui/skeleton";
 
 interface FiltersProps {
     selectedGenre: string;
@@ -87,7 +88,7 @@ const Filters: React.FC<FiltersProps> = ({
                 {/* Search - Right-aligned */}
                 <div className="w-full lg:w-[320px]">
                     <div className="relative h-full/2">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] w-5 h-5" />
+                        <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] w-5 h-5 ${isSearching ? pendingClass : ""}`} />
                         <input
                             type="text"
                             placeholder="Search tracks, artists, albums..."
@@ -98,11 +99,6 @@ const Filters: React.FC<FiltersProps> = ({
                             }}
                             className="w-full h-full pl-10 pr-4 py-3 bg-[#FFFBEb] border border-[#5C5537]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5C5537]/30"
                         />
-                        {isSearching && (
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5C5537]"></div>
-                            </div>
-                        )}
                     </div>
                     {searchError && (
                         <p className="text-[#5C5537] text-sm mt-1">

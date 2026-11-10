@@ -2,6 +2,7 @@ import { Heart } from "lucide-react";
 import { useState } from "react";
 import { Playlist } from "@/app/playlists/types";
 import Link from "next/link";
+import { pendingClass } from "@/components/ui/skeleton";
 
 interface PlaylistCardProps {
     playlist: Playlist;
@@ -83,20 +84,14 @@ export const PlaylistCard = ({
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleLikeClick(); }}
                             disabled={isLoading}
                             className={`group flex-shrink-0 p-2 rounded-full transition-colors ${
-                                !isLoading ? "hover:bg-[#5C5537]/10 cursor-pointer" : "cursor-not-allowed"
+                                !isLoading ? "hover:bg-[#5C5537]/10 cursor-pointer" : `cursor-not-allowed ${pendingClass}`
                             }`}
                         >
-                            {isLoading ? (
-                                <div className="w-5 h-5 flex items-center justify-center">
-                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#5C5537]"></div>
-                                </div>
-                            ) : (
-                                <Heart
-                                    className={`w-5 h-5 transition-colors ${
-                                        isLiked ? "text-[#5C5537] fill-[#5C5537]" : "text-[#6B6547] group-hover:text-[#5C5537]"
-                                    }`}
-                                />
-                            )}
+                            <Heart
+                                className={`w-5 h-5 transition-colors ${
+                                    isLiked ? "text-[#5C5537] fill-[#5C5537]" : "text-[#6B6547] group-hover:text-[#5C5537]"
+                                }`}
+                            />
                         </button>
                         <span className={`text-sm ${isLiked ? "text-[#5C5537] font-medium" : "text-[#6B6547]"}`}>
                             {playlist.like_count}

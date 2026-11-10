@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, BookOpen } from "lucide-react";
 import JournalCard from "@/components/journals/JournalCard";
+import { TileGridSkeleton } from "@/components/ui/skeleton";
 import useUser from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 
@@ -57,9 +58,7 @@ export default function MyJournalsPage() {
                 </div>
 
                 {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="w-8 h-8 border-2 border-[#5C5537] border-t-transparent rounded-full animate-spin" />
-                    </div>
+                    <TileGridSkeleton count={4} cols="grid-cols-2 sm:grid-cols-3 md:grid-cols-4" />
                 ) : journals.length === 0 ? (
                     <div className="text-center py-20">
                         <BookOpen className="w-16 h-16 text-[#5C5537]/20 mx-auto mb-4" />
