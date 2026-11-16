@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import AuthModal from './AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -9,40 +9,70 @@ interface AuthGuardProps {
   children: React.ReactNode;
 }
 
+const publicRoutes = [
+  '/',
+  '/auth',
+  '/login',
+  '/register',
+  '/about',
+  '/contact',
+  '/privacy',
+  '/forgot-password',
+  '/update-password',
+  '/auth/auth-code-error',
+  '/tracks',
+  '/letterboxd-for-music',
+  '/alternatives',
+  '/song-annotations',
+];
+
+// Routes that must render their content to logged-out visitors and crawlers.
+// These are the indexable surfaces — gating them behind the auth modal makes
+// them worthless in search results.
+const isPublicPath = (pathname: string | null | undefined) =>
+  !!pathname && (
+    publicRoutes.some(route => pathname === route) ||
+    pathname.startsWith('/profile/') ||
+    pathname.startsWith('/reviews/') ||
+    pathname.startsWith('/annotations/') ||
+    pathname.startsWith('/songs/') ||
+    pathname.startsWith('/albums/') ||
+    pathname.startsWith('/playlists/') ||
+    (pathname.startsWith('/journals/') && pathname !== '/journals/new')
+  );
+
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { user, loading } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const isPublicRoute = isPublicPath(pathname);
+  // Last public page seen in this tab, so dismissing the modal on a gated page
+  // can send the visitor back to something they are allowed to read.
+  const lastPublicPath = useRef<string | null>(null);
 
-  const publicRoutes = [
-    '/',
-    '/auth',
-    '/login',
-    '/register',
-    '/about',
-    '/contact',
-    '/privacy',
-    '/forgot-password',
-    '/update-password',
-    '/auth/auth-code-error',
-    '/tracks',
-    '/letterboxd-for-music',
-    '/alternatives',
-    '/song-annotations',
-  ];
+  useEffect(() => {
+    if (isPublicRoute && pathname) lastPublicPath.current = pathname;
+  }, [isPublicRoute, pathname]);
 
-  // Routes that must render their content to logged-out visitors and crawlers.
-  // These are the indexable surfaces — gating them behind the auth modal makes
-  // them worthless in search results.
-  const isPublicRoute =
-    publicRoutes.some(route => pathname === route) ||
-    pathname?.startsWith('/profile/') ||
-    pathname?.startsWith('/reviews/') ||
-    pathname?.startsWith('/annotations/') ||
-    pathname?.startsWith('/songs/') ||
-    pathname?.startsWith('/albums/') ||
-    pathname?.startsWith('/playlists/') ||
-    (pathname?.startsWith('/journals/') && pathname !== '/journals/new');
+  // Signed-out visitors reach gated pages (/home, /albums, /search, ...) from
+  // the header nav. Closing the modal there used to do nothing, so people
+  // rage-clicked the X. Now it closes and leaves the gated page.
+  const leaveGatedPage = () => {
+    setShowAuthModal(false);
+    let target = lastPublicPath.current;
+    if (!target && typeof document !== 'undefined' && document.referrer) {
+      try {
+        const ref = new URL(document.referrer);
+        if (ref.origin === window.location.origin && isPublicPath(ref.pathname)) {
+          target = ref.pathname + ref.search;
+        }
+      } catch {
+        // ignore malformed referrer
+      }
+    }
+    router.push(target || '/');
+  };
 
   useEffect(() => {
     if (isPublicRoute) {
@@ -68,8 +98,11 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
             <AuthModal
               isOpen={showAuthModal}
               onClose={() => {
-                if (!isPublicRoute) return;
-                setShowAuthModal(false);
+                if (isPublicRoute) {
+                  setShowAuthModal(false);
+                  return;
+                }
+                leaveGatedPage();
               }}
               defaultMode="login"
             />

@@ -37,6 +37,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
   const [errors, setErrors] = useState<FormErrors>({});
   const [success, setSuccess] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Set when Supabase is waiting for the person to click the confirmation link.
+  const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
+  const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const router = useRouter();
 
   const [formData, setFormData] = useState<FormData>({
@@ -53,6 +56,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
     console.log('AuthModal: defaultMode changed to', defaultMode);
     setMode(defaultMode);
   }, [defaultMode]);
+
+  // Escape closes the modal, like the X and the backdrop.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   // Check authentication for update-password mode
   useEffect(() => {
@@ -204,6 +217,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
         return;
       }
 
+      // With email confirmation on, Supabase answers a sign-up for an address
+      // that already has an account with a placeholder user and no identities.
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        setErrors({ email: 'An account with this email already exists. Sign in instead.' });
+        return;
+      }
+
       if (data.user) {
         identify(data.user.id);
         track('signup_completed', { method: 'email' });
@@ -227,21 +247,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
           // Don't fail the signup if the insert fails, the trigger might have already created it
         }
 
-        // Sign in immediately after signup
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password: formData.password,
-        });
-
-        if (!signInError) {
+        if (data.session) {
+          // Email confirmation is off: the person is already signed in.
           onClose();
           setFormData({ email: '', password: '', confirmPassword: '', name: '' });
-          router.push('/activity');
+          router.push('/home');
           router.refresh();
         } else {
-          setSuccess('Account created! Please sign in to continue.');
-          setMode('login');
+          // Email confirmation is on: signing in now would fail with "Email not
+          // confirmed". Tell them to check their inbox instead of showing the
+          // sign-in form again.
           setFormData({ email: '', password: '', confirmPassword: '', name: '' });
+          setResendState('idle');
+          setConfirmEmail(email);
         }
       }
     } catch (error) {
@@ -278,7 +296,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       });
 
       if (error) {
-        if (error.message.toLowerCase().includes('invalid') || error.message.toLowerCase().includes('credentials')) {
+        if (/not\s*confirmed/i.test(error.message)) {
+          setResendState('idle');
+          setConfirmEmail(email);
+        } else if (error.message.toLowerCase().includes('invalid') || error.message.toLowerCase().includes('credentials')) {
           setErrors({ general: 'Incorrect username or password. Please check your credentials and try again.' });
         } else {
           setErrors({ general: error.message || 'Login failed. Please try again.' });
@@ -376,6 +397,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
     }
   };
 
+  const handleResendConfirmation = async () => {
+    if (!confirmEmail) return;
+    setResendState('sending');
+    const { error } = await supabase.auth.resend({ type: 'signup', email: confirmEmail });
+    setResendState(error ? 'error' : 'sent');
+  };
+
+  const backToSignIn = () => {
+    setConfirmEmail(null);
+    setErrors({});
+    setSuccess(null);
+    setMode('login');
+  };
+
   const switchMode = () => {
     if (mode === 'forgot-password') {
       setMode('login');
@@ -408,11 +443,51 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       <div className="bg-[#FFFBEb] rounded-lg p-8 w-full max-w-md shadow-lg relative z-10 max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
-          className="absolute top-4 right-4 text-[#6B6547] hover:text-[#5C5537] transition-colors"
+          type="button"
+          aria-label="Close"
+          className="absolute top-2 right-2 p-2 rounded-md text-[#6B6547] hover:text-[#5C5537] hover:bg-[#5C5537]/5 transition-colors"
           onClick={onClose}
         >
-          <X size={20} />
+          <X size={20} aria-hidden="true" />
         </button>
+
+        {confirmEmail ? (
+          <div className="text-center" role="status">
+            <Mail className="mx-auto mb-4 text-[#5C5537]" size={32} aria-hidden="true" />
+            <h2 className="text-2xl font-bold text-[#5C5537]">Check your email</h2>
+            <p className="text-[#6B6547] mt-3">
+              We sent a confirmation link to{' '}
+              <span className="font-medium text-[#5C5537] break-all">{confirmEmail}</span>.
+              Open it to activate your account, then sign in.
+            </p>
+            <p className="text-sm text-[#6B6547] mt-3">
+              Can&apos;t find it? Check your spam folder.
+            </p>
+            <div className="mt-6 space-y-3">
+              <button
+                type="button"
+                onClick={handleResendConfirmation}
+                disabled={resendState === 'sending' || resendState === 'sent'}
+                className={`w-full border border-[#5C5537]/30 text-[#5C5537] py-2 px-4 rounded-md hover:bg-[#5C5537]/5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${resendState === 'sending' ? pendingClass : ''}`}
+              >
+                {resendState === 'sending' ? 'Sending…' : resendState === 'sent' ? 'Email sent again' : 'Resend confirmation email'}
+              </button>
+              {resendState === 'error' && (
+                <p className="text-sm text-red-600" role="alert">
+                  Could not resend right now. Wait a minute and try again.
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={backToSignIn}
+                className="w-full bg-[#5C5537] text-white py-2 px-4 rounded-md hover:bg-[#3E3725] transition-colors"
+              >
+                I&apos;ve confirmed it, sign in
+              </button>
+            </div>
+          </div>
+        ) : (
+        <>
 
         {/* Modal Header */}
         <div className="text-center mb-8">
@@ -439,7 +514,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
         {/* General Error */}
         {errors.general && (
-          <div className="mb-4 text-[#5C5537]">
+          <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-red-700" role="alert">
             <p className="text-sm">{errors.general}</p>
           </div>
         )}
@@ -475,7 +550,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   required
                 />
               </div>
-              {errors.email && <p className="text-[#5C5537] text-xs mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-red-600 text-xs mt-1" role="alert">{errors.email}</p>}
             </div>
           )}
 
@@ -501,12 +576,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
+                  onMouseDown={(e) => e.preventDefault()}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-md text-[#6B6547] hover:text-[#5C5537]"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              {errors.password && <p className="text-[#5C5537] text-xs mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-red-600 text-xs mt-1" role="alert">{errors.password}</p>}
 
               {/* Forgot Password Link */}
               <div className="text-right mt-2">
@@ -544,12 +621,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
+                    onMouseDown={(e) => e.preventDefault()}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-md text-[#6B6547] hover:text-[#5C5537]"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {errors.password && <p className="text-[#5C5537] text-xs mt-1">{errors.password}</p>}
+                {errors.password && <p className="text-red-600 text-xs mt-1" role="alert">{errors.password}</p>}
               </div>
 
               <div>
@@ -573,12 +652,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
+                    onMouseDown={(e) => e.preventDefault()}
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-md text-[#6B6547] hover:text-[#5C5537]"
                   >
                     {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {errors.confirmPassword && <p className="text-[#5C5537] text-xs mt-1">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-red-600 text-xs mt-1" role="alert">{errors.confirmPassword}</p>}
               </div>
             </>
           )}
@@ -605,7 +686,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                     required
                   />
                 </div>
-                {errors.name && <p className="text-[#5C5537] text-xs mt-1">{errors.name}</p>}
+                {errors.name ? (
+                  <p className="text-red-600 text-xs mt-1" role="alert">{errors.name}</p>
+                ) : (
+                  <p className="text-[#6B6547] text-xs mt-1">3+ characters: letters, numbers and underscores.</p>
+                )}
               </div>
               {/* Move Password + Confirm Password to bottom */}
               <div>
@@ -628,12 +713,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
+                    onMouseDown={(e) => e.preventDefault()}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-md text-[#6B6547] hover:text-[#5C5537]"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {errors.password && <p className="text-[#5C5537] text-xs mt-1">{errors.password}</p>}
+                {errors.password ? (
+                  <p className="text-red-600 text-xs mt-1" role="alert">{errors.password}</p>
+                ) : (
+                  <p className="text-[#6B6547] text-xs mt-1">At least 8 characters.</p>
+                )}
               </div>
 
               <div>
@@ -656,12 +747,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B6547] hover:text-[#5C5537]"
+                    onMouseDown={(e) => e.preventDefault()}
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-md text-[#6B6547] hover:text-[#5C5537]"
                   >
                     {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {errors.confirmPassword && <p className="text-[#5C5537] text-xs mt-1">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-red-600 text-xs mt-1" role="alert">{errors.confirmPassword}</p>}
               </div>
             </>
           )}
@@ -672,10 +765,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
             disabled={isLoading}
             className={`w-full bg-[#5C5537] text-white py-2 px-4 rounded-md hover:bg-[#3E3725] transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isLoading ? pendingClass : ""}`}
           >
-            {mode === 'login' ? 'Sign In' :
-                mode === 'signup' ? 'Create Account' :
-                  mode === 'forgot-password' ? 'Send Reset Email' :
-                    'Update Password'
+            {isLoading
+              ? (mode === 'login' ? 'Signing in…' :
+                  mode === 'signup' ? 'Creating account…' :
+                    mode === 'forgot-password' ? 'Sending…' :
+                      'Updating…')
+              : (mode === 'login' ? 'Sign In' :
+                  mode === 'signup' ? 'Create Account' :
+                    mode === 'forgot-password' ? 'Send Reset Email' :
+                      'Update Password')
             }
           </button>
         </form>
@@ -708,6 +806,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
               </button>
             </p>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>
