@@ -112,7 +112,8 @@ const LandingPage = ({ children }: { children?: React.ReactNode }) => {
           <button
             className="text-lg text-[#5C5537] hover:text-[#3E3725] transition-colors font-medium px-6 py-3 rounded-md hover:bg-[#5C5537]/5"
             onClick={() => {
-              setAuthMode('login');
+              // Most people pressing this are new: open on sign-up, not sign-in.
+              setAuthMode('signup');
               setShowAuthModal(true);
             }}
           >

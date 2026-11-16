@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import ActivityItem, { ActivityItem as ActivityItemType } from "@/components/activity/ActivityItem";
 import SuggestedUsers from "@/components/activity/SuggestedUsers";
 import PopularUsersSection from "@/components/home/PopularUsersSection";
+import FirstReviewPrompt from "@/components/home/FirstReviewPrompt";
 import useUser from "@/hooks/useUser";
 import { Music } from "lucide-react";
 import { ReviewListSkeleton } from "@/components/ui/skeleton";
@@ -122,6 +123,9 @@ export default function ActivityPage() {
             See what you and your friends have been listening to
           </p>
         </div>
+
+        {/* New accounts land here after signing in: point them at a first rating */}
+        <FirstReviewPrompt userId={user?.id} />
 
         {/* Sparse content: suggest people to follow */}
         {isSparse && (

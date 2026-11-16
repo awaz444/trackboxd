@@ -13,6 +13,7 @@ import PeopleYouMayKnow from "@/components/home/PeopleYouMayKnow";
 import PopularUsersSection from "@/components/home/PopularUsersSection";
 import JournalsPromoModal from "@/components/home/JournalsPromoModal";
 import HomeSectionHeader from "@/components/home/HomeSectionHeader";
+import FirstReviewPrompt from "@/components/home/FirstReviewPrompt";
 import TileRail from "@/components/TileRail";
 import {
   TileSkeleton,
@@ -241,6 +242,9 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#FFFBEb]">
       <main className="max-w-6xl mx-auto px-4 py-8">
+        {/* New accounts: point them at their first rating */}
+        <FirstReviewPrompt userId={user?.id} />
+
         {/* Happening on Trackboxd — live global feed */}
         {globalActivity.items.length >= 4 && (
           <section className="mb-10">

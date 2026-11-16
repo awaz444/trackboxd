@@ -112,6 +112,39 @@ export default function LetterboxdForMusicPage() {
         </p>
       </Section>
 
+      <Section heading="Which apps are a Letterboxd for music?">
+        <p>
+          Trackboxd is a Letterboxd for music built around rating and reviewing
+          individual songs, not just albums. Other apps people often name for
+          the same idea:
+        </p>
+        <ul className="space-y-2">
+          <li>
+            — <strong>Musicboard</strong>: rating and reviewing albums and
+            artists, with a Letterboxd-style social feed.
+          </li>
+          <li>
+            — <strong>RateYourMusic</strong>: a huge community-built album
+            database, known for its genre taxonomy and charts.
+          </li>
+          <li>
+            — <strong>Album of the Year</strong>: critic and user scores for
+            new releases, collected in one place.
+          </li>
+          <li>
+            — <strong>Rate.fm</strong>: a Letterboxd-style app for rating
+            songs and albums, with a listening diary.
+          </li>
+        </ul>
+        <p>
+          For how each one compares on features,{" "}
+          <Link href="/alternatives" className="underline hover:text-[#5C5537]">
+            see the full comparison
+          </Link>
+          .
+        </p>
+      </Section>
+
       <Faq items={faqs} />
 
       <Section>

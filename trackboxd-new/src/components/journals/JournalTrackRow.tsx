@@ -254,7 +254,10 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                             value={rating}
                             precision={0.5}
                             size="medium"
-                            onChange={(_, v) => setRating(v || 0)}
+                            onChange={(_, v) => {
+                                // Clicking the current value would clear it; keep it.
+                                if (v !== null) setRating(v);
+                            }}
                             icon={<StarIcon className="text-[#5C5537]" fontSize="inherit" />}
                             emptyIcon={<StarIcon style={{ opacity: 0.4 }} fontSize="inherit" />}
                         />
@@ -267,7 +270,12 @@ const JournalTrackRow: React.FC<JournalTrackRowProps> = ({
                         className="w-full text-sm p-2.5 rounded-lg border border-[#5C5537]/20 bg-[#FFFBEb] text-[#5C5537] min-h-[80px] focus:outline-none focus:ring-1 focus:ring-[#5C5537]/40 resize-none"
                     />
                     {error && <p className="text-xs text-red-500">{error}</p>}
-                    <div className="flex justify-end gap-2">
+                    <div className="flex items-center justify-end gap-2">
+                        {!error && (!rating || !text.trim()) && (
+                            <p className="mr-auto text-xs text-[#6B6547]">
+                                {!rating ? "Pick a rating to save." : "Write a few words to save."}
+                            </p>
+                        )}
                         <button
                             type="button"
                             onClick={() => { setShowForm(false); setError(null); }}
