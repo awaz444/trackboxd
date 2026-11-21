@@ -146,6 +146,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
     const [trackResults, setTrackResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isAddingTrack, setIsAddingTrack] = useState(false);
+    const [addTrackError, setAddTrackError] = useState<string | null>(null);
     const [linkCopied, setLinkCopied] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [syncMessage, setSyncMessage] = useState<string | null>(null);
@@ -313,6 +314,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
 
     const handleSearchChange = (value: string) => {
         setTrackSearch(value);
+        setAddTrackError(null);
         if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         if (!value.trim()) {
             searchRequestIdRef.current++;
@@ -325,6 +327,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
 
     const handleAddTrack = async (track: any) => {
         setIsAddingTrack(true);
+        setAddTrackError(null);
         try {
             const res = await fetch(`/api/journals/${journal.id}/items`, {
                 method: "POST",
@@ -332,8 +335,11 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                 body: JSON.stringify({ trackId: track.id }),
             });
             if (!res.ok) {
-                const data = await res.json();
-                if (data.error === "Track already in journal") return;
+                const data = await res.json().catch(() => ({}));
+                if (data.error === "Track already in journal") {
+                    setAddTrackError("That track is already in this journal.");
+                    return;
+                }
                 throw new Error(data.error);
             }
             const newItem = await res.json();
@@ -342,7 +348,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
             setTrackResults([]);
             setShowAddTrack(false);
         } catch {
-            // silently ignore
+            setAddTrackError("Couldn't add that track. Try again.");
         } finally {
             setIsAddingTrack(false);
         }
@@ -557,7 +563,7 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-[#5C5537]">Add a track</p>
-                                <button onClick={() => { setShowAddTrack(false); setTrackSearch(""); setTrackResults([]); }}>
+                                <button aria-label="Close" onClick={() => { setShowAddTrack(false); setTrackSearch(""); setTrackResults([]); setAddTrackError(null); }}>
                                     <X className="w-4 h-4 text-[#6B6547]" />
                                 </button>
                             </div>
@@ -567,11 +573,15 @@ export default function JournalDetailClient({ journal, currentUserId, annotation
                                     type="text"
                                     value={trackSearch}
                                     onChange={(e) => handleSearchChange(e.target.value)}
+                                    autoFocus
                                     placeholder="Search for a track..."
                                     className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-[#5C5537]/20 bg-[#FFFBEb] text-[#5C5537] focus:outline-none focus:ring-1 focus:ring-[#5C5537]/40"
                                 />
                                 {trackSearch.trim() && (
                                     <div className="absolute left-0 right-0 top-full mt-1 bg-[#FFFBEb] rounded-xl shadow-xl z-20 overflow-hidden">
+                                        {addTrackError && (
+                                            <p className="text-xs text-red-500 px-3 pt-2" role="alert">{addTrackError}</p>
+                                        )}
                                         {isSearching ? (
                                             <RowListSkeleton count={3} size="w-9 h-9" className="px-2" />
                                         ) : trackResults.length > 0 ? (

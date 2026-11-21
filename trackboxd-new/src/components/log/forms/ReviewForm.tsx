@@ -558,7 +558,11 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                     precision={0.5}
                                     size="large"
                                     onChange={(event, newValue) => {
-                                        setRating(newValue || 0);
+                                        // MUI clears the rating when you click the value
+                                        // that is already set. Keep it: people click again
+                                        // to confirm, and a cleared rating silently
+                                        // disables "Post Review".
+                                        if (newValue !== null) setRating(newValue);
                                     }}
                                     onChangeActive={(event, newHover) => {
                                         setHover(newHover);
@@ -576,6 +580,13 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                                         />
                                     }
                                 />
+                                <span className="text-sm text-[#6B6547] tabular-nums" aria-live="polite">
+                                    {hover > 0
+                                        ? `${hover} / 5`
+                                        : rating > 0
+                                            ? `${rating} / 5`
+                                            : "Tap a star"}
+                                </span>
                             </div>
                         </div>
 
@@ -598,6 +609,11 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                         {submitError && (
                             <p className="text-red-500 text-sm">
                                 {submitError}
+                            </p>
+                        )}
+                        {!rating && (
+                            <p className="text-xs text-[#6B6547] text-right">
+                                Pick a star rating to post.
                             </p>
                         )}
                         <div className="flex justify-end gap-3">
