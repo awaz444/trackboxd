@@ -21,6 +21,8 @@ const publicRoutes = [
   '/update-password',
   '/auth/auth-code-error',
   '/tracks',
+  '/albums',
+  '/search',
   '/letterboxd-for-music',
   '/alternatives',
   '/song-annotations',

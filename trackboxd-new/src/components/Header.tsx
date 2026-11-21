@@ -246,12 +246,21 @@ const Header: React.FC<HeaderProps> = ({ }) => {
         }
     };
 
-    const navItems = [
-        { label: "Home", href: "/home" },
-        { label: "Activity", href: "/activity" },
-        { label: "Tracks", href: "/tracks" },
-        { label: "Albums", href: "/albums" },
-    ];
+    // /home and /activity are personal feeds that need an account. Logged-out
+    // visitors used to get them in the nav and land on a sign-in wall, so they
+    // only see the pages they can actually browse.
+    const navItems = authUser
+        ? [
+              { label: "Home", href: "/home" },
+              { label: "Activity", href: "/activity" },
+              { label: "Tracks", href: "/tracks" },
+              { label: "Albums", href: "/albums" },
+          ]
+        : [
+              { label: "Home", href: "/" },
+              { label: "Tracks", href: "/tracks" },
+              { label: "Albums", href: "/albums" },
+          ];
 
     const dropdownItems = [
         { label: "Profile", href: `/profile/${user.name}`, icon: User, link: true },
@@ -370,7 +379,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                 </span>
                             </Link>
                         ) : (
-                            <div className="flex items-center gap-3">
+                            <Link href="/" className="flex items-center gap-3">
                                 <div className="h-12 w-auto">
                                     <Image
                                         src="/logo.svg"
@@ -383,7 +392,7 @@ const Header: React.FC<HeaderProps> = ({ }) => {
                                 <span className="hidden md:block text-2xl font-bold text-[#5C5537] tracking-tight mt-1">
                                     Trackboxd
                                 </span>
-                            </div>
+                            </Link>
                         )}
                     </div>
 
