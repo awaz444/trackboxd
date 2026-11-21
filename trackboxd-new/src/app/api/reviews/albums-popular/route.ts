@@ -1,17 +1,11 @@
-import { getServerUser } from "@/lib/supabase/get-server-user";
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export async function GET() {
-  const user = await getServerUser();
-  if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  // Public reviews only (is_public below), shown on /albums to everyone.
 
   try {
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createPublicClient();
 
     const fourteenDaysAgo = new Date(
       Date.now() - 14 * 24 * 60 * 60 * 1000

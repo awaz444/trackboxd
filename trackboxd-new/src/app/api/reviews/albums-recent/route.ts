@@ -1,20 +1,14 @@
-import { getServerUser } from "@/lib/supabase/get-server-user";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
 
-  const user = await getServerUser();
-  if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  // Public reviews only (is_public below), shown on /albums to everyone.
 
   try {
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createPublicClient();
 
     let query = supabase
       .from("reviews")
