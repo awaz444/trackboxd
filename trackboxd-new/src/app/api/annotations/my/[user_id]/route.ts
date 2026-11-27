@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { getRequestUser } from '@/lib/supabase/request-user';
+import { getContentAccess } from '@/lib/supabase/content-access';
 
 export async function GET(
   request: Request,
@@ -19,7 +21,15 @@ export async function GET(
     const cookieStore = cookies();
     const supabase = createClient(cookieStore);
 
-    const { data: annotations, error } = await supabase
+    // Owner sees everything; others see public rows only, and nothing at all
+    // on a private profile they don't follow.
+    const viewer = await getRequestUser(request);
+    const access = await getContentAccess(supabase, userId, viewer?.id);
+    if (!access.canView) {
+      return NextResponse.json([]);
+    }
+
+    let query = supabase
       .from('annotations')
       .select(`
         id,
@@ -40,6 +50,12 @@ export async function GET(
       `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
+
+    if (!access.isOwner) {
+      query = query.eq('is_public', true);
+    }
+
+    const { data: annotations, error } = await query;
 
     if (error) throw error;
 

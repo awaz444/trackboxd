@@ -2,6 +2,7 @@ import { getServerUser } from "@/lib/supabase/get-server-user";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { getContentAccess } from "@/lib/supabase/content-access";
 
 export async function GET(
   request: Request,
@@ -10,6 +11,14 @@ export async function GET(
   try {
     const userId = params.userId;
     const supabase = createClient(cookies());
+
+    // Same rule as the profile page: a private profile's followers are hidden
+    // from anyone who isn't the owner or an accepted follower.
+    const viewer = await getServerUser();
+    const access = await getContentAccess(supabase, userId, viewer?.id);
+    if (!access.canView) {
+      return NextResponse.json([]);
+    }
 
     // Get followers from the database (only accepted follows)
     const { data: followersData, error: followersError } = await supabase

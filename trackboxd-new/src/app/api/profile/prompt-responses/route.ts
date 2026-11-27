@@ -2,6 +2,7 @@ import { getServerUser } from "@/lib/supabase/get-server-user";
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
+import { getContentAccess } from '@/lib/supabase/content-access';
 import { getTrackDetails, getAlbumDetails, getPlaylistDetails } from '@/lib/spotify';
 
 // GET: list responses for a given username or for current user if not provided
@@ -26,6 +27,15 @@ export async function GET(request: Request) {
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Nothing from a private profile the viewer doesn't follow.
+    if (username) {
+      const viewer = await getServerUser();
+      const access = await getContentAccess(supabase, userId, viewer?.id);
+      if (!access.canView) {
+        return NextResponse.json([]);
+      }
     }
 
     const { data: responses, error } = await supabase

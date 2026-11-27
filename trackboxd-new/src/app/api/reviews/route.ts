@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { getRequestUser } from "@/lib/supabase/request-user";
+import { getContentAccess } from "@/lib/supabase/content-access";
 import { getAlbumDetails, getTrackDetails } from "@/lib/spotify";
 import { revalidateItemPages } from "@/lib/revalidate";
 
@@ -35,6 +36,15 @@ export async function GET(req: NextRequest) {
                 .single();
 
             if (error) throw error;
+
+            // A private review, or any review on a private profile the viewer
+            // doesn't follow, is "not found" to everyone but its owner.
+            const viewer = await getRequestUser(req);
+            const access = await getContentAccess(supabase, review.user_id, viewer?.id);
+            if (!access.isOwner && (!access.canView || !review.is_public)) {
+                return NextResponse.json({ error: "Review not found" }, { status: 404 });
+            }
+
             return NextResponse.json(review);
         } catch (error) {
             console.error("GET review error:", error);
@@ -50,10 +60,21 @@ export async function GET(req: NextRequest) {
             const cookieStore = cookies();
             const supabase = createClient(cookieStore);
 
-            const { data: review, error } = await supabase
+            const viewer = await getRequestUser(req);
+            const access = await getContentAccess(supabase, userId, viewer?.id);
+            if (!access.canView) {
+                return NextResponse.json(null);
+            }
+
+            let query = supabase
                 .from("reviews")
                 .select("*")
-                .match({ user_id: userId, item_id: itemId })
+                .match({ user_id: userId, item_id: itemId });
+            if (!access.isOwner) {
+                query = query.eq("is_public", true);
+            }
+
+            const { data: review, error } = await query
                 .order("created_at", { ascending: false })
                 .limit(1)
                 .maybeSingle();
