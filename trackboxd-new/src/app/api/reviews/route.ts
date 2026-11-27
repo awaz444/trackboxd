@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { getAlbumDetails, getTrackDetails } from "@/lib/spotify";
+import { revalidateItemPages } from "@/lib/revalidate";
 
 export async function POST(req: NextRequest) {
     return handleReviewRequest(req, "POST");
@@ -236,6 +237,8 @@ async function createReview(body: any, supabase: any, userId: string) {
         // Commit the transaction - Removed
         // await supabase.rpc('commit');
 
+        revalidateItemPages(itemId, [`/reviews/${review.id}`]);
+
         return NextResponse.json(review, { status: 201 });
     } catch (error) {
         // await supabase.rpc('rollback'); // Removed
@@ -304,6 +307,8 @@ async function updateReview(body: any, supabase: any, userId: string) {
         console.error("Activity creation error:", activityError);
     }
 
+    revalidateItemPages(existingReview.item_id, [`/reviews/${reviewId}`]);
+
     return NextResponse.json(updatedReview);
 }
 
@@ -347,6 +352,8 @@ async function deleteReview(body: any, supabase: any, userId: string) {
         .delete()
         .eq("id", reviewId);
     if (deleteError) throw deleteError;
+
+    revalidateItemPages(existingReview.item_id, [`/reviews/${reviewId}`]);
 
     return NextResponse.json({ success: true });
 }

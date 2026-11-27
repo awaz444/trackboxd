@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
 import { getTrackDetails } from '@/lib/spotify';
 import { createPublicClient } from '@/lib/supabase/public';
 import SongDetailClient from './SongDetailClient';
@@ -7,7 +8,7 @@ import { SITE_URL } from '@/lib/site';
 
 // Public track pages are identical for every visitor, so serve them from the
 // ISR cache and refresh hourly. Keeps TTFB low for crawlers.
-export const revalidate = 3600;
+export const revalidate = 86400; // 1 day; writes call revalidateItemPages()
 
 interface Props {
   params: { song_id: string };
@@ -32,7 +33,10 @@ export async function generateStaticParams() {
   }
 }
 
-async function getTrack(song_id: string) {
+// generateMetadata and the page both need this; cache() runs it once per render.
+const getTrack = cache(loadTrack);
+
+async function loadTrack(song_id: string) {
   try {
     const trackDetails = await getTrackDetails(song_id, { revalidate });
     const supabase = createPublicClient();

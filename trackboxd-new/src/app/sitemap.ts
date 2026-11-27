@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { SITE_URL } from '@/lib/site'
 
 // Refresh the sitemap hourly rather than rebuilding it on every crawler request.
-export const revalidate = 3600
+export const revalidate = 86400 // 1 day
 
 /** Pages with real activity get a higher priority than empty stubs. */
 const engagementPriority = (item: {

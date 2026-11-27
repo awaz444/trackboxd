@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from 'react'
 import { Heart } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface LikeButtonProps {
   type: 'review' | 'annotation'
   id: string
   initialLikeCount: number
-  userId: string | null
+  /** Leave out to use the signed-in user from the browser, which keeps the page cacheable. */
+  userId?: string | null
   variant?: 'dark' | 'light'
 }
 
-export default function LikeButton({ type, id, initialLikeCount, userId, variant = 'dark' }: LikeButtonProps) {
+export default function LikeButton({ type, id, initialLikeCount, userId: userIdProp, variant = 'dark' }: LikeButtonProps) {
+  const { user } = useAuth()
+  const userId = userIdProp !== undefined ? userIdProp : user?.id ?? null
   const [isLiked, setIsLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(initialLikeCount)
   const [isLoading, setIsLoading] = useState(false)

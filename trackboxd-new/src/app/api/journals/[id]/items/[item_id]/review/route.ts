@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { revalidateItemPages } from "@/lib/revalidate";
 
 async function getAuthUser(req: NextRequest, supabase: any, body?: any) {
     const authHeader = req.headers.get("Authorization");
@@ -104,6 +105,7 @@ export async function POST(
             console.error("Journal review update error:", updateError);
             return NextResponse.json({ error: "Internal server error" }, { status: 500 });
         }
+        revalidateItemPages(updated?.item_id, [`/reviews/${journalItem.review_id}`]);
         return NextResponse.json(updated);
     }
 
@@ -146,6 +148,8 @@ export async function POST(
         target_table: "review",
         target_id: review.id,
     });
+
+    revalidateItemPages(trackId, [`/reviews/${review.id}`]);
 
     return NextResponse.json(review, { status: 201 });
 }

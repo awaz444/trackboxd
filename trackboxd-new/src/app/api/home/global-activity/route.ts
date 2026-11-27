@@ -5,7 +5,7 @@ import { getGlobalActivity } from "@/lib/global-activity";
 // as JSON so the logged-in home can fetch it client-side alongside its other
 // section calls. Cached briefly at the edge — the feed is public and shared
 // across users.
-export const revalidate = 180;
+export const revalidate = 1800; // 30 min
 
 export async function GET() {
   const data = await getGlobalActivity();

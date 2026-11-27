@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { getTrackDetails } from "@/lib/spotify";
+import { revalidateItemPages } from "@/lib/revalidate";
 
 export async function POST(req: NextRequest) {
     return handleAnnotationRequest(req, "POST");
@@ -215,6 +216,8 @@ async function createAnnotation(body: any, supabase: any, userId: string) {
         // RPC to increment annotation count (outside transaction) - Removed
         // await supabase.rpc("increment_annotation_count", { item_id: trackId });
 
+        revalidateItemPages(trackId, [`/annotations/${annotation.id}`]);
+
         return NextResponse.json(annotation, { status: 201 });
     } catch (error) {
         // await supabase.rpc('rollback'); // Removed
@@ -302,6 +305,8 @@ async function updateAnnotation(body: any, supabase: any, userId: string) {
         console.error("Activity creation error:", activityError);
     }
 
+    revalidateItemPages(existingAnnotation.track_id, [`/annotations/${annotationId}`]);
+
     return NextResponse.json(updatedAnnotation);
 }
 
@@ -353,6 +358,8 @@ async function deleteAnnotation(body: any, supabase: any, userId: string) {
     // await supabase.rpc("decrement_annotation_count", {
     //    item_id: existingAnnotation.track_id,
     // });
+
+    revalidateItemPages(existingAnnotation.track_id, [`/annotations/${annotationId}`]);
 
     return NextResponse.json({ success: true });
 }

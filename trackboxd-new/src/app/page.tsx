@@ -3,7 +3,7 @@ import GlobalActivity from "@/components/landing/GlobalActivity";
 
 // Landing page is the same for every logged-out visitor, so it is cached and
 // the live-activity feed refreshes every few minutes.
-export const revalidate = 300;
+export const revalidate = 1800; // 30 min
 
 export default function Page() {
   return (

@@ -1,10 +1,10 @@
 import { createPublicClient } from '@/lib/supabase/public';
+import { cache } from 'react';
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Clock, ArrowLeft } from 'lucide-react'
 import Footer from '@/components/Footer'
-import { getServerUser } from '@/lib/supabase/get-server-user'
 import LikeButton from '@/components/share/LikeButton'
 import ShareButton from '@/components/share/ShareButton'
 import { VipBadge } from '@/components/VipBadge'
@@ -12,7 +12,7 @@ import { SITE_URL } from '@/lib/site';
 
 // Public annotation pages are the same for every visitor — serve from the ISR cache
 // so crawlers get a fast response instead of a cold render each time.
-export const revalidate = 3600;
+export const revalidate = 86400; // 1 day; writes call revalidateItemPages()
 
 // Prerender the most recent public annotations; older ones render on demand.
 export async function generateStaticParams() {
@@ -55,7 +55,10 @@ function formatTimestamp(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-async function getAnnotation(id: string) {
+// generateMetadata and the page both need this; cache() runs it once per render.
+const getAnnotation = cache(loadAnnotation);
+
+async function loadAnnotation(id: string) {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('annotations')
@@ -106,10 +109,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function AnnotationPage({ params }: PageProps) {
-  const [annotation, currentUser] = await Promise.all([
-    getAnnotation(params.id),
-    getServerUser(),
-  ])
+  // No server-side user lookup: reading cookies here would make the page
+  // render on every request. LikeButton gets the user in the browser.
+  const annotation = await getAnnotation(params.id)
 
   if (!annotation) notFound()
 
@@ -187,7 +189,6 @@ export default async function AnnotationPage({ params }: PageProps) {
                 type="annotation"
                 id={annotation.id}
                 initialLikeCount={annotation.like_count}
-                userId={currentUser?.id ?? null}
                 variant="light"
               />
               <ShareButton type="annotation" id={annotation.id} variant="light" />
