@@ -44,6 +44,9 @@ next-env.d.ts
 schema.sql
 schema.txt
 *.sql
+# ...except versioned database migrations and their rollbacks
+!trackboxd-new/supabase/migrations/*.sql
+!trackboxd-new/supabase/rollback/*.sql
 dev_plan*.md
 featues.md
 tech_guide.md
