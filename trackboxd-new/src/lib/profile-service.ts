@@ -226,6 +226,41 @@ export async function getProfileByUsername(username: string, currentUserId: stri
         .eq("is_public", true),
     ]);
 
+    const profileUser: ProfileData["user"] = {
+      id: user.id,
+      name: user.name,
+      image_url: user.image_url || undefined,
+      country: user.country || undefined,
+      spotify_url: user.spotify_url || undefined,
+      instagram_url: (user as any).instagram_url || undefined,
+      created_at: user.created_at,
+      profile_private: user.profile_private || false,
+    };
+    const stats: ProfileData["stats"] = {
+      followers: followersCount || 0,
+      following: followingCount || 0,
+      reviews: reviewsCount || 0,
+      annotations: annotationsCount || 0,
+    };
+
+    // Private profile and the viewer isn't the owner or an accepted follower:
+    // header and counts only, same as the profile page shows. Don't fetch or
+    // return the content (this also backs the public /api/profile/[username]).
+    const canView = currentUserId === user.id || !user.profile_private || isFollowing;
+    if (!canView) {
+      return {
+        user: profileUser,
+        stats,
+        favoriteTracks: [],
+        recentActivity: [],
+        likesActivity: [],
+        following: [],
+        isFollowing,
+        followStatus,
+        promptResponses: [],
+      };
+    }
+
     // Get favorite tracks
     const { data: favoriteTracks } = await supabase
       .from("user_favorite_tracks")
@@ -441,22 +476,8 @@ export async function getProfileByUsername(username: string, currentUserId: stri
     } catch (e) {}
 
     return {
-      user: {
-        id: user.id,
-        name: user.name,
-        image_url: user.image_url || undefined,
-        country: user.country || undefined,
-        spotify_url: user.spotify_url || undefined,
-        instagram_url: (user as any).instagram_url || undefined,
-        created_at: user.created_at,
-        profile_private: user.profile_private || false,
-      },
-      stats: {
-        followers: followersCount || 0,
-        following: followingCount || 0,
-        reviews: reviewsCount || 0,
-        annotations: annotationsCount || 0,
-      },
+      user: profileUser,
+      stats,
       favoriteTracks: favoriteTracks?.map((ft: any) => {
         const track = Array.isArray(ft.spotify_items) ? ft.spotify_items[0] : ft.spotify_items;
         return track ? { id: track.id, name: track.name, artist: track.artist, cover_url: track.cover_url } : null;

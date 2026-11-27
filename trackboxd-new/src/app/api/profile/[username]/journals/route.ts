@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { getRequestUser } from "@/lib/supabase/request-user";
+import { getContentAccess } from "@/lib/supabase/content-access";
 
 // GET /api/profile/[username]/journals — public journals for a profile
 export async function GET(
@@ -22,9 +24,14 @@ export async function GET(
         return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if this is the requesting user's own profile
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    const isSelf = authUser?.id === user.id;
+    // Nothing from a private profile the viewer doesn't follow; public
+    // journals only unless it's the owner.
+    const authUser = await getRequestUser(req);
+    const access = await getContentAccess(supabase, user.id, authUser?.id);
+    if (!access.canView) {
+        return NextResponse.json([]);
+    }
+    const isSelf = access.isOwner;
 
     let query = supabase
         .from("journals")

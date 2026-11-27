@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { getTrackDetails } from "@/lib/spotify";
+import { getContentAccess } from "@/lib/supabase/content-access";
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -45,6 +46,11 @@ export async function GET(req: NextRequest) {
 
         // If userId is provided, get their public annotations
         if (userId) {
+            // Nothing from a private profile the viewer doesn't follow.
+            const access = await getContentAccess(supabase, userId, user.id);
+            if (!access.canView) {
+                return NextResponse.json([]);
+            }
             query = query.eq("user_id", userId);
         }
 

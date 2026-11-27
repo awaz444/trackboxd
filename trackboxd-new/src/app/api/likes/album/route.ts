@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { getRequestUser } from "@/lib/supabase/request-user";
+import { canViewUserContent } from "@/lib/supabase/content-access";
 import { getAlbumDetails } from "@/lib/spotify";
 import { enrichItemGenres } from "@/lib/enrichGenres";
 
@@ -25,6 +26,13 @@ export async function GET(req: NextRequest) {
   try {
     const cookieStore = cookies();
     const supabase = createClient(cookieStore);
+
+    // Whether someone liked something is part of their profile: hidden on a
+    // private profile the viewer doesn't follow.
+    const visible = await canViewUserContent(supabase, userId, async () => (await getRequestUser(req))?.id);
+    if (!visible) {
+      return NextResponse.json({ isLiked: false });
+    }
 
     const { data } = await supabase
       .from("likes")

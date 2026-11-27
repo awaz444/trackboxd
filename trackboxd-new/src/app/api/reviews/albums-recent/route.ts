@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPublicClient } from "@/lib/supabase/public";
+import { getRequestUser } from "@/lib/supabase/request-user";
+import { getContentAccess } from "@/lib/supabase/content-access";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -30,6 +32,13 @@ export async function GET(req: NextRequest) {
       .limit(4);
 
     if (userId) {
+      // Nothing from a private profile the viewer doesn't follow. The viewer
+      // is only read here so the unfiltered list stays cookie-free.
+      const viewer = await getRequestUser(req);
+      const access = await getContentAccess(supabase, userId, viewer?.id);
+      if (!access.canView) {
+        return NextResponse.json([]);
+      }
       query = query.eq("user_id", userId);
     }
 

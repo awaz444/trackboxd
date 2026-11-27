@@ -67,7 +67,9 @@ export async function GET(req: NextRequest) {
     const { data: follows, error: followsError } = await supabase
       .from("follows")
       .select("following_id")
-      .eq("follower_id", user.id);
+      .eq("follower_id", user.id)
+      // A pending request to a private profile must not show its activity.
+      .eq("accepted", true);
 
     if (followsError) throw followsError;
 

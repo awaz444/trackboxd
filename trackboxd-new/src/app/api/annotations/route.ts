@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { getRequestUser } from "@/lib/supabase/request-user";
+import { getContentAccess } from "@/lib/supabase/content-access";
 import { getTrackDetails } from "@/lib/spotify";
 import { revalidateItemPages } from "@/lib/revalidate";
 
@@ -35,6 +36,15 @@ export async function GET(req: NextRequest) {
                 .single();
 
             if (error) throw error;
+
+            // A private annotation, or any annotation on a private profile the
+            // viewer doesn't follow, is "not found" to everyone but its owner.
+            const viewer = await getRequestUser(req);
+            const access = await getContentAccess(supabase, annotation.user_id, viewer?.id);
+            if (!access.isOwner && (!access.canView || !annotation.is_public)) {
+                return NextResponse.json({ error: "Annotation not found" }, { status: 404 });
+            }
+
             return NextResponse.json(annotation);
         } catch (error) {
             console.error("GET annotation error:", error);
@@ -50,10 +60,21 @@ export async function GET(req: NextRequest) {
             const cookieStore = cookies();
             const supabase = createClient(cookieStore);
 
-            const { data: annotations, error } = await supabase
+            const viewer = await getRequestUser(req);
+            const access = await getContentAccess(supabase, userId, viewer?.id);
+            if (!access.canView) {
+                return NextResponse.json([]);
+            }
+
+            let query = supabase
                 .from("annotations")
                 .select("*")
                 .match({ user_id: userId, track_id: trackId });
+            if (!access.isOwner) {
+                query = query.eq("is_public", true);
+            }
+
+            const { data: annotations, error } = await query;
 
             return NextResponse.json(annotations || []);
         } catch (error) {

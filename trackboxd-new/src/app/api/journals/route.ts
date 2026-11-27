@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { getRequestUser } from "@/lib/supabase/request-user";
+import { getContentAccess } from "@/lib/supabase/content-access";
 import { getPlaylistDetails, getPlaylistItems, getTrackDetails } from "@/lib/spotify";
 
 // Identity comes from the Bearer token or session cookie, never from a
@@ -23,7 +24,13 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "userId is required" }, { status: 400 });
     }
 
-    const isSelf = currentUser?.id === targetUserId;
+    // Nothing from a private profile the viewer doesn't follow; public
+    // journals only unless it's the owner.
+    const access = await getContentAccess(supabase, targetUserId, currentUser?.id);
+    if (!access.canView) {
+        return NextResponse.json([]);
+    }
+    const isSelf = access.isOwner;
 
     let query = supabase
         .from("journals")
