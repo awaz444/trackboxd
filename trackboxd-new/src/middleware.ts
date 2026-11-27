@@ -43,10 +43,28 @@ export async function middleware(request: NextRequest) {
   return supabaseResponse;
 }
 
+// Vercel bills every middleware invocation, including the early return above,
+// and before this change it ran on nearly every request (crawlers included).
+// It only has work to do when a signed-in user hits a server route that reads
+// the session, so the matcher now requires both:
+// - the Supabase auth cookie. @supabase/ssr names it sb-<project ref>-auth-token
+//   and splits it into .0/.1 chunks when large, so both names are listed.
+//   UPDATE THE REF HERE if the app moves to another Supabase project, or
+//   sessions will stop refreshing on the server.
+// - an API route (except the /api/share/ preview images), or one of the pages
+//   that call getServerUser() while rendering: /my-likes, /profile/*,
+//   /journals/*. Every other page is static or reads the user in the browser,
+//   where the Supabase browser client refreshes the token itself.
+// Matcher values must be literals: Next.js reads them at build time.
 export const config = {
-  // Skip files bots fetch constantly that never need a session: robots.txt,
-  // sitemap.xml and the link-preview images under /api/share/.
   matcher: [
-    "/((?!ingest|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|api/share/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)",
+    {
+      source: "/((?:api/(?!share/)|my-likes|profile/|journals/).*)",
+      has: [{ type: "cookie", key: "sb-qufdjlaxzyarnrsiimfw-auth-token" }],
+    },
+    {
+      source: "/((?:api/(?!share/)|my-likes|profile/|journals/).*)",
+      has: [{ type: "cookie", key: "sb-qufdjlaxzyarnrsiimfw-auth-token.0" }],
+    },
   ],
 };
