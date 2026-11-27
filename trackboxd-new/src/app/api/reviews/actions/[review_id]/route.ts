@@ -2,12 +2,18 @@ import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { revalidateItemPages } from '@/lib/revalidate';
+import { getRequestUser } from '@/lib/supabase/request-user';
 
 export async function DELETE(
   request: Request,
   { params }: { params: { review_id: string } }
 ) {
   const reviewId = params.review_id;
+
+  const authUser = await getRequestUser(request);
+  if (!authUser) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
 
   if (!reviewId) {
     return NextResponse.json(
@@ -23,7 +29,7 @@ export async function DELETE(
     // Fetch review first to get item_id
     const { data: existingReview, error: fetchError } = await supabase
         .from('reviews')
-        .select('item_id')
+        .select('item_id, user_id')
         .eq('id', reviewId)
         .single();
 
@@ -34,10 +40,18 @@ export async function DELETE(
         );
     }
 
+    if (existingReview.user_id !== authUser.id) {
+        return NextResponse.json(
+            { error: "Unauthorized to delete this review" },
+            { status: 403 }
+        );
+    }
+
     const { error } = await supabase
       .from('reviews')
       .delete()
-      .eq('id', reviewId);
+      .eq('id', reviewId)
+      .eq('user_id', authUser.id);
 
     if (error) throw error;
 
@@ -62,7 +76,13 @@ export async function PUT(
     { params }: { params: { review_id: string } }
   ) {
     const reviewId = params.review_id;
-    const body = await request.json();
+
+    const authUser = await getRequestUser(request);
+    if (!authUser) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+
+    const body = await request.json().catch(() => ({}));
   
     if (!reviewId) {
       return NextResponse.json(
@@ -84,6 +104,22 @@ export async function PUT(
       const cookieStore = cookies();
       const supabase = createClient(cookieStore);
   
+    const { data: existingReview, error: fetchError } = await supabase
+      .from('reviews')
+      .select('user_id')
+      .eq('id', reviewId)
+      .single();
+
+    if (fetchError || !existingReview) {
+      return NextResponse.json({ error: "Review not found" }, { status: 404 });
+    }
+    if (existingReview.user_id !== authUser.id) {
+      return NextResponse.json(
+        { error: "Unauthorized to update this review" },
+        { status: 403 }
+      );
+    }
+
     const { data: updatedReview, error } = await supabase
       .from('reviews')
       .update({
@@ -93,6 +129,7 @@ export async function PUT(
         updated_at: new Date().toISOString()
       })
       .eq('id', reviewId)
+      .eq('user_id', authUser.id)
       .select('item_id')
       .single();
 

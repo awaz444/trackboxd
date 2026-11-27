@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { getRequestUser } from "@/lib/supabase/request-user";
 import { getTrackDetails } from "@/lib/spotify";
 import { revalidateItemPages } from "@/lib/revalidate";
 
@@ -78,29 +79,20 @@ async function handleAnnotationRequest(
 ) {
     const cookieStore = cookies();
     const supabase = createClient(cookieStore);
-    const body = await req.json();
-    let authUser;
-
-    const authHeader = req.headers.get("Authorization");
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-        const token = authHeader.split(" ")[1];
-        const {
-            data: { user },
-            error,
-        } = await supabase.auth.getUser(token);
-        if (error) console.error("Token validation error:", error);
-        else authUser = user;
-    }
-
-    if (!authUser && body?.userId) {
-        authUser = { id: body.userId };
-    }
+    // Identity comes from the Bearer token or session cookie, never from the
+    // body: a client-sent userId is ignored.
+    const authUser = await getRequestUser(req);
 
     if (!authUser) {
         return NextResponse.json(
             { error: "Authentication required" },
             { status: 401 }
         );
+    }
+
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
 
     try {
