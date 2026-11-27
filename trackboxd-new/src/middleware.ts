@@ -44,7 +44,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Skip files bots fetch constantly that never need a session: robots.txt,
+  // sitemap.xml and the link-preview images under /api/share/.
   matcher: [
-    "/((?!ingest|_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!ingest|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|api/share/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)",
   ],
 };

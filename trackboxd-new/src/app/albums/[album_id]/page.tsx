@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
 import { getAlbumDetails } from '@/lib/spotify';
 import { createPublicClient } from '@/lib/supabase/public';
 import AlbumDetailClient from './AlbumDetailClient';
@@ -7,7 +8,7 @@ import { SITE_URL } from '@/lib/site';
 
 // Public album pages are the same for every visitor — serve from the ISR cache
 // so crawlers get a fast response instead of a cold render each time.
-export const revalidate = 3600;
+export const revalidate = 86400; // 1 day; writes call revalidateItemPages()
 
 // Prerender the albums that already have activity; the rest render on demand
 // and are cached for `revalidate` seconds.
@@ -31,7 +32,10 @@ interface Props {
   params: { album_id: string };
 }
 
-async function getAlbum(album_id: string) {
+// generateMetadata and the page both need this; cache() runs it once per render.
+const getAlbum = cache(loadAlbum);
+
+async function loadAlbum(album_id: string) {
   try {
     const albumDetails = await getAlbumDetails(album_id, { revalidate });
   const supabase = createPublicClient();

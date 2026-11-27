@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { revalidateItemPages } from '@/lib/revalidate';
 
 export async function DELETE(
   request: Request,
@@ -39,6 +40,8 @@ export async function DELETE(
       .eq('id', reviewId);
 
     if (error) throw error;
+
+    revalidateItemPages(existingReview.item_id, [`/reviews/${reviewId}`]);
 
     return NextResponse.json(
       { message: "Review deleted successfully" },
@@ -94,6 +97,8 @@ export async function PUT(
       .single();
 
     if (error) throw error;
+
+    revalidateItemPages(updatedReview?.item_id, [`/reviews/${reviewId}`]);
 
     return NextResponse.json(
       { message: "Review updated successfully" },

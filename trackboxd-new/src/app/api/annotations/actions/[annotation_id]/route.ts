@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { revalidateItemPages } from '@/lib/revalidate';
 
 export async function PUT(
   request: Request,
@@ -29,7 +30,7 @@ export async function PUT(
     const cookieStore = cookies();
     const supabase = createClient(cookieStore);
 
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from('annotations')
       .update({
         text,
@@ -37,9 +38,13 @@ export async function PUT(
         is_public: isPublic,
         updated_at: new Date().toISOString()
       })
-      .eq('id', annotationId);
+      .eq('id', annotationId)
+      .select('track_id')
+      .maybeSingle();
 
     if (error) throw error;
+
+    revalidateItemPages(updated?.track_id, [`/annotations/${annotationId}`]);
 
     return NextResponse.json(
       { message: "Annotation updated successfully" },

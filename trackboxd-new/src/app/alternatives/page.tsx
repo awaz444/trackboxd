@@ -6,7 +6,7 @@ import { MarketingPage, Section, Faq, faqSchema } from "@/components/marketing/M
 // Switch from static prerender to 5-minute ISR so Vercel regenerates the
 // route on request instead of serving a stuck edge-cached HTML from a
 // previous build. The content is still cached, just revalidated.
-export const revalidate = 300;
+export const revalidate = 3600; // 1 hour
 
 export const metadata: Metadata = {
   title: "Musicboard & RYM Alternatives: Trackboxd Compared",

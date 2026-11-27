@@ -1,11 +1,11 @@
 import { createPublicClient } from '@/lib/supabase/public';
+import { cache } from 'react';
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import RatingStars from '@/components/RatingStars'
 import Footer from '@/components/Footer'
-import { getServerUser } from '@/lib/supabase/get-server-user'
 import LikeButton from '@/components/share/LikeButton'
 import ShareButton from '@/components/share/ShareButton'
 import { VipBadge } from '@/components/VipBadge'
@@ -14,7 +14,7 @@ import SignupPrompt from '@/components/SignupPrompt'
 
 // Public review pages are the same for every visitor — serve from the ISR cache
 // so crawlers get a fast response instead of a cold render each time.
-export const revalidate = 3600;
+export const revalidate = 86400; // 1 day; writes call revalidateItemPages()
 
 // Prerender the most recent public reviews; older ones render on demand.
 export async function generateStaticParams() {
@@ -51,7 +51,10 @@ function formatTimeAgo(dateString: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 }
 
-async function getReview(id: string) {
+// generateMetadata and the page both need this; cache() runs it once per render.
+const getReview = cache(loadReview);
+
+async function loadReview(id: string) {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('reviews')
@@ -102,10 +105,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ReviewPage({ params }: PageProps) {
-  const [review, currentUser] = await Promise.all([
-    getReview(params.id),
-    getServerUser(),
-  ])
+  // No server-side user lookup: reading cookies here would make the page
+  // render on every request. LikeButton gets the user in the browser.
+  const review = await getReview(params.id)
 
   if (!review) notFound()
 
@@ -185,7 +187,6 @@ export default async function ReviewPage({ params }: PageProps) {
                   type="review"
                   id={review.id}
                   initialLikeCount={review.like_count}
-                  userId={currentUser?.id ?? null}
                   variant="light"
                 />
                 <ShareButton type="review" id={review.id} variant="light" />

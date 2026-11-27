@@ -77,28 +77,41 @@ const Header: React.FC<HeaderProps> = ({ }) => {
     const mobileSearchContainerRef = useRef<HTMLDivElement>(null);
     const [unreadCount, setUnreadCount] = useState(0);
 
+    const authUserId = authUser?.id;
     useEffect(() => {
-        if (authUser) {
-            const fetchNotifications = async () => {
-                try {
-                    const res = await fetch("/api/notifications");
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (Array.isArray(data)) {
-                            setUnreadCount(data.filter((n: any) => !n.is_read).length);
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error fetching notifications:", error);
-                }
-            };
-            fetchNotifications();
+        if (!authUserId) return;
 
-            // Poll every minute for new notifications
-            const interval = setInterval(fetchNotifications, 60000);
-            return () => clearInterval(interval);
-        }
-    }, [authUser]);
+        let lastFetch = 0;
+        const fetchUnreadCount = async () => {
+            // Background tabs don't poll; each call is a server function run.
+            if (document.visibilityState !== "visible") return;
+            lastFetch = Date.now();
+            try {
+                const res = await fetch("/api/notifications/unread-count");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (typeof data?.count === "number") setUnreadCount(data.count);
+                }
+            } catch (error) {
+                console.error("Error fetching notifications:", error);
+            }
+        };
+        fetchUnreadCount();
+
+        // Check every 5 minutes while the tab is visible, and when the
+        // person comes back to the tab after at least a minute away.
+        const interval = setInterval(fetchUnreadCount, 5 * 60 * 1000);
+        const onVisible = () => {
+            if (document.visibilityState === "visible" && Date.now() - lastFetch > 60 * 1000) {
+                fetchUnreadCount();
+            }
+        };
+        document.addEventListener("visibilitychange", onVisible);
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener("visibilitychange", onVisible);
+        };
+    }, [authUserId]);
 
     // Search handler with debounce
     useEffect(() => {

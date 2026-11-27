@@ -2,13 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { sendNotificationEmail } from '@/lib/email';
+import { revalidateItemPages } from '@/lib/revalidate';
 
 export async function POST(req: NextRequest) {
-  return handleAnnotationLikeRequest(req, 'POST');
+  return likeAndRevalidate(req, 'POST');
 }
 
 export async function DELETE(req: NextRequest) {
-  return handleAnnotationLikeRequest(req, 'DELETE');
+  return likeAndRevalidate(req, 'DELETE');
+}
+
+// The annotations page is cached for a day; rebuild it when its like count changes.
+async function likeAndRevalidate(req: NextRequest, method: 'POST' | 'DELETE') {
+  const body = await req.clone().json().catch(() => null);
+  const res = await handleAnnotationLikeRequest(req, method);
+  if (res.ok && body?.annotationId) revalidateItemPages(null, [`/annotations/${body.annotationId}`]);
+  return res;
 }
 
 export async function GET(req: NextRequest) {
