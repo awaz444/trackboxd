@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { getRequestUser } from "@/lib/supabase/request-user";
 import { getPlaylistItems } from "@/lib/spotify";
 
-async function getAuthUser(req: NextRequest, supabase: any, body?: any) {
-    const authHeader = req.headers.get("Authorization");
-    if (authHeader?.startsWith("Bearer ")) {
-        const token = authHeader.split(" ")[1];
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-        if (!error && user) return user;
-    }
-    if (body?.userId) return { id: body.userId };
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
+// Identity comes from the Bearer token or session cookie, never from a
+// client-sent userId.
+async function getAuthUser(req: NextRequest, _supabase?: any, _body?: any) {
+    return getRequestUser(req);
 }
 
 // POST /api/journals/[id]/resync — refetch the live Spotify playlist and bring

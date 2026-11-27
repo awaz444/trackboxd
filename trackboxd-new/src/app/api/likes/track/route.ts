@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
+import { getRequestUser } from '@/lib/supabase/request-user';
 import { getTrackDetails } from '@/lib/spotify';
 import { enrichItemGenres } from '@/lib/enrichGenres';
 
@@ -45,7 +46,14 @@ export async function GET(req: NextRequest) {
 }
 
 async function handleLikeRequest(req: NextRequest, method: 'POST' | 'DELETE') {
-  const { userId, trackId } = await req.json();
+  // Identity comes from the Bearer token or session cookie; a client-sent
+  // userId is ignored so nobody can like or unlike as another user.
+  const authUser = await getRequestUser(req);
+  if (!authUser) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+  const userId = authUser.id;
+  const { trackId } = (await req.json().catch(() => ({}))) ?? {};
 
   if (!userId || !trackId) {
     return NextResponse.json(
